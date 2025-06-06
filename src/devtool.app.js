@@ -1,5 +1,5 @@
 import React from 'react';
-import { createRoot } from 'react-dom/client';
+import ReactDOM from 'react-dom/client';
 import 'reset-css/reset.css';
 import './global.scss';
 import App from './devtoolApp';
@@ -311,7 +311,7 @@ window.onload = async () => {
       const container = document.getElementById('root');
       if (container) {
         try {
-          const root = createRoot(container);
+          const root = ReactDOM.createRoot(container);
           root.render(<App />);
           console.log(`[DEVTOOLS]: React app initialized successfully in ${mode} mode`);
           
