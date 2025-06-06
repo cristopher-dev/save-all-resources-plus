@@ -2,25 +2,15 @@
 
 const init = () => {
   try {
-    const version = localStorage.getItem('resources-saver-version');
-    if (version === '2') {
-      return chrome.devtools.panels.create('Web Resource Vault', 'icon.gif', 'devtool.app.html', function (panel) {
-        console.log('Content is loaded to panel', panel);
-      });
-    }
-
-    if (version === '0.1.9') {
-      return chrome.devtools.panels.create('Web Resource Vault', 'icon.gif', 'legacy/0.1.9/devtool.app.html', function (panel) {
-        console.log('Content is loaded to panel', panel);
-      });
-    }
-
-    return chrome.devtools.panels.create('Web Resource Vault', 'icon.gif', 'legacy/0.1.8/devtool.app.html', function (panel) {
-      console.log('Content is loaded to panel', panel);
+    // Usar directamente la versión 2.0.6 (versión actual)
+    return chrome.devtools.panels.create('Web Resource Vault', 'icon.png', 'devtool.app.html', function (panel) {
+      console.log('Web Resource Vault panel loaded successfully', panel);
     });
-  } catch {
-    return chrome.devtools.panels.create('Web Resource Vault', 'icon.gif', 'legacy/0.1.8/devtool.app.html', function (panel) {
-      console.log('Content is loaded to panel', panel);
+  } catch (error) {
+    console.error('Error creating Web Resource Vault panel:', error);
+    // Fallback en caso de error
+    return chrome.devtools.panels.create('Web Resource Vault', 'icon.png', 'devtool.app.html', function (panel) {
+      console.log('Web Resource Vault panel loaded (fallback)', panel);
     });
   }
 };

@@ -390,55 +390,6 @@ a:hover {
   color: red;
 }
 
-.switch-version-title {
-  margin-top: 24px;
-  font-size: 18px;
-  font-weight: 600;
-  color: #374151;
-  display: flex;
-  align-items: center;
-}
-
-.switch-version-title::before {
-  content: '⚙️';
-  margin-right: 8px;
-  font-size: 16px;
-}
-
-.switch-version-container {
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: stretch;
-  gap: 8px;
-  margin-top: 12px;
-}
-
-.switch-version-btn {
-  background: linear-gradient(135deg, #f7fafc, #edf2f7);
-  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-  padding: 12px 20px;
-  border-radius: 10px;
-  cursor: pointer;
-  border: 2px solid rgba(102, 126, 234, 0.2);
-  font-weight: 600;
-  color: #4a5568;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
-.switch-version-btn:hover {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(102, 126, 234, 0.4);
-}
-
-.switch-version-btn.active {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-  border-color: #667eea;
-  box-shadow: 0 10px 25px -5px rgba(102, 126, 234, 0.4);
-}
-
 /* Instruction Cards */
 .instruction-card {
   margin: 20px 0;
@@ -509,13 +460,6 @@ a:hover {
   margin: 0;
 }
 
-/* Switch Version Section */
-.switch-version-section {
-  margin-top: 32px;
-  padding-top: 24px;
-  border-top: 2px solid rgba(102, 126, 234, 0.1);
-}
-
 /* Footer */
 .footer {
   margin-top: 24px;
@@ -541,12 +485,8 @@ a:hover {
   animation-delay: 0.3s;
 }
 
-.switch-version-section {
-  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
-}
-
 .footer {
-  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
+  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
 }
 
 /* Animaciones adicionales */
@@ -597,13 +537,13 @@ a:hover {
   }
 }
 
-/* Loading state para botones */
-.switch-version-btn.loading {
+/* Loading state */
+.loading {
   position: relative;
   color: transparent;
 }
 
-.switch-version-btn.loading::after {
+.loading::after {
   content: '';
   position: absolute;
   width: 16px;
@@ -691,7 +631,6 @@ a:hover {
 }
 
 /* Focus styles for accessibility */
-.switch-version-btn:focus,
 .sub-title:focus {
   outline: 2px solid #667eea;
   outline-offset: 2px;

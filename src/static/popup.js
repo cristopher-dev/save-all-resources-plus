@@ -2,30 +2,11 @@
 
 // Añadir efectos de hover y animaciones mejoradas
 const addInteractiveEffects = () => {
-  // Efecto de partículas en el fondo (opcional)
-  const createParticle = () => {
-    const particle = document.createElement('div');
-    particle.style.cssText = `
-      position: absolute;
-      width: 4px;
-      height: 4px;
-      background: linear-gradient(45deg, #667eea, #764ba2);
-      border-radius: 50%;
-      pointer-events: none;
-      opacity: 0.6;
-      animation: float 3s ease-in-out infinite;
-    `;
-    
-    particle.style.left = Math.random() * 100 + '%';
-    particle.style.animationDelay = Math.random() * 3 + 's';
-    
-    return particle;
-  };
-
   // Agregar efectos de hover a los steps
   document.querySelectorAll('.step').forEach((step, index) => {
     step.addEventListener('mouseenter', () => {
       step.style.transform = 'translateY(-4px) scale(1.02)';
+      step.style.transition = 'all 0.3s ease';
     });
     
     step.addEventListener('mouseleave', () => {
@@ -33,22 +14,46 @@ const addInteractiveEffects = () => {
     });
   });
 
-  // Agregar efecto de ripple a los botones
-  document.querySelectorAll('.switch-version-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const ripple = document.createElement('span');
-      const rect = btn.getBoundingClientRect();
-      const size = Math.max(rect.width, rect.height);
-      const x = e.clientX - rect.left - size / 2;
-      const y = e.clientY - rect.top - size / 2;
+  // Agregar animación suave al título
+  const heading = document.querySelector('.heading');
+  if (heading) {
+    heading.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+    heading.style.webkitBackgroundClip = 'text';
+    heading.style.webkitTextFillColor = 'transparent';
+    heading.style.backgroundClip = 'text';
+  }
+
+  // Agregar efectos sutiles a los iconos
+  document.querySelectorAll('.step-icon').forEach(icon => {
+    icon.addEventListener('mouseenter', () => {
+      icon.style.transform = 'rotate(10deg) scale(1.1)';
+      icon.style.transition = 'transform 0.3s ease';
+    });
+    
+    icon.addEventListener('mouseleave', () => {
+      icon.style.transform = 'rotate(0deg) scale(1)';
+    });
+  });
+};
+
+window.onload = () => {
+  // Inicializar efectos interactivos
+  addInteractiveEffects();
+
+  // Agregar animación de entrada escalonada
+  setTimeout(() => {
+    document.querySelectorAll('.step').forEach((step, index) => {
+      step.style.opacity = '0';
+      step.style.transform = 'translateY(20px)';
+      step.style.transition = 'all 0.5s ease';
       
-      ripple.style.cssText = `
-        position: absolute;
-        width: ${size}px;
-        height: ${size}px;
-        left: ${x}px;
-        top: ${y}px;
-        background: rgba(255, 255, 255, 0.3);
+      setTimeout(() => {
+        step.style.opacity = '1';
+        step.style.transform = 'translateY(0)';
+      }, 100 + index * 150);
+    });
+  }, 100);
+};
         border-radius: 50%;
         transform: scale(0);
         animation: ripple 0.6s ease-out;
