@@ -26,6 +26,7 @@ import EnhancedCompression from './EnhancedCompression';
 import SystemNotifications from './SystemNotifications';
 import ProxyConfiguration from './ProxyConfiguration';
 import IntegrityValidation from './IntegrityValidation';
+import ExportOptions from './ExportOptions';
 import { FaTrash } from 'react-icons/fa';
 import { MdDownloading } from 'react-icons/md';
 
@@ -64,6 +65,7 @@ export const DownloadList = () => {
       <SystemNotifications />
       <ProxyConfiguration />
       <IntegrityValidation />
+      <ExportOptions />
       <DownloadListHeader>Download List:</DownloadListHeader>
       <DownloadListContainer>
         {downloadList.map((item, index) => {

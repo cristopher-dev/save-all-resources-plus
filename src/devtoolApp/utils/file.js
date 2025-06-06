@@ -275,3 +275,221 @@ export const applyAdvancedFilters = (resources, filters) => {
     return true;
   });
 };
+
+// Función para descargar un archivo individual
+export const downloadIndividualFile = (resource, options = {}) => {
+  return new Promise((resolve) => {
+    try {
+      let content = resource.content;
+      let mimeType = resource.mimeType || 'application/octet-stream';
+      let filename = resource.saveAs?.name || resource.url.split('/').pop() || 'resource';
+
+      // Procesar contenido según el encoding
+      if (resource.encoding === 'base64') {
+        const binaryString = atob(content);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        content = bytes;
+      }
+
+      // Crear blob y descargar
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      resolve({ success: true, filename });
+    } catch (error) {
+      console.error('Error downloading individual file:', error);
+      resolve({ success: false, error: error.message });
+    }
+  });
+};
+
+// Función para descargar múltiples archivos individuales
+export const downloadMultipleIndividualFiles = async (resources, options = {}, progressCallback = null) => {
+  const results = [];
+  const total = resources.length;
+  
+  for (let i = 0; i < resources.length; i++) {
+    const resource = resources[i];
+    const result = await downloadIndividualFile(resource, options);
+    results.push(result);
+    
+    if (progressCallback) {
+      progressCallback({
+        current: i + 1,
+        total,
+        percentage: Math.round((i + 1) / total * 100),
+        resource,
+        result
+      });
+    }
+    
+    // Pausa entre descargas para evitar bloqueos del navegador
+    if (i < resources.length - 1) {
+      await new Promise(resolve => setTimeout(resolve, options.delay || 200));
+    }
+  }
+  
+  return results;
+};
+
+// Función para agrupar recursos por tipo
+export const groupResourcesByType = (resources) => {
+  const groups = {};
+  
+  resources.forEach(resource => {
+    const type = getFileType(resource.url, resource.mimeType);
+    if (!groups[type]) {
+      groups[type] = [];
+    }
+    groups[type].push(resource);
+  });
+  
+  return groups;
+};
+
+// Función para crear ZIP por grupo
+export const downloadResourcesByGroups = async (resources, options = {}, progressCallback = null) => {
+  const groups = groupResourcesByType(resources);
+  const groupKeys = Object.keys(groups);
+  const results = [];
+  
+  for (let i = 0; i < groupKeys.length; i++) {
+    const groupType = groupKeys[i];
+    const groupResources = groups[groupType];
+    
+    if (groupResources.length === 0) continue;
+    
+    try {
+      const filteredResources = applyAdvancedFilters(groupResources, options.advancedFilters);
+      const toDownload = resolveDuplicatedResources(filteredResources);
+      
+      if (toDownload.length > 0) {
+        await new Promise((resolve) => {
+          const blobWrite = new zip.BlobWriter('application/zip');
+          const zipWriter = new zip.ZipWriter(blobWrite);
+          
+          addItemsToZipWriter(
+            zipWriter,
+            toDownload,
+            options,
+            (item, isDone) => {
+              // Callback para cada archivo procesado
+            },
+            () => {
+              zipWriter.close();
+              blobWrite.getData().then((blob) => {
+                // Descargar el ZIP del grupo
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${groupType}-resources.zip`;
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                results.push({
+                  group: groupType,
+                  count: toDownload.length,
+                  success: true
+                });
+                
+                resolve();
+              });
+            }
+          );
+        });
+      }
+    } catch (error) {
+      console.error(`Error creating ZIP for group ${groupType}:`, error);
+      results.push({
+        group: groupType,
+        count: groupResources.length,
+        success: false,
+        error: error.message
+      });
+    }
+    
+    if (progressCallback) {
+      progressCallback({
+        current: i + 1,
+        total: groupKeys.length,
+        percentage: Math.round((i + 1) / groupKeys.length * 100),
+        group: groupType,
+        results
+      });
+    }
+    
+    // Pausa entre grupos
+    if (i < groupKeys.length - 1) {
+      await new Promise(resolve => setTimeout(resolve, options.delay || 500));
+    }
+  }
+  
+  return results;
+};
+
+// Función para exportar recursos con diferentes opciones
+export const exportResources = async (resources, exportOptions = {}, progressCallback = null) => {
+  const {
+    mode = 'global', // 'global', 'individual', 'groups'
+    format = 'zip',
+    filters = {},
+    beautifyFile = false,
+    ignoreNoContentFile = true,
+    separateByDomain = false,
+    delay = 200
+  } = exportOptions;
+  
+  const filteredResources = applyAdvancedFilters(resources, filters);
+  
+  switch (mode) {
+    case 'individual':
+      return await downloadMultipleIndividualFiles(
+        filteredResources, 
+        { delay, beautifyFile, ignoreNoContentFile }, 
+        progressCallback
+      );
+      
+    case 'groups':
+      return await downloadResourcesByGroups(
+        filteredResources,
+        { delay, beautifyFile, ignoreNoContentFile, advancedFilters: filters },
+        progressCallback
+      );
+      
+    case 'global':
+    default:
+      return new Promise((resolve) => {
+        const toDownload = resolveDuplicatedResources(filteredResources);
+        downloadZipFile(
+          toDownload,
+          { ignoreNoContentFile, beautifyFile },
+          (item, isDone) => {
+            if (progressCallback) {
+              const processed = toDownload.length - toDownload.indexOf(item);
+              progressCallback({
+                current: processed,
+                total: toDownload.length,
+                percentage: Math.round(processed / toDownload.length * 100),
+                item,
+                isDone
+              });
+            }
+          },
+          () => {
+            resolve({ success: true, count: toDownload.length });
+          }
+        );
+      });
+  }
+};
