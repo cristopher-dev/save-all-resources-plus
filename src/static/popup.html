@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web Resource Vault - Popup</title>
     <link href="fonts/styles.css" rel="stylesheet" type="text/css" />
     <link href="popup.css" rel="stylesheet" type="text/css" />
@@ -8,32 +10,47 @@
 
   <body class="popup-body">
     <div class="up-popup">
-      <h2 class="heading">Instruction</h2>
-      <ul>
-        <li>
-          The extension works in devtool environment, so it can read the resources' information. You will need to
-          <span class="success">restart your browser</span> or re-open developer tool panel, and switch to the
-          <span class="success">Web Resource Vault</span> tab.
-        </li>
-        <li>
-          ResourceSaver tab won't be available in devtool panel while your current tab is on url
-          <span class="success">https://chrome.google.com/*</span>
-        </li>
+      <h2 class="heading">📚 Instrucciones</h2>
+      <div class="instruction-card">
+        <div class="step">
+          <div class="step-icon">🛠️</div>
+          <div class="step-content">
+            <h3>Entorno de Herramientas de Desarrollo</h3>
+            <p>La extensión funciona en el entorno de herramientas de desarrollo para leer la información de recursos. Necesitarás <span class="success">reiniciar tu navegador</span> o reabrir el panel de herramientas de desarrollo, y cambiar a la pestaña <span class="success">Web Resource Vault</span>.</p>
+          </div>
+        </div>
+        
+        <div class="step">
+          <div class="step-icon">🚫</div>
+          <div class="step-content">
+            <h3>Limitaciones de URL</h3>
+            <p>La pestaña ResourceSaver no estará disponible en el panel de herramientas de desarrollo mientras tu pestaña actual esté en la URL <span class="success">https://chrome.google.com/*</span></p>
+          </div>
+        </div>
+        
+        <div class="step">
+          <div class="step-icon">🕵️</div>
+          <div class="step-content">
+            <h3>Modo Incógnito</h3>
+            <p>No funciona en modo incógnito. Necesitas <span class="success">reiniciar</span> el panel de herramientas de desarrollo para cambiar de versión.</p>
+          </div>
+        </div>
+      </div>
 
-        <li class="switch-version-title">
-          <span>Switch Version</span>
-        </li>
-        <li>
-          It is not working in incognito mode. You need to <span class="success">restart</span> devtool panel in order to switch version
-        </li>
-        <li class="switch-version-container">
-          <div id="switch-version-2" class="switch-version-btn">2.0.6</div>
-          <div id="switch-version-1-9" class="switch-version-btn">0.1.9</div>
-          <div id="switch-version-1-8" class="switch-version-btn">0.1.8</div>
-        </li>
-      </ul>
-      <div>
-        <a class="sub-title" href="#" target="_blank">Web Resource Vault</a>
+      <div class="switch-version-section">
+        <div class="switch-version-title">
+          <span>Cambiar Versión</span>
+        </div>
+        <div class="switch-version-container">
+          <div id="switch-version-2" class="switch-version-btn active">2.0.6</div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <a class="sub-title" href="#" target="_blank">
+          <span class="vault-icon">🔐</span>
+          Web Resource Vault
+        </a>
       </div>
     </div>
     <div id="debug"></div>
