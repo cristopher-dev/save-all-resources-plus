@@ -58,8 +58,8 @@ export const HeaderTitle = styled.h3`
 `;
 
 export const StatusBadge = styled.span`
-  background: ${props => props.active ? props.theme.success : props.theme.border};
-  color: ${props => props.active ? '#fff' : props.theme.text};
+  background: ${props => props.$active ? props.theme.success : props.theme.border};
+  color: ${props => props.$active ? '#fff' : props.theme.text};
   padding: 4px 8px;
   border-radius: 12px;
   font-size: 12px;
@@ -92,9 +92,9 @@ export const HashTypeSelector = styled.div`
 `;
 
 export const HashOption = styled.button`
-  background: ${props => props.selected ? props.theme.primary : 'transparent'};
-  color: ${props => props.selected ? '#fff' : props.theme.text};
-  border: 1px solid ${props => props.selected ? props.theme.primary : props.theme.border};
+  background: ${props => props.$selected ? props.theme.primary : 'transparent'};
+  color: ${props => props.$selected ? '#fff' : props.theme.text};
+  border: 1px solid ${props => props.$selected ? props.theme.primary : props.theme.border};
   border-radius: 4px;
   padding: 6px 12px;
   font-size: 11px;
@@ -165,11 +165,11 @@ export const ValidationContent = styled.div`
 `;
 
 export const FileUploadArea = styled.div`
-  border: 2px dashed ${props => props.dragOver ? props.theme.primary : props.theme.border};
+  border: 2px dashed ${props => props.$dragOver ? props.theme.primary : props.theme.border};
   border-radius: 6px;
   padding: 24px;
   text-align: center;
-  background: ${props => props.dragOver ? `${props.theme.primary}10` : 'transparent'};
+  background: ${props => props.$dragOver ? `${props.theme.primary}10` : 'transparent'};
   transition: all 0.2s ease;
   cursor: pointer;
   

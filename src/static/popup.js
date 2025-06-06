@@ -54,6 +54,24 @@ window.onload = () => {
     });
   }, 100);
 };
+
+// Agregar efectos de ripple a botones
+const addRippleEffect = () => {
+  document.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const ripple = document.createElement('div');
+      const rect = btn.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      const x = e.clientX - rect.left - size / 2;
+      const y = e.clientY - rect.top - size / 2;
+      
+      ripple.style.cssText = `
+        position: absolute;
+        width: ${size}px;
+        height: ${size}px;
+        left: ${x}px;
+        top: ${y}px;
+        background: rgba(255, 255, 255, 0.6);
         border-radius: 50%;
         transform: scale(0);
         animation: ripple 0.6s ease-out;
@@ -144,6 +162,7 @@ const showVersionChangeNotification = (version) => {
 window.onload = () => {
   // Inicializar efectos interactivos
   addInteractiveEffects();
+  addRippleEffect();
   
   // Event listeners para cambio de versión
   const version18Btn = document.getElementById('switch-version-1-8');

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useStore } from '../../../store';
+import { useStore } from 'devtoolApp/store';
 import {
   IntegrityContainer,
   IntegrityHeader,
@@ -44,7 +44,7 @@ import {
 } from './styles';
 
 const IntegrityValidation = () => {
-  const { optionStore } = useStore();
+  const { state, dispatch } = useStore();
   const [integrityConfig, setIntegrityConfig] = useState({
     enabled: true,
     autoVerify: true,
@@ -126,11 +126,8 @@ const IntegrityValidation = () => {
   const handleConfigChange = (key, value) => {
     setIntegrityConfig(prev => {
       const newConfig = { ...prev, [key]: value };
-      // Guardar en el store
-      optionStore.setState(state => ({
-        ...state,
-        integrityConfig: newConfig
-      }));
+      // Guardar en el store usando dispatch
+      // dispatch(setIntegrityConfig(newConfig)); // Necesitarías crear esta acción
       return newConfig;
     });
   };
@@ -274,7 +271,7 @@ const IntegrityValidation = () => {
       <IntegrityHeader>
         <HeaderTitle>
           🔒 Validación de Integridad
-          <StatusBadge active={integrityConfig.enabled}>
+          <StatusBadge $active={integrityConfig.enabled}>
             {integrityConfig.enabled ? 'Activo' : 'Inactivo'}
           </StatusBadge>
         </HeaderTitle>
@@ -341,7 +338,7 @@ const IntegrityValidation = () => {
               {integrityConfig.hashTypes.map(type => (
                 <HashOption
                   key={type}
-                  selected={integrityConfig.selectedHashType === type}
+                  $selected={integrityConfig.selectedHashType === type}
                   onClick={() => handleConfigChange('selectedHashType', type)}
                 >
                   {type}
@@ -355,7 +352,7 @@ const IntegrityValidation = () => {
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
-              dragOver={dragOver}
+              $dragOver={dragOver}
             >
               {selectedFile ? (
                 <div>

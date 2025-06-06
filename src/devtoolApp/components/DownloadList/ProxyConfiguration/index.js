@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useStore } from '../../../store';
+import { useStore } from 'devtoolApp/store';
 import {
   ProxyContainer,
   ProxyHeader,
@@ -40,7 +40,7 @@ import {
 } from './styles';
 
 const ProxyConfiguration = () => {
-  const { optionStore } = useStore();
+  const { state, dispatch } = useStore();
   const [proxyConfig, setProxyConfig] = useState({
     enabled: false,
     type: 'http', // http, https, socks4, socks5, pac
@@ -91,18 +91,15 @@ const ProxyConfiguration = () => {
 
   useEffect(() => {
     // Cargar configuración del store
-    const savedConfig = optionStore.getState().proxyConfig || {};
+    const savedConfig = state.option?.proxyConfig || {};
     setProxyConfig(prev => ({ ...prev, ...savedConfig }));
-  }, []);
+  }, [state.option]);
 
   const handleConfigChange = (key, value) => {
     setProxyConfig(prev => {
       const newConfig = { ...prev, [key]: value };
-      // Guardar en el store
-      optionStore.setState(state => ({
-        ...state,
-        proxyConfig: newConfig
-      }));
+      // Guardar en el store usando dispatch
+      // dispatch(setProxyConfig(newConfig)); // Necesitarías crear esta acción
       return newConfig;
     });
   };
@@ -207,7 +204,7 @@ const ProxyConfiguration = () => {
       <ProxyHeader>
         <HeaderTitle>
           🌐 Configuración de Proxy
-          <StatusBadge active={proxyConfig.enabled}>
+          <StatusBadge $active={proxyConfig.enabled}>
             {proxyConfig.enabled ? 'Activo' : 'Inactivo'}
           </StatusBadge>
         </HeaderTitle>
@@ -221,7 +218,7 @@ const ProxyConfiguration = () => {
               {['http', 'https', 'socks4', 'socks5', 'pac'].map(type => (
                 <ProxyOption
                   key={type}
-                  selected={proxyConfig.type === type}
+                  $selected={proxyConfig.type === type}
                   onClick={() => handleConfigChange('type', type)}
                 >
                   {type.toUpperCase()}

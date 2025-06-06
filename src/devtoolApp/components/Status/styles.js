@@ -64,7 +64,7 @@ export const MessageCard = styled.div`
   margin-bottom: 16px;
   
   ${props => {
-    switch(props.variant) {
+    switch(props.$variant) {
       case 'success':
         return css`
           background: ${props.theme.colors.successBackground};

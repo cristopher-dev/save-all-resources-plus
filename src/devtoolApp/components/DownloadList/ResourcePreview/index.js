@@ -133,7 +133,7 @@ const ResourcePreview = ({ isOpen, onClose }) => {
         />
         <TypeFilter>
           <TypeBadge 
-            active={selectedType === 'all'}
+            $active={selectedType === 'all'}
             onClick={() => setSelectedType('all')}
           >
             Todos
@@ -143,7 +143,7 @@ const ResourcePreview = ({ isOpen, onClose }) => {
             return (
               <TypeBadge
                 key={type}
-                active={selectedType === type}
+                $active={selectedType === type}
                 color={typeColors[type]}
                 onClick={() => setSelectedType(type)}
               >

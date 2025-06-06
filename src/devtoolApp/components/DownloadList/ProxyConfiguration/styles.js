@@ -58,8 +58,8 @@ export const HeaderTitle = styled.h3`
 `;
 
 export const StatusBadge = styled.span`
-  background: ${props => props.active ? props.theme.success : props.theme.border};
-  color: ${props => props.active ? '#fff' : props.theme.text};
+  background: ${props => props.$active ? props.theme.success : props.theme.border};
+  color: ${props => props.$active ? '#fff' : props.theme.text};
   padding: 4px 8px;
   border-radius: 12px;
   font-size: 12px;
@@ -95,9 +95,9 @@ export const ProxyTypeSelector = styled.div`
 `;
 
 export const ProxyOption = styled.button`
-  background: ${props => props.selected ? props.theme.primary : 'transparent'};
-  color: ${props => props.selected ? '#fff' : props.theme.text};
-  border: 1px solid ${props => props.selected ? props.theme.primary : props.theme.border};
+  background: ${props => props.$selected ? props.theme.primary : 'transparent'};
+  color: ${props => props.$selected ? '#fff' : props.theme.text};
+  border: 1px solid ${props => props.$selected ? props.theme.primary : props.theme.border};
   border-radius: 4px;
   padding: 6px 12px;
   font-size: 11px;
@@ -107,7 +107,7 @@ export const ProxyOption = styled.button`
   
   &:hover {
     border-color: ${props => props.theme.primary};
-    background: ${props => !props.selected ? `${props.theme.primary}20` : props.theme.primary};
+    background: ${props => !props.$selected ? `${props.theme.primary}20` : props.theme.primary};
   }
 `;
 

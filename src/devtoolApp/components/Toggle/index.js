@@ -18,7 +18,7 @@ export const Toggle = (props) => {
   }, [isToggled]);
 
   return (
-    <ToggleWrapper noInteraction={noInteraction} activeColor={activeColor} onClick={handleToggle} isToggled={isInternalToggled}>
+    <ToggleWrapper $noInteraction={noInteraction} $activeColor={activeColor} onClick={handleToggle} $isToggled={isInternalToggled}>
       {children}
     </ToggleWrapper>
   );

@@ -15,7 +15,7 @@ export const AdvancedFiltersHeader = styled.div`
   cursor: pointer;
   user-select: none;
   background: ${props => props.theme.colors.backgroundAlt};
-  border-radius: ${props => props.expanded ? '8px 8px 0 0' : '8px'};
+  border-radius: ${props => props.$expanded ? '8px 8px 0 0' : '8px'};
   transition: all 0.2s ease;
 
   &:hover {
@@ -36,16 +36,16 @@ export const AdvancedFiltersTitle = styled.h3`
 export const ExpandIcon = styled.span`
   display: inline-block;
   transition: transform 0.2s ease;
-  transform: ${props => props.expanded ? 'rotate(180deg)' : 'rotate(0deg)'};
+  transform: ${props => props.$expanded ? 'rotate(180deg)' : 'rotate(0deg)'};
   color: ${props => props.theme.colors.textSecondary};
 `;
 
 export const AdvancedFiltersContent = styled.div`
-  padding: ${props => props.expanded ? '16px' : '0'};
-  max-height: ${props => props.expanded ? '800px' : '0'};
+  padding: ${props => props.$expanded ? '16px' : '0'};
+  max-height: ${props => props.$expanded ? '800px' : '0'};
   overflow: hidden;
   transition: all 0.3s ease;
-  border-top: ${props => props.expanded ? `1px solid ${props.theme.colors.border}` : 'none'};
+  border-top: ${props => props.$expanded ? `1px solid ${props.theme.colors.border}` : 'none'};
 `;
 
 export const FilterSection = styled.div`
@@ -93,12 +93,12 @@ export const FileTypeItem = styled.div`
   padding: 8px 12px;
   border: 1px solid ${props => props.theme.colors.border};
   border-radius: 6px;
-  background: ${props => props.checked ? props.theme.colors.primary + '20' : props.theme.colors.background};
+  background: ${props => props.$checked ? props.theme.colors.primary + '20' : props.theme.colors.background};
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    background: ${props => props.checked ? props.theme.colors.primary + '30' : props.theme.colors.backgroundHover};
+    background: ${props => props.$checked ? props.theme.colors.primary + '30' : props.theme.colors.backgroundHover};
   }
 `;
 
@@ -111,7 +111,7 @@ export const FileTypeIcon = styled.span`
 export const FileTypeLabel = styled.span`
   font-size: 11px;
   color: ${props => props.theme.colors.text};
-  font-weight: ${props => props.checked ? '500' : '400'};
+  font-weight: ${props => props.$checked ? '500' : '400'};
 `;
 
 export const SizeFilterRow = styled.div`

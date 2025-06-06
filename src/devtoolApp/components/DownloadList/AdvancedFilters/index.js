@@ -119,17 +119,17 @@ const AdvancedFilters = () => {
 
   return (
     <AdvancedFiltersContainer>
-      <AdvancedFiltersHeader expanded={expanded} onClick={toggleExpanded}>
+      <AdvancedFiltersHeader $expanded={expanded} onClick={toggleExpanded}>
         <AdvancedFiltersTitle>
           🔧 Filtros Avanzados
           {activeFiltersCount > 0 && ` (${activeFiltersCount} activos)`}
         </AdvancedFiltersTitle>
-        <ExpandIcon expanded={expanded}>
+        <ExpandIcon $expanded={expanded}>
           <FaChevronDown />
         </ExpandIcon>
       </AdvancedFiltersHeader>
 
-      <AdvancedFiltersContent expanded={expanded}>
+      <AdvancedFiltersContent $expanded={expanded}>
         <FilterSection>
           <FilterSectionTitle>
             🗂️ Filtros por Tipo de Archivo
@@ -160,11 +160,11 @@ const AdvancedFilters = () => {
                 return (
                   <FileTypeItem
                     key={key}
-                    checked={isChecked}
+                    $checked={isChecked}
                     onClick={() => handleFileTypeToggle(key)}
                   >
                     <FileTypeIcon>{icon}</FileTypeIcon>
-                    <FileTypeLabel checked={isChecked}>
+                    <FileTypeLabel $checked={isChecked}>
                       {label}
                     </FileTypeLabel>
                   </FileTypeItem>

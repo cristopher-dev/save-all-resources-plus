@@ -81,10 +81,10 @@ export const TypeBadge = styled.button`
   align-items: center;
   gap: 4px;
   padding: 6px 10px;
-  border: 1px solid ${props => props.active ? props.color || props.theme.colors.primary : props.theme.colors.border};
+  border: 1px solid ${props => props.$active ? props.color || props.theme.colors.primary : props.theme.colors.border};
   border-radius: 12px;
-  background: ${props => props.active ? props.color || props.theme.colors.primary : props.theme.colors.surface};
-  color: ${props => props.active ? 'white' : props.theme.colors.text};
+  background: ${props => props.$active ? props.color || props.theme.colors.primary : props.theme.colors.surface};
+  color: ${props => props.$active ? 'white' : props.theme.colors.text};
   font-size: 11px;
   cursor: pointer;
   transition: all 0.2s ease;
