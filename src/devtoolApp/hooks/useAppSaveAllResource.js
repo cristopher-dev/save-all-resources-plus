@@ -19,6 +19,12 @@ export const useAppSaveAllResource = () => {
   } = state;
 
   const handleOnSave = useCallback(async () => {
+    // Verificar que el contexto de DevTools esté disponible antes de proceder
+    if (!chrome?.devtools?.inspectedWindow?.tabId || !chrome?.tabs?.update) {
+      console.error('[SAVE ALL]: DevTools context not available, cannot proceed with save operation');
+      return;
+    }
+
     dispatch(uiActions.setIsSaving(true));
     for (let i = 0; i < downloadList.length; i++) {
       const downloadItem = downloadList[i];
@@ -28,26 +34,38 @@ export const useAppSaveAllResource = () => {
         if (i > 0 || tab?.url !== downloadItem.url) {
           loaded = await new Promise((r) => {
             const tabChangeHandler = (tabId, changeInfo) => {
-              if (tabId !== chrome.devtools.inspectedWindow.tabId || !changeInfo || !changeInfo.status) {
-                return;
-              }
-              if (changeInfo.status === 'loading') {
-                return;
-              }
-              if (changeInfo.status === 'complete') {
-                setTimeout(() => {
-                  r(true);
-                }, 2000);
-              } else {
+              try {
+                if (tabId !== chrome.devtools.inspectedWindow.tabId || !changeInfo || !changeInfo.status) {
+                  return;
+                }
+                if (changeInfo.status === 'loading') {
+                  return;
+                }
+                if (changeInfo.status === 'complete') {
+                  setTimeout(() => {
+                    r(true);
+                  }, 2000);
+                } else {
+                  r(false);
+                }
+                chrome.tabs.onUpdated.removeListener(tabChangeHandler);
+              } catch (error) {
+                console.error('[SAVE ALL]: Error in tab change handler:', error);
                 r(false);
+                chrome.tabs.onUpdated.removeListener(tabChangeHandler);
               }
-              chrome.tabs.onUpdated.removeListener(tabChangeHandler);
             };
-            chrome.tabs.onUpdated.addListener(tabChangeHandler);
-            setTimeout(function () {
-              dispatch(uiActions.setTab({ url: downloadItem.url }));
-              chrome.tabs.update(chrome.devtools.inspectedWindow.tabId, { url: downloadItem.url });
-            }, 500);
+            
+            try {
+              chrome.tabs.onUpdated.addListener(tabChangeHandler);
+              setTimeout(function () {
+                dispatch(uiActions.setTab({ url: downloadItem.url }));
+                chrome.tabs.update(chrome.devtools.inspectedWindow.tabId, { url: downloadItem.url });
+              }, 500);
+            } catch (error) {
+              console.error('[SAVE ALL]: Error setting up tab change:', error);
+              r(false);
+            }
           });
         }
         const allResources = [
