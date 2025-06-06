@@ -13,7 +13,9 @@ export const CompressionContainer = styled.div`
   background-color: ${props => props.theme.backgroundSecondary};
 `;
 
-export const CompressionHeader = styled.div`
+export const CompressionHeader = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'expanded'
+})`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -36,7 +38,9 @@ export const CompressionTitle = styled.h3`
   align-items: center;
 `;
 
-export const CompressionContent = styled.div`
+export const CompressionContent = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'expanded'
+})`
   display: ${props => props.expanded ? 'block' : 'none'};
   padding: 16px;
 `;

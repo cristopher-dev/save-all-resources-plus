@@ -16,6 +16,7 @@ export const ACTIONS = {
   SET_MAX_FILE_SIZE: 'SET_MAX_FILE_SIZE',
   SET_EXCLUDE_DOMAINS: 'SET_EXCLUDE_DOMAINS',
   SET_CUSTOM_FILE_EXTENSIONS: 'SET_CUSTOM_FILE_EXTENSIONS',
+  SET_INTEGRITY_CONFIG: 'SET_INTEGRITY_CONFIG',
 };
 
 export const INITIAL_STATE = {
@@ -32,6 +33,16 @@ export const INITIAL_STATE = {
   maxFileSize: 10240, // 10MB in KB
   excludeDomains: [],
   customFileExtensions: [], // custom extensions to include
+  integrityConfig: {
+    enabled: true,
+    autoVerify: true,
+    hashTypes: ['MD5', 'SHA1', 'SHA256', 'SHA512'],
+    selectedHashType: 'SHA256',
+    verifyOnDownload: true,
+    saveHashes: true,
+    alertOnMismatch: true,
+    quarantineCorrupted: false
+  },
 };
 
 export const setIgnoreNoContentFile = (willIgnore) => ({
@@ -97,6 +108,11 @@ export const setExcludeDomains = (domains) => ({
 export const setCustomFileExtensions = (extensions) => ({
   type: ACTIONS.SET_CUSTOM_FILE_EXTENSIONS,
   payload: Array.isArray(extensions) ? extensions : [],
+});
+
+export const setIntegrityConfig = (config) => ({
+  type: ACTIONS.SET_INTEGRITY_CONFIG,
+  payload: config,
 });
 
 export const uiReducer = (state = INITIAL_STATE, action) => {
@@ -177,6 +193,12 @@ export const uiReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         customFileExtensions: action.payload,
+      };
+    }
+    case ACTIONS.SET_INTEGRITY_CONFIG: {
+      return {
+        ...state,
+        integrityConfig: { ...state.integrityConfig, ...action.payload },
       };
     }
     default: {

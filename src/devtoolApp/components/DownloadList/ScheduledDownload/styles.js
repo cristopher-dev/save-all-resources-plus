@@ -8,7 +8,9 @@ export const ScheduledDownloadContainer = styled.div`
   overflow: hidden;
 `;
 
-export const ScheduledDownloadHeader = styled.div`
+export const ScheduledDownloadHeader = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'expanded'
+})`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -32,7 +34,9 @@ export const ScheduledDownloadTitle = styled.h3`
   gap: 8px;
 `;
 
-export const ScheduledDownloadContent = styled.div`
+export const ScheduledDownloadContent = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'expanded'
+})`
   padding: ${({ expanded }) => expanded ? '16px' : '0'};
   max-height: ${({ expanded }) => expanded ? '400px' : '0'};
   overflow: hidden;

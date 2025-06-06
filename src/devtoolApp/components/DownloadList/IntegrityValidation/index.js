@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from 'devtoolApp/store';
+import { setIntegrityConfig } from 'devtoolApp/store/option';
 import {
   IntegrityContainer,
   IntegrityHeader,
@@ -73,12 +74,12 @@ const IntegrityValidation = () => {
 
   useEffect(() => {
     // Cargar configuración del store
-    const savedConfig = optionStore.getState().integrityConfig || {};
+    const savedConfig = state.option?.integrityConfig || {};
     setIntegrityConfig(prev => ({ ...prev, ...savedConfig }));
     
     // Cargar historial simulado
     loadMockHistory();
-  }, []);
+  }, [state.option]);
 
   const loadMockHistory = () => {
     const mockHistory = [
@@ -127,7 +128,7 @@ const IntegrityValidation = () => {
     setIntegrityConfig(prev => {
       const newConfig = { ...prev, [key]: value };
       // Guardar en el store usando dispatch
-      // dispatch(setIntegrityConfig(newConfig)); // Necesitarías crear esta acción
+      dispatch(setIntegrityConfig(newConfig));
       return newConfig;
     });
   };

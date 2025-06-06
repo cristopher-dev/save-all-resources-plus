@@ -8,7 +8,9 @@ export const CacheContainer = styled.div`
   background-color: ${props => props.theme.backgroundSecondary};
 `;
 
-export const CacheHeader = styled.div`
+export const CacheHeader = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'expanded'
+})`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -31,7 +33,9 @@ export const CacheTitle = styled.h3`
   align-items: center;
 `;
 
-export const CacheContent = styled.div`
+export const CacheContent = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'expanded'
+})`
   display: ${props => props.expanded ? 'block' : 'none'};
   padding: 16px;
 `;
