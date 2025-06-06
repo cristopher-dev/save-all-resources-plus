@@ -20,12 +20,22 @@ export const useAppSaveAllResource = () => {
 
   const handleOnSave = useCallback(async () => {
     // Verificar que el contexto de DevTools esté disponible antes de proceder
-    if (!chrome?.devtools?.inspectedWindow?.tabId || !chrome?.tabs?.update) {
-      console.error('[SAVE ALL]: DevTools context not available, cannot proceed with save operation');
+    if (!chrome?.devtools?.inspectedWindow?.tabId) {
+      console.error('[SAVE ALL]: DevTools context not available - tabId missing');
+      dispatch(uiActions.setStatus('Error: Contexto de DevTools no disponible'));
       return;
     }
 
+    if (!chrome?.tabs?.update) {
+      console.error('[SAVE ALL]: Chrome tabs API not available');
+      dispatch(uiActions.setStatus('Error: API de pestañas no disponible'));
+      return;
+    }
+
+    console.log('[SAVE ALL]: Starting save operation with tabId:', chrome.devtools.inspectedWindow.tabId);
     dispatch(uiActions.setIsSaving(true));
+    
+    try {
     for (let i = 0; i < downloadList.length; i++) {
       const downloadItem = downloadList[i];
 
@@ -115,6 +125,11 @@ export const useAppSaveAllResource = () => {
     dispatch(uiActions.setStatus(UI_INITIAL_STATE.status));
     dispatch(uiActions.setIsSaving(false));
     dispatch(uiActions.setAnalysisCompleted()); // Indicar que el análisis (y guardado) ha terminado
+    } catch (error) {
+      console.error('[SAVE ALL]: Error during save operation:', error);
+      dispatch(uiActions.setStatus('Error durante el guardado: ' + error.message));
+      dispatch(uiActions.setIsSaving(false));
+    }
   }, [state, dispatch, tab, selectedResources]);
 
   useEffect(() => {

@@ -82,35 +82,66 @@ const ResourcePreview = ({ isOpen, onClose }) => {
     const fileType = getFileType(resource.url, resource.mimeType);
     const extension = getFileExtension(resource.url);
     
+    console.log('[PREVIEW]: Rendering preview for', resource.url, 'Type:', fileType, 'Extension:', extension, 'Has content:', !!resource.content);
+    
     if (fileType === 'images' && resource.content) {
       let src = resource.content;
-      if (resource.encoding === 'base64') {
-        src = `data:${resource.mimeType || 'image/png'};base64,${resource.content}`;
-      } else if (!(resource.content instanceof Blob)) {
-        return <NoPreviewMessage>Vista previa no disponible</NoPreviewMessage>;
-      }
       
-      return (
-        <PreviewImage 
-          src={src}
-          alt={resource.url}
-          onError={(e) => {
-            e.target.style.display = 'none';
-          }}
-        />
-      );
+      try {
+        if (resource.encoding === 'base64') {
+          // Verificar si ya es un data URL
+          if (!resource.content.startsWith('data:')) {
+            src = `data:${resource.mimeType || 'image/png'};base64,${resource.content}`;
+          }
+        } else if (resource.content instanceof Blob) {
+          src = URL.createObjectURL(resource.content);
+        } else if (typeof resource.content === 'string' && !resource.content.startsWith('data:')) {
+          // Si es una cadena pero no es data URL ni base64, no mostrar vista previa
+          return <NoPreviewMessage>Vista previa no disponible para este tipo de imagen</NoPreviewMessage>;
+        }
+        
+        return (
+          <PreviewImage 
+            src={src}
+            alt={resource.url}
+            onError={(e) => {
+              console.error('[PREVIEW]: Error loading image:', resource.url);
+              e.target.style.display = 'none';
+              e.target.nextSibling && (e.target.nextSibling.style.display = 'block');
+            }}
+            onLoad={() => {
+              console.log('[PREVIEW]: Image loaded successfully:', resource.url);
+            }}
+          />
+        );
+      } catch (error) {
+        console.error('[PREVIEW]: Error creating image src:', error);
+        return <NoPreviewMessage>Error al cargar la vista previa de imagen</NoPreviewMessage>;
+      }
     }
     
     if (['css', 'javascript', 'documents'].includes(fileType) && resource.content && typeof resource.content === 'string') {
+      let displayContent = resource.content;
+      
+      // Si es base64, intentar decodificar para texto
+      if (resource.encoding === 'base64') {
+        try {
+          displayContent = atob(resource.content);
+        } catch (error) {
+          console.error('[PREVIEW]: Error decoding base64 content:', error);
+          return <NoPreviewMessage>Error al decodificar contenido base64</NoPreviewMessage>;
+        }
+      }
+      
       return (
         <PreviewCode language={extension}>
-          {resource.content.substring(0, 300)}
-          {resource.content.length > 300 && '...'}
+          {displayContent.substring(0, 300)}
+          {displayContent.length > 300 && '...'}
         </PreviewCode>
       );
     }
     
-    return <NoPreviewMessage>Vista previa no disponible para este tipo de archivo</NoPreviewMessage>;
+    return <NoPreviewMessage>Vista previa no disponible para este tipo de archivo ({fileType})</NoPreviewMessage>;
   };
 
   if (!isOpen) return null;

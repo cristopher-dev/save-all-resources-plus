@@ -58,13 +58,26 @@ export const downloadZipFile = (toDownload, options, eachDoneCallback, callback)
 
 // Create a reader of the content for zip
 export const getContentRead = (item) => {
+  console.log('[ZIP]: Creating content reader for:', item.url, 'Encoding:', item.encoding, 'Content type:', typeof item.content);
+  
   if (item.encoding === 'base64') {
-    return new zip.Data64URIReader(item.content || 'No Content: ' + item.url);
+    const content = item.content || 'data:text/plain;base64,' + btoa('No Content: ' + item.url);
+    if (!content.startsWith('data:')) {
+      // Si no es un data URL, crear uno
+      const mimeType = item.mimeType || 'application/octet-stream';
+      const dataUrl = `data:${mimeType};base64,${content}`;
+      return new zip.Data64URIReader(dataUrl);
+    }
+    return new zip.Data64URIReader(content);
   }
   if (item.content instanceof Blob) {
+    console.log('[ZIP]: Using BlobReader for Blob content, size:', item.content.size);
     return new zip.BlobReader(item.content);
   }
-  return new zip.TextReader(item.content || 'No Content: ' + item.url);
+  
+  const textContent = item.content || 'No Content: ' + item.url;
+  console.log('[ZIP]: Using TextReader for content, length:', textContent.length);
+  return new zip.TextReader(textContent);
 };
 
 export const addItemsToZipWriter = (zipWriter, items, options, eachDoneCallback, callback) => {
@@ -73,6 +86,8 @@ export const addItemsToZipWriter = (zipWriter, items, options, eachDoneCallback,
 
   // if item exist so add it to zip
   if (item) {
+    console.log('[ZIP]: Processing item:', item.url, 'Content type:', typeof item.content, 'Has content:', !!item.content);
+    
     // Beautify here
     if (options?.beautifyFile && !item.encoding && !!item.content) {
       try {
@@ -109,10 +124,12 @@ export const addItemsToZipWriter = (zipWriter, items, options, eachDoneCallback,
       // Try to decode first
       try {
         atob(item.content);
+        console.log('[ZIP]: Base64 content is valid for:', item.url);
       } catch (err) {
         console.log('[DEVTOOL]', item.url, ' is not base64 encoding, try to encode to base64.');
         try {
           item.content = btoa(item.content);
+          console.log('[ZIP]: Successfully converted to base64 for:', item.url);
         } catch (err) {
           console.log('[DEVTOOL]', item.url, ' failed to encode to base64, fallback to text.');
           item.encoding = null;
@@ -126,6 +143,9 @@ export const addItemsToZipWriter = (zipWriter, items, options, eachDoneCallback,
     // Item has no content
     const isNoContent = !item.content;
     const ignoreNoContentFile = !!options?.ignoreNoContentFile;
+    
+    console.log('[ZIP]: Content check for', item.url, '- hasContent:', !isNoContent, 'ignore empty:', ignoreNoContentFile);
+    
     if (isNoContent && ignoreNoContentFile) {
       // Exclude file as no content
       console.log('[DEVTOOL]', 'EXCLUDED: ', item.url);
@@ -134,14 +154,23 @@ export const addItemsToZipWriter = (zipWriter, items, options, eachDoneCallback,
       addItemsToZipWriter(zipWriter, rest, options, eachDoneCallback, callback);
     } else {
       // Make sure the file has some byte otherwise no import to avoid corrupted zip
-      if (resolvedContent.size > 0 || resolvedContent['blobReader']?.size > 0) {
-        zipWriter.add(item.saveAs.path, resolvedContent).finally(() => {
+      const hasSize = resolvedContent.size > 0 || resolvedContent['blobReader']?.size > 0;
+      console.log('[ZIP]: Size check for', item.url, '- hasSize:', hasSize, 'size:', resolvedContent.size);
+      
+      if (hasSize) {
+        console.log('[ZIP]: Adding to zip:', item.saveAs.path);
+        zipWriter.add(item.saveAs.path, resolvedContent).then(() => {
+          console.log('[ZIP]: Successfully added to zip:', item.saveAs.path);
           eachDoneCallback(item, true);
+          addItemsToZipWriter(zipWriter, rest, options, eachDoneCallback, callback);
+        }).catch((error) => {
+          console.error('[ZIP]: Error adding to zip:', item.saveAs.path, error);
+          eachDoneCallback(item, false);
           addItemsToZipWriter(zipWriter, rest, options, eachDoneCallback, callback);
         });
       } else {
         // If no size, exclude the item
-        console.log('[DEVTOOL]', 'EXCLUDED: ', item.url);
+        console.log('[DEVTOOL]', 'EXCLUDED (no size): ', item.url);
         eachDoneCallback(item, false);
         // To the next item
         addItemsToZipWriter(zipWriter, rest, options, eachDoneCallback, callback);
@@ -157,16 +186,62 @@ export const addItemsToZipWriter = (zipWriter, items, options, eachDoneCallback,
 export const downloadCompleteZip = (zipWriter, blobWriter, callback) => {
   zipWriter.close();
   blobWriter.getData().then((blob) => {
-    chrome.tabs.get(chrome.devtools.inspectedWindow.tabId, function (tab) {
-      let url = new URL(tab.url);
-      let filename = url.hostname ? url.hostname.replace(/([^A-Za-z0-9.])/g, '_') : 'all';
-      let a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = filename + '.zip';
-      a.click();
+    // Verificar si el contexto de DevTools está disponible
+    try {
+      if (chrome?.devtools?.inspectedWindow?.tabId && chrome?.tabs?.get) {
+        chrome.tabs.get(chrome.devtools.inspectedWindow.tabId, function (tab) {
+          if (chrome.runtime.lastError) {
+            console.error('[DOWNLOAD]: Error getting tab info:', chrome.runtime.lastError.message);
+            // Usar nombre genérico si hay error
+            downloadBlobDirectly(blob, 'resources.zip');
+          } else {
+            try {
+              let url = new URL(tab.url);
+              let filename = url.hostname ? url.hostname.replace(/([^A-Za-z0-9.])/g, '_') : 'resources';
+              downloadBlobDirectly(blob, filename + '.zip');
+            } catch (urlError) {
+              console.error('[DOWNLOAD]: Error parsing URL:', urlError);
+              downloadBlobDirectly(blob, 'resources.zip');
+            }
+          }
+          callback();
+        });
+      } else {
+        console.warn('[DOWNLOAD]: DevTools context not available, using fallback download');
+        downloadBlobDirectly(blob, 'resources.zip');
+        callback();
+      }
+    } catch (error) {
+      console.error('[DOWNLOAD]: Error in downloadCompleteZip:', error);
+      downloadBlobDirectly(blob, 'resources.zip');
       callback();
-    });
+    }
+  }).catch((error) => {
+    console.error('[DOWNLOAD]: Error getting blob data:', error);
+    callback();
   });
+};
+
+// Función auxiliar para descargar blob directamente
+const downloadBlobDirectly = (blob, filename) => {
+  try {
+    const a = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a); // Asegurar que el elemento esté en el DOM
+    a.click();
+    document.body.removeChild(a);
+    
+    // Limpiar el URL object después de un breve delay
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+    }, 100);
+    
+    console.log('[DOWNLOAD]: File downloaded successfully:', filename);
+  } catch (error) {
+    console.error('[DOWNLOAD]: Error downloading file:', error);
+  }
 };
 
 // Funciones de filtrado avanzado
