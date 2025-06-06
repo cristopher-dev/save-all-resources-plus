@@ -8,7 +8,12 @@ export const ACTIONS = {
   SET_STATUS: 'SET_STATUS',
   SET_TAB: 'SET_TAB',
   SET_LOG: 'SET_LOG',
-  SET_ANALYSIS_COMPLETED: 'SET_ANALYSIS_COMPLETED', // Nueva acción
+  SET_ANALYSIS_COMPLETED: 'SET_ANALYSIS_COMPLETED',
+  SET_SELECTED_RESOURCES: 'SET_SELECTED_RESOURCES',
+  TOGGLE_RESOURCE_SELECTION: 'TOGGLE_RESOURCE_SELECTION',
+  CLEAR_SELECTED_RESOURCES: 'CLEAR_SELECTED_RESOURCES',
+  STOP_ANALYSIS: 'STOP_ANALYSIS',
+  RESET_ANALYSIS: 'RESET_ANALYSIS',
 };
 
 export const INITIAL_STATE = {
@@ -17,7 +22,9 @@ export const INITIAL_STATE = {
   isSaving: false,
   savingIndex: 0,
   status: `Idle...`,
-  analysisCompleted: false, // Nuevo estado inicial
+  analysisCompleted: false,
+  selectedResources: {},
+  isAnalyzing: false,
 };
 
 export const setLog = (log) => ({
@@ -48,6 +55,28 @@ export const setStatus = (status) => ({
 // Nuevo creador de acción
 export const setAnalysisCompleted = () => ({
   type: ACTIONS.SET_ANALYSIS_COMPLETED,
+});
+
+export const setSelectedResources = (selectedResources) => ({
+  type: ACTIONS.SET_SELECTED_RESOURCES,
+  payload: selectedResources,
+});
+
+export const toggleResourceSelection = (url) => ({
+  type: ACTIONS.TOGGLE_RESOURCE_SELECTION,
+  payload: url,
+});
+
+export const clearSelectedResources = () => ({
+  type: ACTIONS.CLEAR_SELECTED_RESOURCES,
+});
+
+export const stopAnalysis = () => ({
+  type: ACTIONS.STOP_ANALYSIS,
+});
+
+export const resetAnalysis = () => ({
+  type: ACTIONS.RESET_ANALYSIS,
 });
 
 let flashStatusTimeoutHandler = null;
@@ -100,7 +129,46 @@ export const uiReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         analysisCompleted: true,
-        status: 'Análisis completado', // Actualizar también el estado general
+        isAnalyzing: false,
+        status: 'Análisis completado',
+      };
+    }
+    case ACTIONS.SET_SELECTED_RESOURCES: {
+      return {
+        ...state,
+        selectedResources: action.payload,
+      };
+    }
+    case ACTIONS.TOGGLE_RESOURCE_SELECTION: {
+      return {
+        ...state,
+        selectedResources: {
+          ...state.selectedResources,
+          [action.payload]: !state.selectedResources[action.payload],
+        },
+      };
+    }
+    case ACTIONS.CLEAR_SELECTED_RESOURCES: {
+      return {
+        ...state,
+        selectedResources: {},
+      };
+    }
+    case ACTIONS.STOP_ANALYSIS: {
+      return {
+        ...state,
+        isAnalyzing: false,
+        analysisCompleted: true,
+        status: 'Análisis detenido por el usuario',
+      };
+    }
+    case ACTIONS.RESET_ANALYSIS: {
+      return {
+        ...state,
+        isAnalyzing: false,
+        analysisCompleted: false,
+        selectedResources: {},
+        status: 'Reiniciando análisis...',
       };
     }
     default: {

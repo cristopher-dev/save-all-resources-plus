@@ -27,7 +27,8 @@ import SystemNotifications from './SystemNotifications';
 import ProxyConfiguration from './ProxyConfiguration';
 import IntegrityValidation from './IntegrityValidation';
 import ExportOptions from './ExportOptions';
-import { FaTrash } from 'react-icons/fa';
+import AnalysisStatus from '../AnalysisStatus';
+import { FaTrash, FaCheckSquare, FaSquare } from 'react-icons/fa';
 import { MdDownloading } from 'react-icons/md';
 
 export const DownloadList = () => {
@@ -35,17 +36,21 @@ export const DownloadList = () => {
   const {
     downloadList,
     downloadLog,
-    ui: { tab, log, isSaving, savingIndex },
-    staticResource = [], // Added to access staticResource
-    networkResource = [], // Added to access networkResource
+    ui: { tab, log, isSaving, savingIndex, selectedResources = {} },
+    staticResource = [],
+    networkResource = [],
   } = state;
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedResources, setSelectedResources] = useState({}); // Estado para los checkboxes
 
   const handleClose = useMemo(() => () => setIsModalOpen(false), []);
   const handleOpen = useMemo(() => () => setIsModalOpen(true), []);
   const handleReset = useMemo(
-    () => () => downloadList.slice(1).forEach((item) => dispatch(downloadListActions.removeDownloadItem(item))),
+    () => () => {
+      // Reset download list (except main page)
+      downloadList.slice(1).forEach((item) => dispatch(downloadListActions.removeDownloadItem(item)));
+      // Reset analysis and UI state
+      dispatch(uiActions.resetAnalysis());
+    },
     [downloadList, dispatch]
   );
   const handleRemove = (item) => () => dispatch(downloadListActions.removeDownloadItem(item));
@@ -58,16 +63,29 @@ export const DownloadList = () => {
   };
 
   const handleCheckboxChange = (url) => {
-    setSelectedResources((prev) => ({
-      ...prev,
-      [url]: !prev[url],
-    }));
+    dispatch(uiActions.toggleResourceSelection(url));
   };
+
+  const handleSelectAll = () => {
+    const allUrls = downloadList.reduce((acc, item) => {
+      acc[item.url] = true;
+      return acc;
+    }, {});
+    dispatch(uiActions.setSelectedResources(allUrls));
+  };
+
+  const handleDeselectAll = () => {
+    dispatch(uiActions.clearSelectedResources());
+  };
+
+  const selectedCount = Object.values(selectedResources).filter(Boolean).length;
+  const totalCount = downloadList.length;
 
   const allResources = useMemo(() => [...staticResource, ...networkResource], [staticResource, networkResource]);
 
   return (
     <DownloadListWrapper>
+      <AnalysisStatus />
       <OptionSection />
       <ConfigurationPresets />
       <AdvancedFilters />
@@ -79,7 +97,32 @@ export const DownloadList = () => {
       <ProxyConfiguration />
       <IntegrityValidation />
       <ExportOptions />
-      <DownloadListHeader>Download List:</DownloadListHeader>
+      <DownloadListHeader>
+        Download List:
+        <div style={{ fontSize: '12px', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <span style={{ color: '#666' }}>
+            {selectedCount > 0 ? `${selectedCount} de ${totalCount} seleccionados` : `${totalCount} recursos disponibles`}
+          </span>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <Button 
+              color="secondary" 
+              onClick={handleSelectAll}
+              style={{ fontSize: '10px', padding: '2px 8px' }}
+            >
+              <FaCheckSquare style={{ marginRight: '4px' }} />
+              Todos
+            </Button>
+            <Button 
+              color="secondary" 
+              onClick={handleDeselectAll}
+              style={{ fontSize: '10px', padding: '2px 8px' }}
+            >
+              <FaSquare style={{ marginRight: '4px' }} />
+              Ninguno
+            </Button>
+          </div>
+        </div>
+      </DownloadListHeader>
       <DownloadListContainer>
         {downloadList.map((item, index) => {
           const foundLog = downloadLog.find((i) => i.url === item.url);

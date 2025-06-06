@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useStore } from 'devtoolApp/store';
+import * as uiActions from 'devtoolApp/store/ui';
 import {
   DependencyAnalysisContainer,
   DependencyAnalysisHeader,
@@ -26,20 +27,22 @@ import {
   FilterButton,
   DependencyVisualization,
 } from './styles';
-import { FaChevronDown, FaProjectDiagram, FaExclamationTriangle, FaSearch, FaDownload } from 'react-icons/fa';
+import { FaChevronDown, FaProjectDiagram, FaExclamationTriangle, FaSearch, FaDownload, FaStop } from 'react-icons/fa';
 import Button from '../../Button';
 import { getFileType, getFileExtension } from 'devtoolApp/utils/file';
 
 const RESOURCE_TYPES = ['all', 'css', 'js', 'image', 'font', 'document'];
 
 const DependencyAnalysis = () => {
-  const { state } = useStore();
-  const { downloadList } = state;
+  const { state, dispatch } = useStore();
+  const { downloadList, ui } = state;
+  const { isAnalyzing, analysisCompleted } = ui;
   
   const [expanded, setExpanded] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [dependencyTree, setDependencyTree] = useState({});
   const [analyzing, setAnalyzing] = useState(false);
+  const [analysisInterrupted, setAnalysisInterrupted] = useState(false);
 
   const toggleExpanded = () => setExpanded(!expanded);
 
@@ -178,15 +181,35 @@ const DependencyAnalysis = () => {
 
   // Ejecutar análisis automático
   useEffect(() => {
-    if (downloadList.length > 1 && !analyzing) {
+    if (downloadList.length > 1 && !analyzing && !analysisCompleted && !analysisInterrupted) {
       setAnalyzing(true);
-      // Simular tiempo de análisis
-      setTimeout(() => {
-        setDependencyTree(analyzeDependencies.dependencies);
-        setAnalyzing(false);
-      }, 1500);
+      dispatch(uiActions.setStatus('Iniciando análisis de dependencias...'));
+      
+      // Simular tiempo de análisis con posibilidad de interrupción
+      const analysisTimeout = setTimeout(() => {
+        if (!analysisInterrupted) {
+          setDependencyTree(analyzeDependencies.dependencies);
+          setAnalyzing(false);
+          dispatch(uiActions.setAnalysisCompleted());
+          dispatch(uiActions.setStatus('Análisis de dependencias completado'));
+        }
+      }, 2000);
+
+      return () => clearTimeout(analysisTimeout);
     }
-  }, [downloadList, analyzeDependencies.dependencies, analyzing]);
+  }, [downloadList, analyzeDependencies.dependencies, analyzing, analysisCompleted, analysisInterrupted, dispatch]);
+
+  const stopAnalysis = () => {
+    setAnalysisInterrupted(true);
+    setAnalyzing(false);
+    dispatch(uiActions.stopAnalysis());
+  };
+
+  const restartAnalysis = () => {
+    setAnalysisInterrupted(false);
+    dispatch(uiActions.setStatus('Reiniciando análisis...'));
+    // El useEffect se encargará de reiniciar el análisis
+  };
 
   const exportDependencyReport = () => {
     const report = {
@@ -226,14 +249,32 @@ const DependencyAnalysis = () => {
         {analyzing && (
           <DependencySection>
             <div style={{ textAlign: 'center', padding: '20px' }}>
-              <div style={{ fontSize: '14px', color: '#666' }}>
+              <div style={{ fontSize: '14px', color: '#666', marginBottom: '16px' }}>
                 🔍 Analizando dependencias entre recursos...
               </div>
+              <Button color="danger" onClick={stopAnalysis}>
+                <FaStop style={{ marginRight: '8px' }} />
+                Detener Análisis
+              </Button>
             </div>
           </DependencySection>
         )}
 
-        {!analyzing && totalResources > 0 && (
+        {analysisInterrupted && !analyzing && (
+          <DependencySection>
+            <div style={{ textAlign: 'center', padding: '20px' }}>
+              <div style={{ fontSize: '14px', color: '#f39c12', marginBottom: '16px' }}>
+                ⚠️ Análisis interrumpido por el usuario
+              </div>
+              <Button color="primary" onClick={restartAnalysis}>
+                <FaSearch style={{ marginRight: '8px' }} />
+                Reiniciar Análisis
+              </Button>
+            </div>
+          </DependencySection>
+        )}
+
+        {!analyzing && !analysisInterrupted && totalResources > 0 && (
           <>
             <DependencySection>
               <DependencySectionTitle>📊 Estadísticas Generales</DependencySectionTitle>

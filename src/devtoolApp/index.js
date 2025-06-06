@@ -12,11 +12,13 @@ import { useAppTheme } from './hooks/useAppTheme';
 import { useAppInit } from './hooks/useAppInit';
 import { useAppRecordingStaticResource } from './hooks/useAppRecordingStaticResource';
 import { useAppRecordingNetworkResource } from './hooks/useAppRecordingNetworkResource';
+import { useResourceAdditionMonitor } from './hooks/useResourceAdditionMonitor';
 
 export const DevToolApp = ({ initialChromeTab }) => {
   useAppInit();
   useAppRecordingStaticResource();
   useAppRecordingNetworkResource();
+  useResourceAdditionMonitor(3000); // Detectar fin de adición después de 3 segundos sin nuevos recursos
 
   const { dispatch } = useStore();
 

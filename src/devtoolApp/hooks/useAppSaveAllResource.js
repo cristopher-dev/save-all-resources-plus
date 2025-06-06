@@ -15,11 +15,8 @@ export const useAppSaveAllResource = () => {
   const {
     downloadList,
     option: { ignoreNoContentFile, beautifyFile, advancedFilters },
-    ui: { tab },
-  } = state;
-
-  // Se espera que selectedResources venga del estado global o como prop
-  const selectedResources = state.ui?.selectedResources || {}; 
+    ui: { tab, selectedResources = {} },
+  } = state; 
 
   const handleOnSave = useCallback(async () => {
     // Verificar que el contexto de DevTools esté disponible antes de proceder
@@ -35,6 +32,7 @@ export const useAppSaveAllResource = () => {
       // Si hay recursos seleccionados y el item actual no está seleccionado, saltarlo
       const hasSelectedItems = Object.values(selectedResources).some(isSelected => isSelected);
       if (hasSelectedItems && !selectedResources[downloadItem.url]) {
+        console.log(`[SAVE ALL]: Skipping ${downloadItem.url} - not selected`);
         continue;
       }
 
@@ -89,6 +87,9 @@ export const useAppSaveAllResource = () => {
         // Filtrar `toDownload` basado en `selectedResources` si hay selecciones
         if (hasSelectedItems) {
           toDownload = toDownload.filter(resource => selectedResources[resource.url]);
+          console.log(`[SAVE ALL]: Filtered resources for ${downloadItem.url}:`, toDownload.length);
+        } else {
+          console.log(`[SAVE ALL]: No specific selections, downloading all resources for ${downloadItem.url}:`, toDownload.length);
         }
 
         console.log(toDownload.filter(t => typeof t?.content !== 'string' && !!t?.content?.then));
