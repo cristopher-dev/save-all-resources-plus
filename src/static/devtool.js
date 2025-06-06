@@ -4,22 +4,22 @@ const init = () => {
   try {
     const version = localStorage.getItem('resources-saver-version');
     if (version === '2') {
-      return chrome.devtools.panels.create('ResourcesSaver', 'icon.gif', 'devtool.app.html', function (panel) {
+      return chrome.devtools.panels.create('Web Resource Vault', 'icon.gif', 'devtool.app.html', function (panel) {
         console.log('Content is loaded to panel', panel);
       });
     }
 
     if (version === '0.1.9') {
-      return chrome.devtools.panels.create('ResourcesSaver', 'icon.gif', 'legacy/0.1.9/devtool.app.html', function (panel) {
+      return chrome.devtools.panels.create('Web Resource Vault', 'icon.gif', 'legacy/0.1.9/devtool.app.html', function (panel) {
         console.log('Content is loaded to panel', panel);
       });
     }
 
-    return chrome.devtools.panels.create('ResourcesSaver', 'icon.gif', 'legacy/0.1.8/devtool.app.html', function (panel) {
+    return chrome.devtools.panels.create('Web Resource Vault', 'icon.gif', 'legacy/0.1.8/devtool.app.html', function (panel) {
       console.log('Content is loaded to panel', panel);
     });
   } catch {
-    return chrome.devtools.panels.create('ResourcesSaver', 'icon.gif', 'legacy/0.1.8/devtool.app.html', function (panel) {
+    return chrome.devtools.panels.create('Web Resource Vault', 'icon.gif', 'legacy/0.1.8/devtool.app.html', function (panel) {
       console.log('Content is loaded to panel', panel);
     });
   }

@@ -20,15 +20,15 @@ export const Header = (props) => {
 
   const saveText = useMemo(() => {
     if (status !== UI_INITIAL_STATE.status) {
-      return 'Processing resources...';
+      return 'Procesando recursos...';
     }
-    return isSaving ? `Saving all resource...` : `Save All Resources`;
+    return isSaving ? `Guardando recursos en la bóveda...` : `Web Resource Vault`;
   }, [status, isSaving]);
 
   return (
     <HeaderWrapper>
       <div>
-        <span>Resources Saver</span>
+        <span>Web Resource Vault</span>
         <sup>Version: {packageJson?.version || 'LOCAL'}</sup>
         <ResetButton color={props.theme.white} bgColor={props.theme.danger} />
       </div>

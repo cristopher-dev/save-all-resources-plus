@@ -1,308 +1,287 @@
-import React, { useCallback, useState } from 'react';
-import { Toggle } from '../../Toggle';
-import Button from '../../Button';
-import {
-  AdvancedFiltersWrapper,
-  AdvancedFiltersTitle,
-  AdvancedFiltersCollapsible,
-  AdvancedFiltersRow,
-  AdvancedFiltersInput,
-  AdvancedFiltersLabel,
-  AdvancedFiltersGroup,
-  FileTypeGrid,
-  SizeFilterRow,
-  DomainExcludeSection,
-  CustomExtensionsSection,
-} from './styles';
+import React, { useState } from 'react';
+import { useStore } from 'devtoolApp/store';
 import * as optionActions from 'devtoolApp/store/option';
-import useStore from 'devtoolApp/store';
+import {
+  AdvancedFiltersContainer,
+  AdvancedFiltersHeader,
+  AdvancedFiltersTitle,
+  ExpandIcon,
+  AdvancedFiltersContent,
+  FilterSection,
+  FilterSectionTitle,
+  ToggleRow,
+  ToggleLabel,
+  FileTypeGrid,
+  FileTypeItem,
+  FileTypeIcon,
+  FileTypeLabel,
+  SizeFilterRow,
+  SizeInput,
+  SizeLabel,
+  TagsContainer,
+  Tag,
+  TagRemove,
+  AddTagInput,
+  FilterStats,
+  StatItem,
+  StatIcon,
+} from './styles';
+import { Toggle } from '../../Toggle';
+import { FaChevronDown, FaTimes } from 'react-icons/fa';
 
-export const AdvancedFilters = () => {
-  const {
-    dispatch,
-    state: {
-      option: {
-        filterByFileType,
-        filterBySize,
-        includeImages,
-        includeStylesheets,
-        includeScripts,
-        includeFonts,
-        includeDocuments,
-        minFileSize,
-        maxFileSize,
-        excludeDomains,
-        customFileExtensions,
-      },
-      ui: { isSaving },
-    },
-  } = useStore();
+const FILE_TYPES = [
+  { key: 'images', label: 'Imágenes', icon: '🖼️' },
+  { key: 'css', label: 'CSS', icon: '🎨' },
+  { key: 'javascript', label: 'JavaScript', icon: '⚡' },
+  { key: 'fonts', label: 'Fuentes', icon: '🔤' },
+  { key: 'documents', label: 'Documentos', icon: '📄' },
+  { key: 'other', label: 'Otros', icon: '📎' },
+];
 
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [domainInput, setDomainInput] = useState('');
-  const [extensionInput, setExtensionInput] = useState('');
+const AdvancedFilters = () => {
+  const { state, dispatch } = useStore();
+  const { option } = state;
+  
+  const [expanded, setExpanded] = useState(false);
+  const [newDomain, setNewDomain] = useState('');
+  const [newExtension, setNewExtension] = useState('');
 
-  const handleToggleExpanded = useCallback(() => setIsExpanded(!isExpanded), [isExpanded]);
+  const toggleExpanded = () => setExpanded(!expanded);
 
-  const handleFilterByFileType = useCallback((willFilter) => {
-    dispatch(optionActions.setFilterByFileType(willFilter));
-  }, [dispatch]);
-
-  const handleFilterBySize = useCallback((willFilter) => {
-    dispatch(optionActions.setFilterBySize(willFilter));
-  }, [dispatch]);
-
-  const handleIncludeImages = useCallback((willInclude) => {
-    dispatch(optionActions.setIncludeImages(willInclude));
-  }, [dispatch]);
-
-  const handleIncludeStylesheets = useCallback((willInclude) => {
-    dispatch(optionActions.setIncludeStylesheets(willInclude));
-  }, [dispatch]);
-
-  const handleIncludeScripts = useCallback((willInclude) => {
-    dispatch(optionActions.setIncludeScripts(willInclude));
-  }, [dispatch]);
-
-  const handleIncludeFonts = useCallback((willInclude) => {
-    dispatch(optionActions.setIncludeFonts(willInclude));
-  }, [dispatch]);
-
-  const handleIncludeDocuments = useCallback((willInclude) => {
-    dispatch(optionActions.setIncludeDocuments(willInclude));
-  }, [dispatch]);
-
-  const handleMinFileSize = useCallback((e) => {
-    dispatch(optionActions.setMinFileSize(e.target.value));
-  }, [dispatch]);
-
-  const handleMaxFileSize = useCallback((e) => {
-    dispatch(optionActions.setMaxFileSize(e.target.value));
-  }, [dispatch]);
-
-  const handleAddDomain = useCallback(() => {
-    if (domainInput.trim()) {
-      const newDomains = [...excludeDomains, domainInput.trim()];
-      dispatch(optionActions.setExcludeDomains(newDomains));
-      setDomainInput('');
+  const handleFileTypeToggle = (fileType) => {
+    // Map to existing store structure
+    const toggleAction = {
+      images: optionActions.setIncludeImages,
+      css: optionActions.setIncludeStylesheets,
+      javascript: optionActions.setIncludeScripts,
+      fonts: optionActions.setIncludeFonts,
+      documents: optionActions.setIncludeDocuments,
+    }[fileType];
+    
+    if (toggleAction) {
+      const currentValue = {
+        images: option.includeImages,
+        css: option.includeStylesheets,
+        javascript: option.includeScripts,
+        fonts: option.includeFonts,
+        documents: option.includeDocuments,
+      }[fileType];
+      
+      dispatch(toggleAction(!currentValue));
     }
-  }, [domainInput, excludeDomains, dispatch]);
+  };
 
-  const handleRemoveDomain = useCallback((domain) => {
-    const newDomains = excludeDomains.filter(d => d !== domain);
-    dispatch(optionActions.setExcludeDomains(newDomains));
-  }, [excludeDomains, dispatch]);
-
-  const handleAddExtension = useCallback(() => {
-    if (extensionInput.trim()) {
-      const ext = extensionInput.trim().replace(/^\./, ''); // Remove leading dot if present
-      const newExtensions = [...customFileExtensions, ext];
-      dispatch(optionActions.setCustomFileExtensions(newExtensions));
-      setExtensionInput('');
+  const handleSizeChange = (field, value) => {
+    const numValue = parseInt(value) || 0;
+    if (field === 'minSize') {
+      dispatch(optionActions.setMinFileSize(numValue));
+    } else {
+      dispatch(optionActions.setMaxFileSize(numValue));
     }
-  }, [extensionInput, customFileExtensions, dispatch]);
+  };
 
-  const handleRemoveExtension = useCallback((extension) => {
-    const newExtensions = customFileExtensions.filter(ext => ext !== extension);
-    dispatch(optionActions.setCustomFileExtensions(newExtensions));
-  }, [customFileExtensions, dispatch]);
+  const addDomain = () => {
+    if (newDomain.trim()) {
+      const domains = [...(option.excludeDomains || []), newDomain.trim()];
+      dispatch(optionActions.setExcludeDomains(domains));
+      setNewDomain('');
+    }
+  };
+
+  const removeDomain = (domain) => {
+    const domains = (option.excludeDomains || []).filter(d => d !== domain);
+    dispatch(optionActions.setExcludeDomains(domains));
+  };
+
+  const addExtension = () => {
+    if (newExtension.trim()) {
+      const extensions = [...(option.customFileExtensions || []), newExtension.trim()];
+      dispatch(optionActions.setCustomFileExtensions(extensions));
+      setNewExtension('');
+    }
+  };
+
+  const removeExtension = (extension) => {
+    const extensions = (option.customFileExtensions || []).filter(e => e !== extension);
+    dispatch(optionActions.setCustomFileExtensions(extensions));
+  };
+
+  const getActiveFiltersCount = () => {
+    let count = 0;
+    if (option.filterByFileType) count++;
+    if (option.filterBySize) count++;
+    if (option.excludeDomains?.length > 0) count++;
+    if (option.customFileExtensions?.length > 0) count++;
+    return count;
+  };
+
+  const activeFiltersCount = getActiveFiltersCount();
 
   return (
-    <AdvancedFiltersWrapper>
-      <AdvancedFiltersTitle onClick={handleToggleExpanded}>
-        🔧 Filtros Avanzados {isExpanded ? '⬆️' : '⬇️'}
-      </AdvancedFiltersTitle>
-      
-      {isExpanded && (
-        <AdvancedFiltersCollapsible>
-          <AdvancedFiltersGroup>
-            <Toggle 
-              noInteraction={isSaving} 
-              isToggled={filterByFileType} 
-              onToggle={handleFilterByFileType}
-            >
-              Filtrar por tipo de archivo
-            </Toggle>
-            
-            {filterByFileType && (
-              <FileTypeGrid>
-                <Toggle 
-                  noInteraction={isSaving} 
-                  isToggled={includeImages} 
-                  onToggle={handleIncludeImages}
-                  size="small"
-                >
-                  🖼️ Imágenes (jpg, png, gif, svg, webp)
-                </Toggle>
-                <Toggle 
-                  noInteraction={isSaving} 
-                  isToggled={includeStylesheets} 
-                  onToggle={handleIncludeStylesheets}
-                  size="small"
-                >
-                  🎨 CSS (css, scss, sass, less)
-                </Toggle>
-                <Toggle 
-                  noInteraction={isSaving} 
-                  isToggled={includeScripts} 
-                  onToggle={handleIncludeScripts}
-                  size="small"
-                >
-                  📜 JavaScript (js, ts, jsx, tsx)
-                </Toggle>
-                <Toggle 
-                  noInteraction={isSaving} 
-                  isToggled={includeFonts} 
-                  onToggle={handleIncludeFonts}
-                  size="small"
-                >
-                  🔤 Fuentes (woff, woff2, ttf, eot)
-                </Toggle>
-                <Toggle 
-                  noInteraction={isSaving} 
-                  isToggled={includeDocuments} 
-                  onToggle={handleIncludeDocuments}
-                  size="small"
-                >
-                  📄 Documentos (html, xml, json, txt)
-                </Toggle>
-              </FileTypeGrid>
+    <AdvancedFiltersContainer>
+      <AdvancedFiltersHeader expanded={expanded} onClick={toggleExpanded}>
+        <AdvancedFiltersTitle>
+          🔧 Filtros Avanzados
+          {activeFiltersCount > 0 && ` (${activeFiltersCount} activos)`}
+        </AdvancedFiltersTitle>
+        <ExpandIcon expanded={expanded}>
+          <FaChevronDown />
+        </ExpandIcon>
+      </AdvancedFiltersHeader>
+
+      <AdvancedFiltersContent expanded={expanded}>
+        <FilterSection>
+          <FilterSectionTitle>
+            🗂️ Filtros por Tipo de Archivo
+          </FilterSectionTitle>
+          
+          <ToggleRow>
+            <Toggle
+              isToggled={option.filterByFileType || false}
+              onToggle={(enabled) => dispatch(optionActions.setFilterByFileType(enabled))}
+            />
+            <ToggleLabel>
+              Habilitar filtro por tipo de archivo
+            </ToggleLabel>
+          </ToggleRow>
+
+          {option.filterByFileType && (
+            <FileTypeGrid>
+              {FILE_TYPES.map(({ key, label, icon }) => {
+                const isChecked = {
+                  images: option.includeImages,
+                  css: option.includeStylesheets,
+                  javascript: option.includeScripts,
+                  fonts: option.includeFonts,
+                  documents: option.includeDocuments,
+                  other: true, // Default for other types
+                }[key] || false;
+                
+                return (
+                  <FileTypeItem
+                    key={key}
+                    checked={isChecked}
+                    onClick={() => handleFileTypeToggle(key)}
+                  >
+                    <FileTypeIcon>{icon}</FileTypeIcon>
+                    <FileTypeLabel checked={isChecked}>
+                      {label}
+                    </FileTypeLabel>
+                  </FileTypeItem>
+                );
+              })}
+            </FileTypeGrid>
+          )}
+        </FilterSection>
+
+        <FilterSection>
+          <FilterSectionTitle>
+            📏 Filtros por Tamaño
+          </FilterSectionTitle>
+          
+          <ToggleRow>
+            <Toggle
+              isToggled={option.filterBySize || false}
+              onToggle={(enabled) => dispatch(optionActions.setFilterBySize(enabled))}
+            />
+            <ToggleLabel>
+              Habilitar filtro por tamaño
+            </ToggleLabel>
+          </ToggleRow>
+
+          {option.filterBySize && (
+            <SizeFilterRow>
+              <SizeLabel>Mín:</SizeLabel>
+              <SizeInput
+                type="number"
+                value={option.minFileSize || 0}
+                onChange={(e) => handleSizeChange('minSize', e.target.value)}
+                placeholder="0"
+              />
+              <SizeLabel>KB</SizeLabel>
+              
+              <SizeLabel>Máx:</SizeLabel>
+              <SizeInput
+                type="number"
+                value={option.maxFileSize || ''}
+                onChange={(e) => handleSizeChange('maxSize', e.target.value)}
+                placeholder="Sin límite"
+              />
+              <SizeLabel>KB</SizeLabel>
+            </SizeFilterRow>
+          )}
+        </FilterSection>
+
+        <FilterSection>
+          <FilterSectionTitle>
+            🚫 Dominios Excluidos
+          </FilterSectionTitle>
+          
+          <TagsContainer>
+            {(option.excludeDomains || []).map((domain) => (
+              <Tag key={domain}>
+                {domain}
+                <TagRemove onClick={() => removeDomain(domain)}>
+                  <FaTimes />
+                </TagRemove>
+              </Tag>
+            ))}
+            <AddTagInput
+              type="text"
+              placeholder="Agregar dominio..."
+              value={newDomain}
+              onChange={(e) => setNewDomain(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && addDomain()}
+            />
+          </TagsContainer>
+        </FilterSection>
+
+        <FilterSection>
+          <FilterSectionTitle>
+            🎯 Solo Extensiones Específicas
+          </FilterSectionTitle>
+          
+          <TagsContainer>
+            {(option.customFileExtensions || []).map((extension) => (
+              <Tag key={extension}>
+                .{extension}
+                <TagRemove onClick={() => removeExtension(extension)}>
+                  <FaTimes />
+                </TagRemove>
+              </Tag>
+            ))}
+            <AddTagInput
+              type="text"
+              placeholder="Agregar extensión (sin punto)..."
+              value={newExtension}
+              onChange={(e) => setNewExtension(e.target.value.replace('.', ''))}
+              onKeyPress={(e) => e.key === 'Enter' && addExtension()}
+            />
+          </TagsContainer>
+        </FilterSection>
+
+        {activeFiltersCount > 0 && (
+          <FilterStats>
+            <StatItem>
+              <StatIcon>📊</StatIcon>
+              {activeFiltersCount} filtro{activeFiltersCount !== 1 ? 's' : ''} activo{activeFiltersCount !== 1 ? 's' : ''}
+            </StatItem>
+            {option.filterByFileType && (
+              <StatItem>
+                <StatIcon>🗂️</StatIcon>
+                Tipos activos: {[option.includeImages, option.includeStylesheets, option.includeScripts, option.includeFonts, option.includeDocuments].filter(Boolean).length}
+              </StatItem>
             )}
-          </AdvancedFiltersGroup>
-
-          <AdvancedFiltersGroup>
-            <Toggle 
-              noInteraction={isSaving} 
-              isToggled={filterBySize} 
-              onToggle={handleFilterBySize}
-            >
-              Filtrar por tamaño de archivo
-            </Toggle>
-            
-            {filterBySize && (
-              <SizeFilterRow>
-                <div>
-                  <AdvancedFiltersLabel>Tamaño mínimo (KB):</AdvancedFiltersLabel>
-                  <AdvancedFiltersInput
-                    type="number"
-                    min="0"
-                    value={minFileSize}
-                    onChange={handleMinFileSize}
-                    disabled={isSaving}
-                  />
-                </div>
-                <div>
-                  <AdvancedFiltersLabel>Tamaño máximo (KB):</AdvancedFiltersLabel>
-                  <AdvancedFiltersInput
-                    type="number"
-                    min="0"
-                    value={maxFileSize}
-                    onChange={handleMaxFileSize}
-                    disabled={isSaving}
-                  />
-                </div>
-              </SizeFilterRow>
+            {option.excludeDomains?.length > 0 && (
+              <StatItem>
+                <StatIcon>🚫</StatIcon>
+                Dominios excluidos: {option.excludeDomains.length}
+              </StatItem>
             )}
-          </AdvancedFiltersGroup>
-
-          <AdvancedFiltersGroup>
-            <DomainExcludeSection>
-              <AdvancedFiltersLabel>🚫 Excluir dominios:</AdvancedFiltersLabel>
-              <AdvancedFiltersRow>
-                <AdvancedFiltersInput
-                  type="text"
-                  placeholder="ej: ads.google.com"
-                  value={domainInput}
-                  onChange={(e) => setDomainInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleAddDomain()}
-                  disabled={isSaving}
-                />
-                <Button color="primary" onClick={handleAddDomain} disabled={isSaving || !domainInput.trim()}>
-                  Añadir
-                </Button>
-              </AdvancedFiltersRow>
-              {excludeDomains.length > 0 && (
-                <div>
-                  {excludeDomains.map(domain => (
-                    <span key={domain} style={{ 
-                      display: 'inline-block', 
-                      margin: '2px', 
-                      padding: '4px 8px', 
-                      background: '#f0f0f0', 
-                      borderRadius: '4px',
-                      fontSize: '12px'
-                    }}>
-                      {domain}
-                      <button 
-                        onClick={() => handleRemoveDomain(domain)}
-                        style={{ 
-                          marginLeft: '5px', 
-                          background: 'none', 
-                          border: 'none', 
-                          color: 'red', 
-                          cursor: 'pointer' 
-                        }}
-                        disabled={isSaving}
-                      >
-                        ✕
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
-            </DomainExcludeSection>
-          </AdvancedFiltersGroup>
-
-          <AdvancedFiltersGroup>
-            <CustomExtensionsSection>
-              <AdvancedFiltersLabel>➕ Extensiones personalizadas:</AdvancedFiltersLabel>
-              <AdvancedFiltersRow>
-                <AdvancedFiltersInput
-                  type="text"
-                  placeholder="ej: pdf, doc, zip"
-                  value={extensionInput}
-                  onChange={(e) => setExtensionInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleAddExtension()}
-                  disabled={isSaving}
-                />
-                <Button color="primary" onClick={handleAddExtension} disabled={isSaving || !extensionInput.trim()}>
-                  Añadir
-                </Button>
-              </AdvancedFiltersRow>
-              {customFileExtensions.length > 0 && (
-                <div>
-                  {customFileExtensions.map(ext => (
-                    <span key={ext} style={{ 
-                      display: 'inline-block', 
-                      margin: '2px', 
-                      padding: '4px 8px', 
-                      background: '#e8f4f8', 
-                      borderRadius: '4px',
-                      fontSize: '12px'
-                    }}>
-                      .{ext}
-                      <button 
-                        onClick={() => handleRemoveExtension(ext)}
-                        style={{ 
-                          marginLeft: '5px', 
-                          background: 'none', 
-                          border: 'none', 
-                          color: 'red', 
-                          cursor: 'pointer' 
-                        }}
-                        disabled={isSaving}
-                      >
-                        ✕
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
-            </CustomExtensionsSection>
-          </AdvancedFiltersGroup>
-        </AdvancedFiltersCollapsible>
-      )}
-    </AdvancedFiltersWrapper>
+          </FilterStats>
+        )}
+      </AdvancedFiltersContent>
+    </AdvancedFiltersContainer>
   );
 };
 

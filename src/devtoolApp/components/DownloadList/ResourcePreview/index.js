@@ -12,7 +12,7 @@ import {
   ResourceInfo,
   ResourceName,
   ResourceMeta,
-  ResourcePreview,
+  ResourcePreview as ResourcePreviewWrapper,
   PreviewImage,
   PreviewCode,
   ResourceStats,
@@ -23,7 +23,7 @@ import {
   TypeBadge,
   NoPreviewMessage
 } from './styles';
-import { FaTimes, FaFile, FaImage, FaCode, FaFont, FaFileText } from 'react-icons/fa';
+import { FaTimes, FaFile, FaImage, FaCode, FaFont, FaFileAlt } from 'react-icons/fa';
 
 const ResourcePreview = ({ isOpen, onClose }) => {
   const { state } = useStore();
@@ -45,7 +45,7 @@ const ResourcePreview = ({ isOpen, onClose }) => {
     css: FaCode,
     javascript: FaCode,
     fonts: FaFont,
-    documents: FaFileText,
+    documents: FaFileAlt,
     other: FaFile
   };
 
@@ -185,9 +185,9 @@ const ResourcePreview = ({ isOpen, onClose }) => {
                     {Math.round(fileSize / 1024)} KB • {fileType}
                   </ResourceMeta>
                 </ResourceInfo>
-                <ResourcePreview>
+                <ResourcePreviewWrapper>
                   {renderPreview(resource)}
-                </ResourcePreview>
+                </ResourcePreviewWrapper>
               </ResourceItem>
             );
           })}

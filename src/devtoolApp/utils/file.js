@@ -207,82 +207,70 @@ export const getFileDomain = (url) => {
   }
 };
 
-export const getFileType = (url, mimeType = '') => {
+// Función para obtener el tipo de archivo basado en URL y MIME type
+export const getFileType = (url, mimeType) => {
   const extension = getFileExtension(url);
-  const mime = mimeType.toLowerCase();
   
-  // Imágenes
-  if (['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'bmp', 'ico'].includes(extension) ||
-      mime.startsWith('image/')) {
-    return 'images';
+  if (mimeType) {
+    if (mimeType.startsWith('image/')) return 'images';
+    if (mimeType.includes('css')) return 'css';
+    if (mimeType.includes('javascript')) return 'javascript';
+    if (mimeType.includes('font')) return 'fonts';
+    if (mimeType.includes('text/') || mimeType.includes('application/json')) return 'documents';
   }
   
-  // CSS
-  if (extension === 'css' || mime.includes('css')) {
-    return 'css';
-  }
+  const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'ico', 'bmp'];
+  const cssExts = ['css'];
+  const jsExts = ['js', 'mjs', 'jsx', 'ts', 'tsx'];
+  const fontExts = ['woff', 'woff2', 'ttf', 'otf', 'eot'];
+  const docExts = ['html', 'htm', 'xml', 'json', 'txt', 'md'];
   
-  // JavaScript
-  if (['js', 'jsx', 'ts', 'tsx', 'mjs'].includes(extension) || 
-      mime.includes('javascript') || mime.includes('ecmascript')) {
-    return 'javascript';
-  }
-  
-  // Fuentes
-  if (['woff', 'woff2', 'ttf', 'otf', 'eot'].includes(extension) ||
-      mime.includes('font')) {
-    return 'fonts';
-  }
-  
-  // Documentos
-  if (['html', 'htm', 'xml', 'json', 'txt', 'md', 'pdf'].includes(extension) ||
-      mime.includes('html') || mime.includes('xml') || mime.includes('json') || mime.includes('text')) {
-    return 'documents';
-  }
+  if (imageExts.includes(extension)) return 'images';
+  if (cssExts.includes(extension)) return 'css';
+  if (jsExts.includes(extension)) return 'javascript';
+  if (fontExts.includes(extension)) return 'fonts';
+  if (docExts.includes(extension)) return 'documents';
   
   return 'other';
 };
 
-export const applyAdvancedFilters = (resources, advancedFilters) => {
-  if (!advancedFilters) return resources;
+// Función para aplicar filtros avanzados
+export const applyAdvancedFilters = (resources, filters) => {
+  if (!filters) return resources;
   
   return resources.filter(resource => {
+    const fileType = getFileType(resource.url, resource.mimeType);
     const fileSize = getFileSize(resource);
     const fileSizeKB = Math.round(fileSize / 1024);
-    const fileExtension = getFileExtension(resource.url);
-    const fileDomain = getFileDomain(resource.url);
-    const fileType = getFileType(resource.url, resource.mimeType);
+    const domain = new URL(resource.url).hostname;
+    const extension = getFileExtension(resource.url);
     
-    // Filtrar por tipo de archivo
-    if (advancedFilters.enableFileTypeFilter && advancedFilters.fileTypes) {
-      const enabledTypes = Object.keys(advancedFilters.fileTypes).filter(
-        type => advancedFilters.fileTypes[type]
-      );
-      if (enabledTypes.length > 0 && !enabledTypes.includes(fileType)) {
+    // Filtro por tipo de archivo
+    if (filters.enableFileTypeFilter && filters.fileTypes) {
+      if (!filters.fileTypes[fileType]) {
         return false;
       }
     }
     
-    // Filtrar por tamaño
-    if (advancedFilters.enableSizeFilter) {
-      if (advancedFilters.minSize && fileSizeKB < advancedFilters.minSize) {
-        return false;
-      }
-      if (advancedFilters.maxSize && fileSizeKB > advancedFilters.maxSize) {
-        return false;
-      }
-    }
-    
-    // Filtrar dominios excluidos
-    if (advancedFilters.excludedDomains && advancedFilters.excludedDomains.length > 0) {
-      if (advancedFilters.excludedDomains.includes(fileDomain)) {
+    // Filtro por tamaño
+    if (filters.enableSizeFilter) {
+      const minSize = filters.minSize || 0;
+      const maxSize = filters.maxSize || Infinity;
+      if (fileSizeKB < minSize || fileSizeKB > maxSize) {
         return false;
       }
     }
     
-    // Filtrar extensiones personalizadas (solo incluir estas)
-    if (advancedFilters.customExtensions && advancedFilters.customExtensions.length > 0) {
-      if (!advancedFilters.customExtensions.includes(fileExtension)) {
+    // Filtro por dominios excluidos
+    if (filters.excludedDomains && filters.excludedDomains.length > 0) {
+      if (filters.excludedDomains.some(excludedDomain => domain.includes(excludedDomain))) {
+        return false;
+      }
+    }
+    
+    // Filtro por extensiones personalizadas
+    if (filters.customExtensions && filters.customExtensions.length > 0) {
+      if (!filters.customExtensions.includes(extension)) {
         return false;
       }
     }

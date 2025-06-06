@@ -210,7 +210,7 @@ function tabCompleteForXHRHandler(tabId, changeInfo, keepDisabled) {
     document.getElementById('check-xhr').checked = true;
     document.getElementById('check-xhr').disabled = false;
     document.getElementById('label-xhr').innerHTML = 'Include all assets by XHR requests (require page reload).';
-    document.getElementById('up-save').innerHTML = 'Save All Resources';
+    document.getElementById('up-save').innerHTML = 'Web Resource Vault';
     document.getElementById('up-save').disabled = false;
     // Remove listener from further same event
     chrome.tabs.onUpdated.removeListener(tabCompleteForXHRHandler);
