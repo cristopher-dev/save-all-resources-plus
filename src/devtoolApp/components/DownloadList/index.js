@@ -36,8 +36,12 @@ export const DownloadList = () => {
     downloadList,
     downloadLog,
     ui: { tab, log, isSaving, savingIndex },
+    staticResource = [], // Added to access staticResource
+    networkResource = [], // Added to access networkResource
   } = state;
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedResources, setSelectedResources] = useState({}); // Estado para los checkboxes
+
   const handleClose = useMemo(() => () => setIsModalOpen(false), []);
   const handleOpen = useMemo(() => () => setIsModalOpen(true), []);
   const handleReset = useMemo(
@@ -52,6 +56,15 @@ export const DownloadList = () => {
     }
     dispatch(uiActions.setLog(currentLog));
   };
+
+  const handleCheckboxChange = (url) => {
+    setSelectedResources((prev) => ({
+      ...prev,
+      [url]: !prev[url],
+    }));
+  };
+
+  const allResources = useMemo(() => [...staticResource, ...networkResource], [staticResource, networkResource]);
 
   return (
     <DownloadListWrapper>
@@ -71,9 +84,16 @@ export const DownloadList = () => {
         {downloadList.map((item, index) => {
           const foundLog = downloadLog.find((i) => i.url === item.url);
           const logExpanded = log && log.url === item.url;
+          const isChecked = selectedResources[item.url] || false;
           return (
             <React.Fragment key={item.url}>
               <DownloadListItemWrapper highlighted={item.url === tab.url} done={!!foundLog} logExpanded={logExpanded}>
+                <input
+                  type="checkbox"
+                  checked={isChecked}
+                  onChange={() => handleCheckboxChange(item.url)}
+                  style={{ marginRight: '10px' }}
+                />
                 <DownloadListItemUrl active={isSaving === item.url}>{item.url}</DownloadListItemUrl>
                 <DownloadListButtonGroup>
                   {!isSaving && foundLog && (

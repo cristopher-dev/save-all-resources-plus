@@ -75,17 +75,17 @@ export const Status = () => {
   }, [staticResource, networkResource]);
 
   const totalResources = staticResource.length + networkResource.length;
-  const isProcessing = status && status !== 'Listo para procesar recursos';
+  const isProcessing = status && status !== 'Listo para procesar recursos' && status !== 'Análisis completado';
 
   const getStatusIcon = () => {
     if (isProcessing) return FaSpinner;
-    if (totalResources > 0) return FaCheckCircle;
+    if (totalResources > 0 || status === 'Análisis completado') return FaCheckCircle;
     return FaExclamationTriangle;
   };
 
   const getStatusVariant = () => {
     if (isProcessing) return 'warning';
-    if (totalResources > 0) return 'success';
+    if (totalResources > 0 || status === 'Análisis completado') return 'success';
     return 'info';
   };
 
@@ -103,10 +103,10 @@ export const Status = () => {
           <span>{status || 'Esperando análisis...'}</span>
         </MessageCard>
 
-        {totalResources > 0 && (
+        {(totalResources > 0 || status === 'Análisis completado') && (
           <>
             <ProgressBar>
-              <ProgressFill width={totalResources > 0 ? 100 : 0} />
+              <ProgressFill width={100} />
             </ProgressBar>
 
             <StatusGrid>

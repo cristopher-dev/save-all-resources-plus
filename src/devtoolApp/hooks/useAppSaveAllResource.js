@@ -18,6 +18,9 @@ export const useAppSaveAllResource = () => {
     ui: { tab },
   } = state;
 
+  // Se espera que selectedResources venga del estado global o como prop
+  const selectedResources = state.ui?.selectedResources || {}; 
+
   const handleOnSave = useCallback(async () => {
     // Verificar que el contexto de DevTools esté disponible antes de proceder
     if (!chrome?.devtools?.inspectedWindow?.tabId || !chrome?.tabs?.update) {
@@ -28,6 +31,13 @@ export const useAppSaveAllResource = () => {
     dispatch(uiActions.setIsSaving(true));
     for (let i = 0; i < downloadList.length; i++) {
       const downloadItem = downloadList[i];
+
+      // Si hay recursos seleccionados y el item actual no está seleccionado, saltarlo
+      const hasSelectedItems = Object.values(selectedResources).some(isSelected => isSelected);
+      if (hasSelectedItems && !selectedResources[downloadItem.url]) {
+        continue;
+      }
+
       dispatch(uiActions.setSavingIndex(i));
       await new Promise(async (resolve) => {
         let loaded = true;
@@ -73,7 +83,14 @@ export const useAppSaveAllResource = () => {
           ...(staticResourceRef.current || []),
         ];
         const filteredResources = applyAdvancedFilters(allResources, advancedFilters);
-        const toDownload = resolveDuplicatedResources(filteredResources);
+        
+        let toDownload = resolveDuplicatedResources(filteredResources);
+
+        // Filtrar `toDownload` basado en `selectedResources` si hay selecciones
+        if (hasSelectedItems) {
+          toDownload = toDownload.filter(resource => selectedResources[resource.url]);
+        }
+
         console.log(toDownload.filter(t => typeof t?.content !== 'string' && !!t?.content?.then));
         if (loaded && toDownload.length) {
           downloadZipFile(
@@ -96,7 +113,8 @@ export const useAppSaveAllResource = () => {
     }
     dispatch(uiActions.setStatus(UI_INITIAL_STATE.status));
     dispatch(uiActions.setIsSaving(false));
-  }, [state, dispatch, tab]);
+    dispatch(uiActions.setAnalysisCompleted()); // Indicar que el análisis (y guardado) ha terminado
+  }, [state, dispatch, tab, selectedResources]);
 
   useEffect(() => {
     networkResourceRef.current = networkResource;
