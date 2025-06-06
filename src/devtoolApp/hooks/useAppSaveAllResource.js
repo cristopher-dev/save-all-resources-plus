@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import * as uiActions from '../store/ui';
-import { downloadZipFile, resolveDuplicatedResources } from '../utils/file';
+import { downloadZipFile, resolveDuplicatedResources, applyAdvancedFilters } from '../utils/file';
 import { logResourceByUrl } from '../utils/resource';
 import { resetNetworkResource } from '../store/networkResource';
 import { resetStaticResource } from '../store/staticResource';
@@ -14,7 +14,7 @@ export const useAppSaveAllResource = () => {
   const staticResourceRef = useRef(staticResource);
   const {
     downloadList,
-    option: { ignoreNoContentFile, beautifyFile },
+    option: { ignoreNoContentFile, beautifyFile, advancedFilters },
     ui: { tab },
   } = state;
 
@@ -50,10 +50,12 @@ export const useAppSaveAllResource = () => {
             }, 500);
           });
         }
-        const toDownload = resolveDuplicatedResources([
+        const allResources = [
           ...(networkResourceRef.current || []),
           ...(staticResourceRef.current || []),
-        ]);
+        ];
+        const filteredResources = applyAdvancedFilters(allResources, advancedFilters);
+        const toDownload = resolveDuplicatedResources(filteredResources);
         console.log(toDownload.filter(t => typeof t?.content !== 'string' && !!t?.content?.then));
         if (loaded && toDownload.length) {
           downloadZipFile(

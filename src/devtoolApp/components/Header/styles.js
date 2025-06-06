@@ -22,3 +22,9 @@ export const HeaderWrapper = styled.h1`
     color: ${(props) => (props.theme.name === THEME_KEYS.DARK ? props.theme.text : props.theme.secondary)};
   }
 `;
+
+export const ButtonGroup = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+`;

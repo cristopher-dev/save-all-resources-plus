@@ -171,3 +171,122 @@ export const downloadCompleteZip = (zipWriter, blobWriter, callback) => {
     });
   });
 };
+
+// Funciones de filtrado avanzado
+export const getFileSize = (item) => {
+  if (!item.content) return 0;
+  
+  if (item.content instanceof Blob) {
+    return item.content.size;
+  }
+  
+  if (item.encoding === 'base64') {
+    try {
+      const decoded = atob(item.content);
+      return new Blob([decoded]).size;
+    } catch (e) {
+      return item.content.length;
+    }
+  }
+  
+  return new Blob([item.content]).size;
+};
+
+export const getFileExtension = (url) => {
+  if (!url) return '';
+  const match = url.match(/\.([a-zA-Z0-9]+)(?:\?|#|$)/);
+  return match ? match[1].toLowerCase() : '';
+};
+
+export const getFileDomain = (url) => {
+  try {
+    const urlObj = new URL(url);
+    return urlObj.hostname;
+  } catch (e) {
+    return '';
+  }
+};
+
+export const getFileType = (url, mimeType = '') => {
+  const extension = getFileExtension(url);
+  const mime = mimeType.toLowerCase();
+  
+  // Imágenes
+  if (['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'bmp', 'ico'].includes(extension) ||
+      mime.startsWith('image/')) {
+    return 'images';
+  }
+  
+  // CSS
+  if (extension === 'css' || mime.includes('css')) {
+    return 'css';
+  }
+  
+  // JavaScript
+  if (['js', 'jsx', 'ts', 'tsx', 'mjs'].includes(extension) || 
+      mime.includes('javascript') || mime.includes('ecmascript')) {
+    return 'javascript';
+  }
+  
+  // Fuentes
+  if (['woff', 'woff2', 'ttf', 'otf', 'eot'].includes(extension) ||
+      mime.includes('font')) {
+    return 'fonts';
+  }
+  
+  // Documentos
+  if (['html', 'htm', 'xml', 'json', 'txt', 'md', 'pdf'].includes(extension) ||
+      mime.includes('html') || mime.includes('xml') || mime.includes('json') || mime.includes('text')) {
+    return 'documents';
+  }
+  
+  return 'other';
+};
+
+export const applyAdvancedFilters = (resources, advancedFilters) => {
+  if (!advancedFilters) return resources;
+  
+  return resources.filter(resource => {
+    const fileSize = getFileSize(resource);
+    const fileSizeKB = Math.round(fileSize / 1024);
+    const fileExtension = getFileExtension(resource.url);
+    const fileDomain = getFileDomain(resource.url);
+    const fileType = getFileType(resource.url, resource.mimeType);
+    
+    // Filtrar por tipo de archivo
+    if (advancedFilters.enableFileTypeFilter && advancedFilters.fileTypes) {
+      const enabledTypes = Object.keys(advancedFilters.fileTypes).filter(
+        type => advancedFilters.fileTypes[type]
+      );
+      if (enabledTypes.length > 0 && !enabledTypes.includes(fileType)) {
+        return false;
+      }
+    }
+    
+    // Filtrar por tamaño
+    if (advancedFilters.enableSizeFilter) {
+      if (advancedFilters.minSize && fileSizeKB < advancedFilters.minSize) {
+        return false;
+      }
+      if (advancedFilters.maxSize && fileSizeKB > advancedFilters.maxSize) {
+        return false;
+      }
+    }
+    
+    // Filtrar dominios excluidos
+    if (advancedFilters.excludedDomains && advancedFilters.excludedDomains.length > 0) {
+      if (advancedFilters.excludedDomains.includes(fileDomain)) {
+        return false;
+      }
+    }
+    
+    // Filtrar extensiones personalizadas (solo incluir estas)
+    if (advancedFilters.customExtensions && advancedFilters.customExtensions.length > 0) {
+      if (!advancedFilters.customExtensions.includes(fileExtension)) {
+        return false;
+      }
+    }
+    
+    return true;
+  });
+};

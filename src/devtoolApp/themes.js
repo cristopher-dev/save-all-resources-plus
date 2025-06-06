@@ -6,6 +6,9 @@ export const colors = {
   red: `#ac3434`,
   black: `#000000`,
   white: `#ffffff`,
+  success: `#28a745`,
+  warning: `#ffc107`,
+  info: `#17a2b8`,
 };
 
 export const THEME_KEYS = {
@@ -24,6 +27,25 @@ export const generateThemeConfig = (factor, baseShade) => {
     background: baseShade,
     text: getShade(0.9, baseShade, factor),
     getShade: (value) => getShade(value, baseShade, factor),
+    // Colores adicionales para los nuevos componentes
+    colors: {
+      primary: colors.blue,
+      primaryHover: darken(0.1, colors.blue),
+      secondary: colors.green,
+      success: colors.success,
+      successHover: darken(0.1, colors.success),
+      danger: colors.red,
+      dangerHover: darken(0.1, colors.red),
+      warning: colors.warning,
+      info: colors.info,
+      text: getShade(0.9, baseShade, factor),
+      textSecondary: getShade(0.6, baseShade, factor),
+      background: baseShade,
+      backgroundAlt: getShade(0.05, baseShade, factor),
+      backgroundHover: getShade(0.1, baseShade, factor),
+      surface: getShade(0.02, baseShade, factor),
+      border: getShade(0.2, baseShade, factor),
+    },
   };
 };
 

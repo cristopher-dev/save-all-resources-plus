@@ -17,6 +17,8 @@ import * as downloadListActions from 'devtoolApp/store/downloadList';
 import * as uiActions from 'devtoolApp/store/ui';
 import LogSection from './LogSection';
 import OptionSection from './OptionSection';
+import AdvancedFilters from './AdvancedFilters';
+import ConfigurationPresets from './ConfigurationPresets';
 import { FaTrash } from 'react-icons/fa';
 import { MdDownloading } from 'react-icons/md';
 
@@ -46,6 +48,8 @@ export const DownloadList = () => {
   return (
     <DownloadListWrapper>
       <OptionSection />
+      <ConfigurationPresets />
+      <AdvancedFilters />
       <DownloadListHeader>Download List:</DownloadListHeader>
       <DownloadListContainer>
         {downloadList.map((item, index) => {
