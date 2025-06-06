@@ -8,6 +8,7 @@ export const ACTIONS = {
   SET_STATUS: 'SET_STATUS',
   SET_TAB: 'SET_TAB',
   SET_LOG: 'SET_LOG',
+  SET_ANALYSIS_COMPLETED: 'SET_ANALYSIS_COMPLETED', // Nueva acción
 };
 
 export const INITIAL_STATE = {
@@ -16,6 +17,7 @@ export const INITIAL_STATE = {
   isSaving: false,
   savingIndex: 0,
   status: `Idle...`,
+  analysisCompleted: false, // Nuevo estado inicial
 };
 
 export const setLog = (log) => ({
@@ -41,6 +43,11 @@ export const setSavingIndex = (savingIndex) => ({
 export const setStatus = (status) => ({
   type: ACTIONS.SET_STATUS,
   payload: status,
+});
+
+// Nuevo creador de acción
+export const setAnalysisCompleted = () => ({
+  type: ACTIONS.SET_ANALYSIS_COMPLETED,
 });
 
 let flashStatusTimeoutHandler = null;
@@ -86,6 +93,14 @@ export const uiReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         log: action.payload,
+      };
+    }
+    // Manejar la nueva acción en el reducer
+    case ACTIONS.SET_ANALYSIS_COMPLETED: {
+      return {
+        ...state,
+        analysisCompleted: true,
+        status: 'Análisis completado', // Actualizar también el estado general
       };
     }
     default: {
