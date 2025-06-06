@@ -1,7 +1,4 @@
 import prettier from 'prettier';
-import htmlParser from 'prettier/parser-html';
-import babelParser from 'prettier/parser-babel';
-import postCssParser from 'prettier/parser-postcss';
 import * as zip from '@zip.js/zip.js';
 
 export const resolveDuplicatedResources = (resourceList = []) => {
@@ -83,22 +80,22 @@ export const addItemsToZipWriter = (zipWriter, items, options, eachDoneCallback,
         switch (fileExt ? fileExt[1] : '') {
           case 'js': {
             console.log('[DEVTOOL]', item.saveAs?.name, ' will be beautified!');
-            item.content = prettier.format(item.content, { parser: 'babel', plugins: [babelParser] });
+            item.content = prettier.format(item.content, { parser: 'babel' });
             break;
           }
           case 'json': {
             console.log('[DEVTOOL]', item.saveAs?.name, ' will be beautified!');
-            item.content = prettier.format(item.content, { parser: 'json', plugins: [babelParser] });
+            item.content = prettier.format(item.content, { parser: 'json' });
             break;
           }
           case 'html': {
             console.log('[DEVTOOL]', item.saveAs?.name, ' will be beautified!');
-            item.content = prettier.format(item.content, { parser: 'html', plugins: [htmlParser, babelParser, postCssParser] });
+            item.content = prettier.format(item.content, { parser: 'html' });
             break;
           }
           case 'css': {
             console.log('[DEVTOOL]', item.saveAs?.name, ' will be beautified!');
-            item.content = prettier.format(item.content, { parser: 'css', plugins: [postCssParser] });
+            item.content = prettier.format(item.content, { parser: 'css' });
             break;
           }
         }

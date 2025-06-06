@@ -16,17 +16,27 @@ const handleDuplicatedName = (filename) => {
 
 module.exports = new Namer({
   name({ bundle }) {
-    const filePath = bundle.getMainEntry().filePath;
-    const ext = path.extname(filePath);
-    if (ext.endsWith('css')) {
-      return path.basename(filePath);
+    try {
+      const mainEntry = bundle.getMainEntry();
+      if (!mainEntry || !mainEntry.filePath) {
+        return null; // Let Parcel handle the naming for bundles without a main entry or filePath
+      }
+      
+      const filePath = mainEntry.filePath;
+      const ext = path.extname(filePath);
+      if (ext.endsWith('css')) {
+        return path.basename(filePath);
+      }
+      if (filePath.includes('src/static/fonts')) {
+        return `fonts/${path.basename(filePath)}`;
+      }
+      if (path.dirname(filePath).endsWith('/src')) {
+        return handleDuplicatedName(path.basename(filePath));
+      }
+      return null;
+    } catch (error) {
+      console.error('Error in parcel-namer-resource-saver:', error);
+      return null; // Fallback to default naming
     }
-    if (filePath.includes('src/static/fonts')) {
-      return `fonts/${path.basename(filePath)}`;
-    }
-    if (path.dirname(filePath).endsWith('/src')) {
-      return handleDuplicatedName(path.basename(filePath));
-    }
-    return null;
   },
 });
