@@ -40,6 +40,14 @@ export const DownloadList = () => {
     staticResource = [],
     networkResource = [],
   } = state;
+  
+  // Debug logging
+  console.log('[DownloadList]: Component render - downloadList length:', downloadList?.length || 0);
+  console.log('[DownloadList]: downloadList items:', downloadList);
+  console.log('[DownloadList]: staticResource length:', staticResource?.length || 0);
+  console.log('[DownloadList]: networkResource length:', networkResource?.length || 0);
+  console.log('[DownloadList]: Current tab:', tab);
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleClose = useMemo(() => () => setIsModalOpen(false), []);

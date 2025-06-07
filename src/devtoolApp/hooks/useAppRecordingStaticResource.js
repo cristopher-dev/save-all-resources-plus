@@ -41,20 +41,35 @@ export const useAppRecordingStaticResource = () => {
     
     function initializeStaticResourceRecording() {
       try {
+        console.log('[STATIC RESOURCE]: Initializing static resource recording...');
+        
         //Get all resources that were already cached
         chrome.devtools.inspectedWindow.getResources((resources) => {
+          console.log('[STATIC RESOURCE]: getResources callback called, count:', resources?.length || 0);
+          console.log('[STATIC RESOURCE]: Raw resources:', resources);
+          
           if (resources && resources.length) {
-            resources.forEach((res) => processStaticResourceToStore(dispatch, res));
+            console.log('[STATIC RESOURCE]: Processing', resources.length, 'static resources');
+            resources.forEach((res, index) => {
+              console.log(`[STATIC RESOURCE]: Processing resource ${index + 1}:`, res.url, res.type);
+              processStaticResourceToStore(dispatch, res);
+            });
+          } else {
+            console.log('[STATIC RESOURCE]: No static resources found');
           }
         });
 
         //This can be used for identifying when ever a new resource is added
-        chrome.devtools.inspectedWindow.onResourceAdded.addListener((res) => processStaticResourceToStore(dispatch, res));
+        chrome.devtools.inspectedWindow.onResourceAdded.addListener((res) => {
+          console.log('[STATIC RESOURCE]: New resource added:', res.url, res.type);
+          processStaticResourceToStore(dispatch, res);
+        });
 
         //This can be used to detect when ever a resource code is changed/updated
-        chrome.devtools.inspectedWindow.onResourceContentCommitted.addListener((res) =>
-          processStaticResourceToStore(dispatch, res)
-        );
+        chrome.devtools.inspectedWindow.onResourceContentCommitted.addListener((res) => {
+          console.log('[STATIC RESOURCE]: Resource content committed:', res.url, res.type);
+          processStaticResourceToStore(dispatch, res);
+        });
       } catch (error) {
         console.error('[STATIC RESOURCE]: Error initializing static resource recording:', error);
       }

@@ -41,15 +41,30 @@ export const useAppRecordingNetworkResource = () => {
     
     function initializeNetworkResourceRecording() {
       try {
+        console.log('[NETWORK RESOURCE]: Initializing network resource recording...');
+        
         //Get all HARs that were already captured
         chrome.devtools.network.getHAR((logInfo) => {
+          console.log('[NETWORK RESOURCE]: getHAR callback called');
+          console.log('[NETWORK RESOURCE]: HAR entries count:', logInfo?.entries?.length || 0);
+          console.log('[NETWORK RESOURCE]: HAR log info:', logInfo);
+          
           if (logInfo && logInfo.entries && logInfo.entries.length) {
-            logInfo.entries.forEach((req) => processNetworkResourceToStore(dispatch, req));
+            console.log('[NETWORK RESOURCE]: Processing', logInfo.entries.length, 'network requests');
+            logInfo.entries.forEach((req, index) => {
+              console.log(`[NETWORK RESOURCE]: Processing request ${index + 1}:`, req.request?.url);
+              processNetworkResourceToStore(dispatch, req);
+            });
+          } else {
+            console.log('[NETWORK RESOURCE]: No network requests found in HAR');
           }
         });
 
         //This can be used for detecting when a request is finished
-        chrome.devtools.network.onRequestFinished.addListener((req) => processNetworkResourceToStore(dispatch, req));
+        chrome.devtools.network.onRequestFinished.addListener((req) => {
+          console.log('[NETWORK RESOURCE]: New request finished:', req.request?.url);
+          processNetworkResourceToStore(dispatch, req);
+        });
       } catch (error) {
         console.error('[NETWORK RESOURCE]: Error initializing network resource recording:', error);
       }
