@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useStore } from '../store';
 import * as uiActions from '../store/ui';
+import * as downloadListActions from '../store/downloadList';
 
 /**
  * Hook para monitorear la adición de recursos y detectar cuando se completa
@@ -44,6 +45,15 @@ export const useResourceAdditionMonitor = (timeoutMs = 3000) => {
         // Si hemos tenido estabilidad por suficiente tiempo, completar análisis
         if (stableCountRef.current >= 1 && currentResourceCount > 0) {
           console.log('[RESOURCE MONITOR]: Resources stable, completing analysis');
+          
+          // Agregar recursos detectados a la downloadList automáticamente
+          const allResources = [...networkResource, ...staticResource];
+          console.log('[RESOURCE MONITOR]: Adding', allResources.length, 'resources to download list');
+          
+          allResources.forEach(resource => {
+            dispatch(downloadListActions.addDownloadItem({ url: resource.url }));
+          });
+          
           dispatch(uiActions.setAnalysisCompleted());
         }
       }, timeoutMs);
