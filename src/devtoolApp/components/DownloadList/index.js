@@ -133,12 +133,13 @@ export const DownloadList = () => {
       </DownloadListHeader>
       <DownloadListContainer>
         {downloadList.map((item, index) => {
+          if (!item) return null; // Protección contra item nulo
           const foundLog = downloadLog.find((i) => i.url === item.url);
           const logExpanded = log && log.url === item.url;
           const isChecked = selectedResources[item.url] || false;
           return (
             <React.Fragment key={item.url}>
-              <DownloadListItemWrapper highlighted={item.url === tab.url} done={!!foundLog} logExpanded={logExpanded}>
+              <DownloadListItemWrapper highlighted={tab && item.url === tab.url} done={!!foundLog} logExpanded={logExpanded}>
                 <input
                   type="checkbox"
                   checked={isChecked}
@@ -160,7 +161,6 @@ export const DownloadList = () => {
                   {isSaving && savingIndex === index && <Spinner />}
                 </DownloadListButtonGroup>
               </DownloadListItemWrapper>
-              {logExpanded && <LogSection log={log} />}
             </React.Fragment>
           );
         })}
