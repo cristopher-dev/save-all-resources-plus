@@ -76,6 +76,7 @@ export const Status = () => {
 
   const totalResources = staticResource.length + networkResource.length;
   const isProcessing = status && status !== 'Listo para procesar recursos' && status !== 'Análisis completado';
+  const isError = status && status.toLowerCase().includes('error');
 
   const getStatusIcon = () => {
     if (isProcessing) return FaSpinner;
@@ -98,22 +99,18 @@ export const Status = () => {
           <StatusIcon size={20} className={isProcessing ? 'spinning' : ''} />
           <StatusTitle>Estado del Análisis</StatusTitle>
         </StatusHeader>
-        
-        <MessageCard variant={getStatusVariant()}>
+        <MessageCard variant={isError ? 'danger' : getStatusVariant()}>
           <span>{status || 'Esperando análisis...'}</span>
         </MessageCard>
-
-        {(totalResources > 0 || status === 'Análisis completado') && (
+        {(totalResources > 0 || status === 'Análisis completado') && !isError && (
           <>
             <ProgressBar>
               <ProgressFill width={100} />
             </ProgressBar>
-
             <StatusGrid>
               {Object.entries(resourceStats).map(([key, stat]) => {
                 if (stat.count === 0) return null;
                 const IconComponent = stat.icon;
-                
                 return (
                   <ResourceCard key={key}>
                     <ResourceIcon color={stat.color}>

@@ -38,8 +38,6 @@ export const useAppSaveAllResource = () => {
     try {
     for (let i = 0; i < downloadList.length; i++) {
       const downloadItem = downloadList[i];
-
-      // Si hay recursos seleccionados y el item actual no está seleccionado, saltarlo
       const hasSelectedItems = Object.values(selectedResources).some(isSelected => isSelected);
       if (hasSelectedItems && !selectedResources[downloadItem.url]) {
         console.log(`[SAVE ALL]: Skipping ${downloadItem.url} - not selected`);
@@ -49,82 +47,88 @@ export const useAppSaveAllResource = () => {
       dispatch(uiActions.setSavingIndex(i));
       await new Promise(async (resolve) => {
         let loaded = true;
-        if (i > 0 || tab?.url !== downloadItem.url) {
-          loaded = await new Promise((r) => {
-            const tabChangeHandler = (tabId, changeInfo) => {
-              try {
-                if (tabId !== chrome.devtools.inspectedWindow.tabId || !changeInfo || !changeInfo.status) {
-                  return;
-                }
-                if (changeInfo.status === 'loading') {
-                  return;
-                }
-                if (changeInfo.status === 'complete') {
-                  setTimeout(() => {
-                    r(true);
-                  }, 2000);
-                } else {
+        try {
+          if (i > 0 || tab?.url !== downloadItem.url) {
+            loaded = await new Promise((r) => {
+              const tabChangeHandler = (tabId, changeInfo) => {
+                try {
+                  if (tabId !== chrome.devtools.inspectedWindow.tabId || !changeInfo || !changeInfo.status) {
+                    return;
+                  }
+                  if (changeInfo.status === 'loading') {
+                    return;
+                  }
+                  if (changeInfo.status === 'complete') {
+                    setTimeout(() => {
+                      r(true);
+                    }, 2000);
+                  } else {
+                    r(false);
+                  }
+                  chrome.tabs.onUpdated.removeListener(tabChangeHandler);
+                } catch (error) {
+                  console.error('[SAVE ALL]: Error in tab change handler:', error);
+                  dispatch(uiActions.setStatus('Error en cambio de pestaña: ' + error.message));
                   r(false);
+                  chrome.tabs.onUpdated.removeListener(tabChangeHandler);
                 }
-                chrome.tabs.onUpdated.removeListener(tabChangeHandler);
+              };
+              try {
+                chrome.tabs.onUpdated.addListener(tabChangeHandler);
+                setTimeout(function () {
+                  dispatch(uiActions.setTab({ url: downloadItem.url }));
+                  chrome.tabs.update(chrome.devtools.inspectedWindow.tabId, { url: downloadItem.url });
+                }, 500);
               } catch (error) {
-                console.error('[SAVE ALL]: Error in tab change handler:', error);
+                console.error('[SAVE ALL]: Error setting up tab change:', error);
+                dispatch(uiActions.setStatus('Error preparando cambio de pestaña: ' + error.message));
                 r(false);
-                chrome.tabs.onUpdated.removeListener(tabChangeHandler);
               }
-            };
-            
-            try {
-              chrome.tabs.onUpdated.addListener(tabChangeHandler);
-              setTimeout(function () {
-                dispatch(uiActions.setTab({ url: downloadItem.url }));
-                chrome.tabs.update(chrome.devtools.inspectedWindow.tabId, { url: downloadItem.url });
-              }, 500);
-            } catch (error) {
-              console.error('[SAVE ALL]: Error setting up tab change:', error);
-              r(false);
-            }
-          });
-        }
-        const allResources = [
-          ...(networkResourceRef.current || []),
-          ...(staticResourceRef.current || []),
-        ];
-        const filteredResources = applyAdvancedFilters(allResources, advancedFilters);
-        
-        let toDownload = resolveDuplicatedResources(filteredResources);
-
-        // Filtrar `toDownload` basado en `selectedResources` si hay selecciones
-        if (hasSelectedItems) {
-          toDownload = toDownload.filter(resource => selectedResources[resource.url]);
-          console.log(`[SAVE ALL]: Filtered resources for ${downloadItem.url}:`, toDownload.length);
-        } else {
-          console.log(`[SAVE ALL]: No specific selections, downloading all resources for ${downloadItem.url}:`, toDownload.length);
-        }
-
-        console.log(toDownload.filter(t => typeof t?.content !== 'string' && !!t?.content?.then));
-        if (loaded && toDownload.length) {
-          downloadZipFile(
-            toDownload,
-            { ignoreNoContentFile, beautifyFile },
-            (item, isDone) => {
-              dispatch(uiActions.setStatus(`Compressed: ${item.url} Processed: ${isDone}`));
-            },
-            () => {
-              logResourceByUrl(dispatch, downloadItem.url, toDownload);
-              if (i + 1 !== downloadList.length) {
-                dispatch(resetNetworkResource());
-                dispatch(resetStaticResource());
+            });
+          }
+          const allResources = [
+            ...(networkResourceRef.current || []),
+            ...(staticResourceRef.current || []),
+          ];
+          const filteredResources = applyAdvancedFilters(allResources, advancedFilters);
+          let toDownload = resolveDuplicatedResources(filteredResources);
+          if (hasSelectedItems) {
+            toDownload = toDownload.filter(resource => selectedResources[resource.url]);
+            console.log(`[SAVE ALL]: Filtered resources for ${downloadItem.url}:`, toDownload.length);
+          } else {
+            console.log(`[SAVE ALL]: No specific selections, downloading all resources for ${downloadItem.url}:`, toDownload.length);
+          }
+          if (loaded && toDownload.length) {
+            downloadZipFile(
+              toDownload,
+              { ignoreNoContentFile, beautifyFile },
+              (item, isDone) => {
+                dispatch(uiActions.setStatus(`Compressed: ${item.url} Processed: ${isDone}`));
+              },
+              () => {
+                logResourceByUrl(dispatch, downloadItem.url, toDownload);
+                if (i + 1 !== downloadList.length) {
+                  dispatch(resetNetworkResource());
+                  dispatch(resetStaticResource());
+                }
+                resolve();
               }
-              resolve();
-            }
-          );
+            );
+          } else {
+            resolve();
+          }
+        } catch (error) {
+          console.error('[SAVE ALL]: Error en descarga de recursos:', error);
+          dispatch(uiActions.setStatus('Error en descarga de recursos: ' + error.message));
+          resolve();
         }
       });
+      // Pausa para evitar bloqueo de UI en descargas masivas
+      await new Promise(res => setTimeout(res, 50));
     }
     dispatch(uiActions.setStatus(UI_INITIAL_STATE.status));
     dispatch(uiActions.setIsSaving(false));
-    dispatch(uiActions.setAnalysisCompleted()); // Indicar que el análisis (y guardado) ha terminado
+    dispatch(uiActions.setAnalysisCompleted());
     } catch (error) {
       console.error('[SAVE ALL]: Error during save operation:', error);
       dispatch(uiActions.setStatus('Error durante el guardado: ' + error.message));
