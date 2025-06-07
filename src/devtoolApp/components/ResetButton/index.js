@@ -2,15 +2,34 @@ import React, { useState } from 'react';
 import { ResetButtonWrapper, ConfirmModal, ModalOverlay, ModalContent } from './styles';
 import Button from '../Button';
 import { FaRedo, FaTimes, FaExclamationTriangle } from 'react-icons/fa';
+import { useStore } from '../../store';
+import * as downloadListActions from '../../store/downloadList';
+import * as networkResourceActions from '../../store/networkResource';
+import * as staticResourceActions from '../../store/staticResource';
+import * as uiActions from '../../store/ui';
 
-const reloadWindow = () => window.location.reload(true);
+// Función para reiniciar el estado de la aplicación sin recargar la página
+const resetAppState = (dispatch) => {
+  console.log('[RESET]: Reiniciando estado de la aplicación sin recargar página');
+  
+  // Reiniciar todos los stores al estado inicial
+  dispatch(networkResourceActions.resetNetworkResource());
+  dispatch(staticResourceActions.resetStaticResource());
+  dispatch(uiActions.resetAnalysis());
+  
+  // Reiniciar la lista de descargas
+  dispatch(downloadListActions.resetDownloadList());
+  
+  console.log('[RESET]: Estado de la aplicación reiniciado exitosamente');
+};
 
 const ResetButton = ({ variant = 'outline', size = 'sm' }) => {
   const [showConfirm, setShowConfirm] = useState(false);
+  const { dispatch } = useStore();
 
   const handleReset = () => {
     setShowConfirm(false);
-    reloadWindow();
+    resetAppState(dispatch);
   };
 
   return (
