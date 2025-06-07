@@ -20,9 +20,9 @@ export const processNetworkResourceToStore = (dispatch, res) => {
   // logIfDev('[NETWORK] Resource: ', res);
   flashStatusDebounced(dispatch, `[NETWORK] Processing: ${res.request?.url || `No Url`}`);
   if (res.request?.url && !res.request.url.match(`^(debugger:|chrome-extension:|ws:)`)) {
-    console.log('[NETWORK RESOURCE PROCESSING]: URL passed filter, getting content...');
+    // console.log('[NETWORK RESOURCE PROCESSING]: URL passed filter, getting content...');
     res.getContent((content, encoding) => {
-      console.log('[NETWORK RESOURCE PROCESSING]: Content retrieved, length:', content?.length || 0);
+      // console.log('[NETWORK RESOURCE PROCESSING]: Content retrieved, length:', content?.length || 0);
       const uriDataTypeMatches = res.request.url.match(/^data:(?<dataType>.*?);/);
       const uriDataType = uriDataTypeMatches?.groups?.dataType;
       const mimeType = res.response?.content?.mimeType;
@@ -78,28 +78,35 @@ export const processStaticResourceToStore = (dispatch, res) => {
           meta.failed = true;
         }
       }
+      // Si hay contenido en memoria, agregar directamente y NO intentar fetch
+      if (meta.content) {
+        console.log('[STATIC RESOURCE PROCESSING]: Content in memory, adding to static resource store:', meta.url);
+        dispatch(staticResourceActions.addStaticResource(meta));
+        return;
+      }
+      // Si no hay contenido y la URL es http, intentar fetch
       if (!meta.content && res.url.startsWith('http')) {
-        console.log('[STATIC RESOURCE PROCESSING]: No content from memory, trying to fetch directly:', res.url);
+        // console.log('[STATIC RESOURCE PROCESSING]: No content from memory, trying to fetch directly:', res.url);
         fetch(res.url)
           .then(async (retryRequest) => {
             if (retryRequest.ok) {
-              console.log('[STATIC RESOURCE PROCESSING]: Direct fetch successful');
+              // console.log('[STATIC RESOURCE PROCESSING]: Direct fetch successful');
               meta.content = await retryRequest.blob();
             } else {
-              console.log('[STATIC RESOURCE PROCESSING]: Direct fetch failed');
+              // console.log('[STATIC RESOURCE PROCESSING]: Direct fetch failed');
               meta.failed = true;
             }
-            console.log('[STATIC RESOURCE PROCESSING]: Adding to static resource store:', meta.url);
+            // console.log('[STATIC RESOURCE PROCESSING]: Adding to static resource store:', meta.url);
             dispatch(staticResourceActions.addStaticResource(meta));
           })
           .catch((err) => {
-            console.log(`[STATIC RESOURCE PROCESSING]: Error fetching ${res.url}`, err);
+            // console.log(`[STATIC RESOURCE PROCESSING]: Error fetching ${res.url}`, err);
             meta.failed = true;
-            console.log('[STATIC RESOURCE PROCESSING]: Adding failed resource to store:', meta.url);
+            // console.log('[STATIC RESOURCE PROCESSING]: Adding failed resource to store:', meta.url);
             dispatch(staticResourceActions.addStaticResource(meta));
           });
       } else {
-        console.log('[STATIC RESOURCE PROCESSING]: Adding to static resource store:', meta.url);
+        // console.log('[STATIC RESOURCE PROCESSING]: Adding to static resource store:', meta.url);
         dispatch(staticResourceActions.addStaticResource(meta));
       }
     });
@@ -107,7 +114,7 @@ export const processStaticResourceToStore = (dispatch, res) => {
 };
 
 export const logResourceByUrl = (dispatch, url, resources) => {
-  console.debug(`[ALL] Now log resource state from url: `, url);
+  // console.debug(`[ALL] Now log resource state from url: `, url);
   dispatch(
     downloadLogActions.addLogItem({
       url: url,

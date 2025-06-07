@@ -23,9 +23,9 @@ export const DevToolApp = ({ initialChromeTab }) => {
   const { dispatch } = useStore();
 
   useEffect(() => {
-    console.log('[DevToolApp] initialChromeTab:', initialChromeTab);
+    // console.log('[DevToolApp] initialChromeTab:', initialChromeTab);
     if (initialChromeTab) {
-      console.log('[DevToolApp] Setting initial tab and download item:', initialChromeTab.url);
+      // console.log('[DevToolApp] Setting initial tab and download item:', initialChromeTab.url);
       dispatch(uiActions.setTab(initialChromeTab));
       dispatch(
         downloadListActions.replaceDownloadItem(
@@ -37,7 +37,7 @@ export const DevToolApp = ({ initialChromeTab }) => {
         )
       );
     } else {
-      console.log('[DevToolApp] No initialChromeTab provided');
+      // console.log('[DevToolApp] No initialChromeTab provided');
     }
   }, [initialChromeTab, dispatch]);
 

@@ -42,6 +42,7 @@ import {
   PreviewRow,
   PreviewCell
 } from './styles';
+import { formatBytes, simulateCompressionStats } from './compressionHelpers';
 
 const COMPRESSION_FORMATS = {
   'zip': {
@@ -127,40 +128,7 @@ const EnhancedCompression = () => {
   const toggleExpanded = () => setExpanded(!expanded);
 
   // Estadísticas calculadas
-  const compressionStats = useMemo(() => {
-    if (downloadList.length <= 1) return { totalFiles: 0, originalSize: 0, estimatedSize: 0, estimatedRatio: 0 };
-    
-    const resources = downloadList.slice(1);
-    const totalFiles = resources.length;
-    const originalSize = resources.reduce((sum, item) => {
-      // Simular tamaño basado en el tipo de archivo
-      const extension = item.url.split('.').pop()?.toLowerCase() || '';
-      let estimatedSize = 50 * 1024; // 50KB base
-      
-      if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension)) {
-        estimatedSize = Math.random() * 500 * 1024 + 100 * 1024; // 100KB - 600KB
-      } else if (['js', 'css'].includes(extension)) {
-        estimatedSize = Math.random() * 200 * 1024 + 20 * 1024; // 20KB - 220KB
-      } else if (['html', 'htm'].includes(extension)) {
-        estimatedSize = Math.random() * 100 * 1024 + 10 * 1024; // 10KB - 110KB
-      }
-      
-      return sum + estimatedSize;
-    }, 0);
-    
-    const format = COMPRESSION_FORMATS[selectedFormat];
-    const levelMultiplier = compressionLevel === 1 ? 0.9 : compressionLevel === 3 ? 0.8 : compressionLevel === 6 ? 0.7 : 0.6;
-    const estimatedRatio = format.averageRatio * levelMultiplier / 100;
-    const estimatedSize = originalSize * (1 - estimatedRatio);
-    
-    return {
-      totalFiles,
-      originalSize,
-      estimatedSize,
-      estimatedRatio: Math.round(estimatedRatio * 100),
-      spaceSaved: originalSize - estimatedSize
-    };
-  }, [downloadList, selectedFormat, compressionLevel]);
+  const compressionStats = useMemo(() => simulateCompressionStats(downloadList, selectedFormat, compressionLevel, COMPRESSION_FORMATS), [downloadList, selectedFormat, compressionLevel]);
 
   // Simular proceso de compresión
   const startCompression = useCallback(async () => {
@@ -206,14 +174,6 @@ const EnhancedCompression = () => {
     // En una implementación real, aquí se descargaría el archivo
     console.log('Descargando:', result.filename);
   }, []);
-
-  const formatBytes = (bytes) => {
-    if (bytes === 0) return '0 B';
-    const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
 
   const getSpeedColor = (speed) => {
     switch (speed) {

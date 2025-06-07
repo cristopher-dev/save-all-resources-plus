@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useStore } from '../store';
 import * as uiActions from '../store/ui';
 import * as downloadListActions from '../store/downloadList';
+import { handleResourceStability } from './useResourceAdditionMonitorHelpers';
 
 /**
  * Hook para monitorear la adición de recursos y detectar cuando se completa
@@ -23,49 +24,26 @@ export const useResourceAdditionMonitor = (timeoutMs = 3000) => {
       return;
     }
 
-    // Si la cantidad de recursos cambió
-    if (currentResourceCount !== lastResourceCountRef.current) {
-      lastResourceCountRef.current = currentResourceCount;
-      stableCountRef.current = 0; // Resetear contador de estabilidad
-      
-      // Limpiar timeout anterior
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-      
-      // Actualizar estado si hay recursos
-      if (currentResourceCount > 0) {
-        dispatch(uiActions.setStatus(`Detectando recursos... ${currentResourceCount} encontrados`));
-      }
-      
-      // Establecer nuevo timeout para detectar estabilidad
-      timeoutRef.current = setTimeout(() => {
-        stableCountRef.current++;
-        
-        // Si hemos tenido estabilidad por suficiente tiempo, completar análisis
-        if (stableCountRef.current >= 1 && currentResourceCount > 0) {
-          console.log('[RESOURCE MONITOR]: Resources stable, completing analysis');
-          
-          // Agregar recursos detectados a la downloadList automáticamente
-          const allResources = [...networkResource, ...staticResource];
-          console.log('[RESOURCE MONITOR]: Adding', allResources.length, 'resources to download list');
-          
-          allResources.forEach(resource => {
-            dispatch(downloadListActions.addDownloadItem({ url: resource.url }));
-          });
-          
-          dispatch(uiActions.setAnalysisCompleted());
-        }
-      }, timeoutMs);
-    }
-
+    handleResourceStability({
+      currentResourceCount,
+      lastResourceCountRef,
+      stableCountRef,
+      timeoutRef,
+      timeoutMs,
+      networkResource,
+      staticResource,
+      dispatch,
+      uiActions,
+      downloadListActions
+    });
+    
     // Cleanup
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [currentResourceCount, analysisCompleted, dispatch, timeoutMs]);
+  }, [currentResourceCount, analysisCompleted, dispatch, timeoutMs, networkResource, staticResource]);
 
   // Función para reiniciar el monitoreo
   const resetMonitoring = () => {

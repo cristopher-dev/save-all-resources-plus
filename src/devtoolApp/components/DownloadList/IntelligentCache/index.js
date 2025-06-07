@@ -33,6 +33,7 @@ import {
   CompressionStats,
   CompressionCard
 } from './styles';
+import { simulateCacheData, formatBytes, formatTime } from './cacheHelpers';
 
 const CACHE_POLICIES = {
   'aggressive': { label: 'Agresivo', ttl: 24 * 60 * 60 * 1000, description: '24 horas' },
@@ -63,42 +64,13 @@ const IntelligentCache = () => {
 
   // Simular datos de caché basados en downloadList
   useEffect(() => {
-    if (downloadList.length > 1) {
-      const simulatedCache = {};
-      let totalSize = 0;
-      
-      downloadList.slice(1).forEach((item, index) => {
-        const url = item.url;
-        const hash = btoa(url).substring(0, 12);
-        const originalSize = Math.floor(Math.random() * 500 + 50) * 1024; // 50KB - 550KB
-        const compressedSize = Math.floor(originalSize * (100 - cacheStats.compressionRatio) / 100);
-        const cachedAt = new Date(Date.now() - Math.random() * 86400000);
-        const accessCount = Math.floor(Math.random() * 20 + 1);
-        
-        simulatedCache[hash] = {
-          url,
-          hash,
-          originalSize,
-          compressedSize,
-          cachedAt,
-          lastAccessed: new Date(cachedAt.getTime() + Math.random() * 86400000),
-          accessCount,
-          contentType: item.mimeType || 'application/octet-stream',
-          compressionAlgorithm: 'gzip',
-          ttl: CACHE_POLICIES[cachePolicy].ttl,
-          isExpired: Date.now() - cachedAt.getTime() > CACHE_POLICIES[cachePolicy].ttl
-        };
-        
-        totalSize += compressedSize;
-      });
-      
-      setCacheData(simulatedCache);
-      setCacheStats(prev => ({
-        ...prev,
-        totalItems: Object.keys(simulatedCache).length,
-        totalSize
-      }));
-    }
+    const { cache, totalSize } = simulateCacheData(downloadList, cachePolicy, cacheStats.compressionRatio, CACHE_POLICIES);
+    setCacheData(cache);
+    setCacheStats(prev => ({
+      ...prev,
+      totalItems: Object.keys(cache).length,
+      totalSize
+    }));
   }, [downloadList, cachePolicy, cacheStats.compressionRatio]);
 
   // Estadísticas calculadas
@@ -163,18 +135,6 @@ const IntelligentCache = () => {
       compressionRatio: Math.min(prev.compressionRatio + 5, 90)
     }));
   }, []);
-
-  const formatBytes = (bytes) => {
-    if (bytes === 0) return '0 B';
-    const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
-
-  const formatTime = (date) => {
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
-  };
 
   const cacheEntries = Object.entries(cacheData).slice(0, 10); // Mostrar solo 10 elementos
 

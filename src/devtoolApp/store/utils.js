@@ -16,7 +16,7 @@ export const generateManageActions = (actionName, key) => {
         : {};
       
       if (actionName === 'DOWNLOAD_LIST_ACTION') {
-        console.log('[DOWNLOAD_LIST]: Adding item to downloadList:', item, 'Action:', action);
+        // console.log('[DOWNLOAD_LIST]: Adding item to downloadList:', item, 'Action:', action);
       }
       
       return action;
@@ -43,7 +43,7 @@ export const generateManageActions = (actionName, key) => {
         : {};
       
       if (actionName === 'DOWNLOAD_LIST_ACTION') {
-        console.log('[DOWNLOAD_LIST]: Replacing item in downloadList at index', index, ':', item, 'Action:', action);
+        // console.log('[DOWNLOAD_LIST]: Replacing item in downloadList at index', index, ':', item, 'Action:', action);
       }
       
       return action;
@@ -62,7 +62,7 @@ export const generateManageReducer =
     const mappedPayload = payloadMapper ? payloadMapper(payload, state) : payload;
     
     if (actionName === 'DOWNLOAD_LIST_ACTION') {
-      console.log('[DOWNLOAD_LIST_REDUCER]: Processing action:', type, 'State length before:', state.length, 'Payload:', payload);
+      // console.log('[DOWNLOAD_LIST_REDUCER]: Processing action:', type, 'State length before:', state.length, 'Payload:', payload);
     }
     
     switch (type) {
@@ -76,14 +76,14 @@ export const generateManageReducer =
             ...state.slice(index + 1),
           ];
           if (actionName === 'DOWNLOAD_LIST_ACTION') {
-            console.log('[DOWNLOAD_LIST_REDUCER]: Replaced existing item, new state length:', newState.length);
+            // console.log('[DOWNLOAD_LIST_REDUCER]: Replaced existing item, new state length:', newState.length);
           }
           return newState;
         } else {
           // Add New
           const newState = [...state, { ...(newPayloadMapper ? newPayloadMapper(mappedPayload, state) : mappedPayload) }];
           if (actionName === 'DOWNLOAD_LIST_ACTION') {
-            console.log('[DOWNLOAD_LIST_REDUCER]: Added new item, new state length:', newState.length);
+            // console.log('[DOWNLOAD_LIST_REDUCER]: Added new item, new state length:', newState.length);
           }
           return newState;
         }
@@ -102,8 +102,8 @@ export const generateManageReducer =
         const mappedPayload = payloadMapper ? payloadMapper(item, state) : item;
         
         if (actionName === 'DOWNLOAD_LIST_ACTION') {
-          console.log('[DOWNLOAD_LIST_REDUCER]: Replace action - index:', index, 'item:', item, 'upsert:', upsert, 'current state length:', state.length);
-          console.log('[DOWNLOAD_LIST_REDUCER]: Condition check - state[index]:', state[index], 'key comparison:', state[index] && state[index][key] !== item[key], 'upsert:', upsert);
+          // console.log('[DOWNLOAD_LIST_REDUCER]: Replace action - index:', index, 'item:', item, 'upsert:', upsert, 'current state length:', state.length);
+          // console.log('[DOWNLOAD_LIST_REDUCER]: Condition check - state[index]:', state[index], 'key comparison:', state[index] && state[index][key] !== item[key], 'upsert:', upsert);
         }
         
         if ((state[index] && state[index][key] !== item[key]) || upsert) {
@@ -113,12 +113,12 @@ export const generateManageReducer =
             ...state.slice(index + 1),
           ];
           if (actionName === 'DOWNLOAD_LIST_ACTION') {
-            console.log('[DOWNLOAD_LIST_REDUCER]: Replaced/upserted item, new state length:', newState.length);
+            // console.log('[DOWNLOAD_LIST_REDUCER]: Replaced/upserted item, new state length:', newState.length);
           }
           return newState;
         } else {
           if (actionName === 'DOWNLOAD_LIST_ACTION') {
-            console.log('[DOWNLOAD_LIST_REDUCER]: No change - conditions not met');
+            // console.log('[DOWNLOAD_LIST_REDUCER]: No change - conditions not met');
           }
           return state;
         }

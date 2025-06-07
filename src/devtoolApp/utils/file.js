@@ -1,5 +1,7 @@
 import prettier from 'prettier';
 import * as zip from '@zip.js/zip.js';
+import { applyAllFilters } from './fileFilters';
+import { downloadBlobDirectly, downloadIndividualFile as downloadIndividualFileHelper } from './fileDownload';
 
 export const resolveDuplicatedResources = (resourceList = []) => {
   const resolvedListByKey = {};
@@ -80,104 +82,70 @@ export const getContentRead = (item) => {
   return new zip.TextReader(textContent);
 };
 
+function prepareZipItemContent(item, options) {
+  // Beautify aquí
+  if (options?.beautifyFile && !item.encoding && !!item.content) {
+    try {
+      const fileExt = item.saveAs?.name?.match(/\.([0-9a-z]+)(?:[\?#]|$)/);
+      switch (fileExt ? fileExt[1] : '') {
+        case 'js':
+          item.content = prettier.format(item.content, { parser: 'babel' });
+          break;
+        case 'json':
+          item.content = prettier.format(item.content, { parser: 'json' });
+          break;
+        case 'html':
+          item.content = prettier.format(item.content, { parser: 'html' });
+          break;
+        case 'css':
+          item.content = prettier.format(item.content, { parser: 'css' });
+          break;
+      }
+    } catch (err) {
+      // No romper si falla el formateo
+    }
+  }
+  // Validar base64
+  if (item.encoding === 'base64') {
+    try {
+      atob(item.content);
+    } catch (err) {
+      try {
+        item.content = btoa(item.content);
+      } catch (err) {
+        item.encoding = null;
+      }
+    }
+  }
+  return getContentRead(item);
+}
+
 export const addItemsToZipWriter = (zipWriter, items, options, eachDoneCallback, callback) => {
   const item = items[0];
   const rest = items.slice(1);
-
-  // if item exist so add it to zip
   if (item) {
-    console.log('[ZIP]: Processing item:', item.url, 'Content type:', typeof item.content, 'Has content:', !!item.content);
-    
-    // Beautify here
-    if (options?.beautifyFile && !item.encoding && !!item.content) {
-      try {
-        const fileExt = item.saveAs?.name?.match(/\.([0-9a-z]+)(?:[\?#]|$)/);
-        switch (fileExt ? fileExt[1] : '') {
-          case 'js': {
-            console.log('[DEVTOOL]', item.saveAs?.name, ' will be beautified!');
-            item.content = prettier.format(item.content, { parser: 'babel' });
-            break;
-          }
-          case 'json': {
-            console.log('[DEVTOOL]', item.saveAs?.name, ' will be beautified!');
-            item.content = prettier.format(item.content, { parser: 'json' });
-            break;
-          }
-          case 'html': {
-            console.log('[DEVTOOL]', item.saveAs?.name, ' will be beautified!');
-            item.content = prettier.format(item.content, { parser: 'html' });
-            break;
-          }
-          case 'css': {
-            console.log('[DEVTOOL]', item.saveAs?.name, ' will be beautified!');
-            item.content = prettier.format(item.content, { parser: 'css' });
-            break;
-          }
-        }
-      } catch (err) {
-        console.log('[DEVTOOL]', 'Cannot format file', item, err);
-      }
-    }
-
-    // Check whether base64 encoding is valid
-    if (item.encoding === 'base64') {
-      // Try to decode first
-      try {
-        atob(item.content);
-        console.log('[ZIP]: Base64 content is valid for:', item.url);
-      } catch (err) {
-        console.log('[DEVTOOL]', item.url, ' is not base64 encoding, try to encode to base64.');
-        try {
-          item.content = btoa(item.content);
-          console.log('[ZIP]: Successfully converted to base64 for:', item.url);
-        } catch (err) {
-          console.log('[DEVTOOL]', item.url, ' failed to encode to base64, fallback to text.');
-          item.encoding = null;
-        }
-      }
-    }
-
-    // Create a reader of the content for zip
-    const resolvedContent = getContentRead(item);
-
-    // Item has no content
+    const resolvedContent = prepareZipItemContent(item, options);
     const isNoContent = !item.content;
     const ignoreNoContentFile = !!options?.ignoreNoContentFile;
-    
-    console.log('[ZIP]: Content check for', item.url, '- hasContent:', !isNoContent, 'ignore empty:', ignoreNoContentFile);
-    
     if (isNoContent && ignoreNoContentFile) {
-      // Exclude file as no content
-      console.log('[DEVTOOL]', 'EXCLUDED: ', item.url);
       eachDoneCallback(item, true);
-      // To the next item
       addItemsToZipWriter(zipWriter, rest, options, eachDoneCallback, callback);
     } else {
-      // Make sure the file has some byte otherwise no import to avoid corrupted zip
       const hasSize = resolvedContent.size > 0 || resolvedContent['blobReader']?.size > 0;
-      console.log('[ZIP]: Size check for', item.url, '- hasSize:', hasSize, 'size:', resolvedContent.size);
-      
       if (hasSize) {
-        console.log('[ZIP]: Adding to zip:', item.saveAs.path);
         zipWriter.add(item.saveAs.path, resolvedContent).then(() => {
-          console.log('[ZIP]: Successfully added to zip:', item.saveAs.path);
           eachDoneCallback(item, true);
           addItemsToZipWriter(zipWriter, rest, options, eachDoneCallback, callback);
-        }).catch((error) => {
-          console.error('[ZIP]: Error adding to zip:', item.saveAs.path, error);
+        }).catch(() => {
           eachDoneCallback(item, false);
           addItemsToZipWriter(zipWriter, rest, options, eachDoneCallback, callback);
         });
       } else {
-        // If no size, exclude the item
-        console.log('[DEVTOOL]', 'EXCLUDED (no size): ', item.url);
         eachDoneCallback(item, false);
-        // To the next item
         addItemsToZipWriter(zipWriter, rest, options, eachDoneCallback, callback);
       }
     }
   } else {
-    // Callback when all done
     callback();
   }
   return rest;
@@ -220,28 +188,6 @@ export const downloadCompleteZip = (zipWriter, blobWriter, callback) => {
     console.error('[DOWNLOAD]: Error getting blob data:', error);
     callback();
   });
-};
-
-// Función auxiliar para descargar blob directamente
-const downloadBlobDirectly = (blob, filename) => {
-  try {
-    const a = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a); // Asegurar que el elemento esté en el DOM
-    a.click();
-    document.body.removeChild(a);
-    
-    // Limpiar el URL object después de un breve delay
-    setTimeout(() => {
-      URL.revokeObjectURL(url);
-    }, 100);
-    
-    console.log('[DOWNLOAD]: File downloaded successfully:', filename);
-  } catch (error) {
-    console.error('[DOWNLOAD]: Error downloading file:', error);
-  }
 };
 
 // Funciones de filtrado avanzado
@@ -306,88 +252,14 @@ export const getFileType = (url, mimeType) => {
   return 'other';
 };
 
-// Función para aplicar filtros avanzados
+// Reemplazar lógica de filtrado en applyAdvancedFilters
 export const applyAdvancedFilters = (resources, filters) => {
   if (!filters) return resources;
-  
-  return resources.filter(resource => {
-    const fileType = getFileType(resource.url, resource.mimeType);
-    const fileSize = getFileSize(resource);
-    const fileSizeKB = Math.round(fileSize / 1024);
-    const domain = new URL(resource.url).hostname;
-    const extension = getFileExtension(resource.url);
-    
-    // Filtro por tipo de archivo
-    if (filters.enableFileTypeFilter && filters.fileTypes) {
-      if (!filters.fileTypes[fileType]) {
-        return false;
-      }
-    }
-    
-    // Filtro por tamaño
-    if (filters.enableSizeFilter) {
-      const minSize = filters.minSize || 0;
-      const maxSize = filters.maxSize || Infinity;
-      if (fileSizeKB < minSize || fileSizeKB > maxSize) {
-        return false;
-      }
-    }
-    
-    // Filtro por dominios excluidos
-    if (filters.excludedDomains && filters.excludedDomains.length > 0) {
-      if (filters.excludedDomains.some(excludedDomain => domain.includes(excludedDomain))) {
-        return false;
-      }
-    }
-    
-    // Filtro por extensiones personalizadas
-    if (filters.customExtensions && filters.customExtensions.length > 0) {
-      if (!filters.customExtensions.includes(extension)) {
-        return false;
-      }
-    }
-    
-    return true;
-  });
+  return resources.filter(resource => applyAllFilters(resource, filters));
 };
 
 // Función para descargar un archivo individual
-export const downloadIndividualFile = (resource, options = {}) => {
-  return new Promise((resolve) => {
-    try {
-      let content = resource.content;
-      let mimeType = resource.mimeType || 'application/octet-stream';
-      let filename = resource.saveAs?.name || resource.url.split('/').pop() || 'resource';
-
-      // Procesar contenido según el encoding
-      if (resource.encoding === 'base64') {
-        const binaryString = atob(content);
-        const bytes = new Uint8Array(binaryString.length);
-        for (let i = 0; i < binaryString.length; i++) {
-          bytes[i] = binaryString.charCodeAt(i);
-        }
-        content = bytes;
-      }
-
-      // Crear blob y descargar
-      const blob = new Blob([content], { type: mimeType });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      a.style.display = 'none';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      
-      resolve({ success: true, filename });
-    } catch (error) {
-      console.error('Error downloading individual file:', error);
-      resolve({ success: false, error: error.message });
-    }
-  });
-};
+export const downloadIndividualFile = downloadIndividualFileHelper;
 
 // Función para descargar múltiples archivos individuales
 export const downloadMultipleIndividualFiles = async (resources, options = {}, progressCallback = null) => {

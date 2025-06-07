@@ -91,12 +91,12 @@ export const resolveURLToPath = (cUrl, cType, cContent) => {
             haveExtension = 'html';
         }
         console.log(
-            '[DEVTOOL]',
-            'File without extension: ',
-            filename,
-            'Will process as: ',
-            filename + '.' + haveExtension,
-            filepath
+            // '[DEVTOOL]',
+            // 'File without extension: ',
+            // filename,
+            // 'Will process as: ',
+            // filename + '.' + haveExtension,
+            // filepath
         );
         filename = filename + '.' + haveExtension;
     }

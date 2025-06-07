@@ -30,6 +30,7 @@ import {
 import { FaChevronDown, FaProjectDiagram, FaExclamationTriangle, FaSearch, FaDownload, FaStop } from 'react-icons/fa';
 import Button from '../../Button';
 import { getFileType, getFileExtension } from 'devtoolApp/utils/file';
+import { analyzeDependenciesFromList } from './dependencyHelpers';
 
 const RESOURCE_TYPES = ['all', 'css', 'js', 'image', 'font', 'document'];
 
@@ -47,126 +48,7 @@ const DependencyAnalysis = () => {
   const toggleExpanded = () => setExpanded(!expanded);
 
   // Analizar dependencias de recursos
-  const analyzeDependencies = useMemo(() => {
-    if (downloadList.length <= 1) return { dependencies: {}, stats: {}, criticalPath: [] };
-
-    const resources = downloadList.slice(1); // Excluir la página principal
-    const dependencies = {};
-    const stats = {
-      totalResources: resources.length,
-      cssFiles: 0,
-      jsFiles: 0,
-      images: 0,
-      fonts: 0,
-      documents: 0,
-      externalDependencies: 0,
-      circularDependencies: 0,
-    };
-
-    // Analizar cada recurso
-    resources.forEach((resource, index) => {
-      const url = new URL(resource.url);
-      const fileType = getFileType(resource.url);
-      const extension = getFileExtension(resource.url);
-      
-      // Contar tipos de archivo
-      switch (fileType) {
-        case 'css': stats.cssFiles++; break;
-        case 'javascript': stats.jsFiles++; break;
-        case 'images': stats.images++; break;
-        case 'fonts': stats.fonts++; break;
-        case 'documents': stats.documents++; break;
-      }
-
-      // Determinar dependencias basadas en el tipo de archivo y URL
-      const resourceDeps = [];
-      
-      // CSS puede depender de imágenes y fuentes
-      if (fileType === 'css') {
-        const cssImages = resources.filter(r => 
-          getFileType(r.url) === 'images' && 
-          new URL(r.url).hostname === url.hostname
-        );
-        const cssFonts = resources.filter(r => 
-          getFileType(r.url) === 'fonts' && 
-          new URL(r.url).hostname === url.hostname
-        );
-        resourceDeps.push(...cssImages.map(r => r.url), ...cssFonts.map(r => r.url));
-      }
-
-      // JavaScript puede depender de otros recursos
-      if (fileType === 'javascript') {
-        const jsImages = resources.filter(r => 
-          getFileType(r.url) === 'images' && 
-          new URL(r.url).hostname === url.hostname
-        );
-        resourceDeps.push(...jsImages.map(r => r.url));
-      }
-
-      // Detectar dependencias externas
-      const mainDomain = downloadList[0] ? new URL(downloadList[0].url).hostname : '';
-      if (url.hostname !== mainDomain) {
-        stats.externalDependencies++;
-      }
-
-      dependencies[resource.url] = {
-        type: fileType,
-        extension,
-        domain: url.hostname,
-        size: resource.size || 0,
-        dependencies: resourceDeps,
-        dependents: [],
-        depth: 0,
-        critical: false,
-      };
-    });
-
-    // Calcular dependientes inversos
-    Object.keys(dependencies).forEach(resourceUrl => {
-      dependencies[resourceUrl].dependencies.forEach(depUrl => {
-        if (dependencies[depUrl]) {
-          dependencies[depUrl].dependents.push(resourceUrl);
-        }
-      });
-    });
-
-    // Calcular profundidad de dependencias
-    const calculateDepth = (url, visited = new Set()) => {
-      if (visited.has(url)) {
-        stats.circularDependencies++;
-        return 0;
-      }
-      
-      visited.add(url);
-      const resource = dependencies[url];
-      if (!resource || resource.dependencies.length === 0) {
-        return 0;
-      }
-      
-      const maxDepth = Math.max(
-        ...resource.dependencies.map(depUrl => calculateDepth(depUrl, new Set(visited)))
-      );
-      
-      resource.depth = maxDepth + 1;
-      return resource.depth;
-    };
-
-    Object.keys(dependencies).forEach(url => {
-      calculateDepth(url);
-    });
-
-    // Identificar ruta crítica (recursos con más dependientes)
-    const criticalPath = Object.entries(dependencies)
-      .filter(([_, resource]) => resource.dependents.length > 2 || resource.depth > 3)
-      .sort((a, b) => b[1].dependents.length - a[1].dependents.length)
-      .slice(0, 5)
-      .map(([url, resource]) => {
-        dependencies[url].critical = true;
-        return url;
-      });
-
-    return { dependencies, stats, criticalPath };
-  }, [downloadList]);
+  const analyzeDependencies = useMemo(() => analyzeDependenciesFromList(downloadList), [downloadList]);
 
   // Filtrar recursos por tipo
   const filteredDependencies = useMemo(() => {
