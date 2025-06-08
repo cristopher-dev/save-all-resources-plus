@@ -250,7 +250,9 @@ export const CachePolicy = styled.div`
   flex-wrap: wrap;
 `;
 
-export const PolicyButton = styled.button`
+export const PolicyButton = styled.button.withConfig({
+  shouldForwardProp: (prop) => prop !== 'active'
+})`
   padding: 6px 12px;
   border: 1px solid ${props => props.active ? '#667eea' : props.theme.border};
   border-radius: 4px;

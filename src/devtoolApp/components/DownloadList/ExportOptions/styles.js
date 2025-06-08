@@ -42,7 +42,9 @@ export const ExportActions = styled.div`
   margin-top: 12px;
 `;
 
-export const ActionButton = styled.button`
+export const ActionButton = styled.button.withConfig({
+  shouldForwardProp: (prop) => prop !== 'primary'
+})`
   display: flex;
   align-items: center;
   gap: 8px;

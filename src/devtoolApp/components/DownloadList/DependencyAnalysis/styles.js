@@ -255,7 +255,9 @@ export const AnalysisFilters = styled.div`
   flex-wrap: wrap;
 `;
 
-export const FilterButton = styled.button`
+export const FilterButton = styled.button.withConfig({
+  shouldForwardProp: (prop) => prop !== 'active'
+})`
   background: ${({ active, theme }) => active ? theme.colors.primary : theme.colors.background};
   color: ${({ active, theme }) => active ? 'white' : theme.colors.text};
   border: 1px solid ${({ theme }) => theme.colors.border};

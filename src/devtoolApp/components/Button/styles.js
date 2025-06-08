@@ -114,7 +114,7 @@ const getSizeStyles = (size) => {
 };
 
 export const ButtonWrapper = styled.button.withConfig({
-  shouldForwardProp: (prop) => prop !== 'variant' && prop !== 'size' && prop !== 'fullWidth'
+  shouldForwardProp: (prop) => !['variant', 'size', 'fullWidth', 'color', 'loading'].includes(prop)
 })`
   position: relative;
   display: inline-flex;
