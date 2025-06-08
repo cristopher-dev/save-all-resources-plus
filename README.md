@@ -1,10 +1,10 @@
-# ResourcesSaverExt-dev (Chrome)
+# Save All Resources plus (Chrome)
 
 ---
 
 ## 🚀 Download complete websites in seconds and keep everything organized
 
-Are you a developer, designer, archivist, or just want to save a website to study or migrate it? ResourcesSaverExt-dev is the ultimate tool for you:
+Are you a developer, designer, archivist, or just want to save a website to study or migrate it? Save All Resources plus is the ultimate tool for you:
 
 - **Save time:** Download all resources from a website with a single click.
 - **Stay organized:** Preserve the original folder and file structure.
@@ -18,9 +18,9 @@ Are you a developer, designer, archivist, or just want to save a website to stud
 - Create reference copies for design, development, or auditing.
 - Save educational or research resources.
 
-> **Stop wasting time downloading files one by one! Try ResourcesSaverExt-dev and take your productivity to the next level.**
+> **Stop wasting time downloading files one by one! Try Save All Resources plus and take your productivity to the next level.**
 
-[⭐ Visit the repository and give it a star](https://github.com/cristopher-dev/ResourcesSaverExt-dev)
+[⭐ Visit the repository and give it a star](https://github.com/cristopher-dev/save-all-resources-plus)
 
 ---
 
@@ -38,7 +38,7 @@ Are you a developer, designer, archivist, or just want to save a website to stud
 
 ![Usage in DevTools: shows the custom ResourceSaver tab inside Chrome DevTools, ready to download resources.](image-3.png)
 
-ResourcesSaverExt-dev is a Google Chrome extension that allows you to download all resources from a web page (HTML, CSS, JS, images, fonts, etc.) with a single click, preserving the site's original folder structure. It's ideal for developers, archivists, designers, and anyone who needs to save complete websites easily, in an organized way, and ready to be re-hosted or analyzed offline.
+Save All Resources plus is a Google Chrome extension that allows you to download all resources from a web page (HTML, CSS, JS, images, fonts, etc.) with a single click, preserving the site's original folder structure. It's ideal for developers, archivists, designers, and anyone who needs to save complete websites easily, in an organized way, and ready to be re-hosted or analyzed offline.
 
 ## What does this project do?
 
@@ -66,7 +66,7 @@ ResourcesSaverExt-dev is a Google Chrome extension that allows you to download a
 
 ## Quick Installation and Usage
 
-1. Clone this repository: [https://github.com/cristopher-dev/ResourcesSaverExt-dev](https://github.com/cristopher-dev/ResourcesSaverExt-dev)
+1. Clone this repository: [Save All Resources plus](https://github.com/cristopher-dev/save-all-resources-plus)
 2. Install dependencies by running `yarn` in the project root.
 3. Build the extension with `yarn build` (files will be generated in the `unpacked2x` folder).
 4. Open Chrome and go to `chrome://extensions/`.
@@ -118,4 +118,4 @@ To build the extension and have it ready to use in Chrome:
 ---
 
 Author: Cristopher Martinez
-Repository: [https://github.com/cristopher-dev/ResourcesSaverExt-dev](https://github.com/cristopher-dev/ResourcesSaverExt-dev)
+Repository: [Save All Resources plus](https://github.com/cristopher-dev/save-all-resources-plus)
