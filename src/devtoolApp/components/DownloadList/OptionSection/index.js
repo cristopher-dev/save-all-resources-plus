@@ -6,9 +6,9 @@ import {
   ActionSection,
   ActionRow,
   StatusIndicator,
-  ProgressIndicator,
-  InfoTooltip,
   AnimatedIcon,
+  InfoTooltip,
+  ProgressIndicator,
   StatsCard,
   StatsNumber,
   StatsLabel
@@ -18,16 +18,12 @@ import useStore from 'devtoolApp/store';
 import Button from '../../Button';
 import { useAppSaveAllResource } from 'devtoolApp/hooks/useAppSaveAllResource';
 import { 
-  FaDownload, 
-  FaStop, 
-  FaCog, 
-  FaFileAlt, 
-  FaCode, 
+  FaDownload,
+  FaCog,
+  FaInfoCircle,
   FaCheckCircle,
   FaSpinner,
-  FaInfoCircle,
-  FaChartBar,
-  FaEye,
+  FaStop,
   FaRocket
 } from 'react-icons/fa';
 

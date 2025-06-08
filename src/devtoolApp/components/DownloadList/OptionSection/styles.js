@@ -357,134 +357,136 @@ export const StatusIndicator = styled.div`
   }
 `;
 
-export const ProgressIndicator = styled.div`
-  width: 100%;
-  height: 6px;
-  background: ${props => props.theme.colors.backgroundAlt};
-  border-radius: 3px;
-  overflow: hidden;
-  margin-top: 8px;
-  position: relative;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-  
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 30%;
-    background: linear-gradient(
-      90deg,
-      ${props => props.theme.colors.primary},
-      ${props => props.theme.colors.secondary},
-      ${props => props.theme.colors.primary}
-    );
-    border-radius: 3px;
-    animation: ${shimmer} 2s ease-in-out infinite;
-    box-shadow: 0 0 10px ${props => props.theme.colors.primary}50;
-  }
-`;
-
-// New component for informational tooltips
-export const InfoTooltip = styled.div`
-  position: relative;
-  display: inline-block;
-  cursor: help;
-  
-  &::before {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: 125%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: ${props => props.theme.colors.text};
-    color: ${props => props.theme.colors.surface};
-    padding: 8px 12px;
-    border-radius: var(--border-radius-md);
-    font-size: 12px;
-    white-space: nowrap;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-    z-index: 1000;
-    box-shadow: var(--shadow-lg);
-  }
-  
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 115%;
-    left: 50%;
-    transform: translateX(-50%);
-    border: 5px solid transparent;
-    border-top-color: ${props => props.theme.colors.text};
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-  }
-  
-  &:hover::before,
-  &:hover::after {
-    opacity: 1;
-    visibility: visible;
-  }
-`;
-
-// Component for icons with effects
+// Componentes adicionales para OptionSection
 export const AnimatedIcon = styled.div`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, ${props => props.theme.colors.primary}20, ${props => props.theme.colors.secondary}20);
+  width: 24px;
+  height: 24px;
+  color: ${props => props.theme.colors.primary};
   transition: var(--transition-default);
+  animation: ${pulse} 2s ease-in-out infinite;
   
   svg {
-    font-size: 16px;
-    color: ${props => props.theme.colors.primary};
-    transition: var(--transition-default);
+    width: 100%;
+    height: 100%;
   }
   
   &:hover {
-    transform: scale(1.1) rotate(5deg);
-    background: linear-gradient(135deg, ${props => props.theme.colors.primary}, ${props => props.theme.colors.secondary});
-    box-shadow: 0 4px 15px ${props => props.theme.colors.primary}40;
-    
-    svg {
-      color: white;
-      transform: scale(1.1);
-    }
+    transform: rotate(360deg) scale(1.1);
+    animation-play-state: paused;
   }
 `;
 
-// Component for enhanced statistics
+export const InfoTooltip = styled.div`
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: help;
+  
+  &:hover::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    animation: ${fadeInUp} 0.2s ease-out;
+  }
+  
+  &:hover::after {
+    content: '';
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: rgba(0, 0, 0, 0.9);
+    z-index: 1000;
+  }
+`;
+
+export const ProgressIndicator = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: ${props => props.theme.colors.backgroundAlt};
+  border: 1px solid ${props => props.theme.colors.border};
+  border-radius: var(--border-radius-md);
+  font-size: 12px;
+  color: ${props => props.theme.colors.textSecondary};
+  animation: ${pulse} 1.5s ease-in-out infinite;
+  
+  &::before {
+    content: '';
+    width: 12px;
+    height: 12px;
+    border: 2px solid ${props => props.theme.colors.primary};
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+`;
+
 export const StatsCard = styled.div`
-  background: linear-gradient(135deg, ${props => props.theme.colors.backgroundAlt}, ${props => props.theme.colors.surface});
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 12px;
+  background: ${props => props.theme.colors.backgroundAlt};
   border: 1px solid ${props => props.theme.colors.borderLight};
   border-radius: var(--border-radius-lg);
-  padding: 16px;
-  text-align: center;
   transition: var(--transition-default);
   position: relative;
   overflow: hidden;
+  animation: ${bounceIn} 0.6s ease-out;
+  min-height: 80px;
   
   &::before {
     content: '';
     position: absolute;
     top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, ${props => props.theme.colors.primary}, ${props => props.theme.colors.secondary});
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      ${props => props.theme.colors.primary}10,
+      transparent
+    );
+    transition: left 0.5s ease;
   }
   
   &:hover {
-    transform: translateY(-2px);
+    background: ${props => props.theme.colors.backgroundHover};
+    border-color: ${props => props.theme.colors.primary}50;
+    transform: translateY(-3px) scale(1.02);
     box-shadow: var(--shadow-md);
-    border-color: ${props => props.theme.colors.primary}30;
+    
+    &::before {
+      left: 100%;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    padding: 12px 8px;
+    min-height: 70px;
   }
 `;
 
@@ -492,14 +494,27 @@ export const StatsNumber = styled.div`
   font-size: 24px;
   font-weight: 700;
   color: ${props => props.theme.colors.primary};
+  line-height: 1;
   margin-bottom: 4px;
   text-shadow: 0 0 10px ${props => props.theme.colors.primary}30;
+  
+  @media (max-width: 480px) {
+    font-size: 20px;
+  }
 `;
 
 export const StatsLabel = styled.div`
-  font-size: 12px;
+  font-size: 11px;
   color: ${props => props.theme.colors.textSecondary};
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-weight: 500;
+  text-align: center;
+  line-height: 1.2;
+  
+  @media (max-width: 480px) {
+    font-size: 10px;
+  }
 `;
+
+

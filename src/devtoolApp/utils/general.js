@@ -1,9 +1,3 @@
-export const pause = async (timeout) => {
-  return new Promise((res) => {
-    setTimeout(res, timeout);
-  });
-};
-
 export const debounce = (func, wait, immediate) => {
   let timeout;
   return function () {

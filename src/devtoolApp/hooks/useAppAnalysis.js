@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef } from 'react';
 import * as uiActions from '../store/ui';
 import { resetNetworkResource } from '../store/networkResource';
 import { resetStaticResource } from '../store/staticResource';
-import { INITIAL_STATE as UI_INITIAL_STATE } from '../store/ui';
 import useStore from '../store';
 
 export const useAppAnalysis = () => {
@@ -99,7 +98,6 @@ export const useAppAnalysis = () => {
       dispatch(uiActions.stopAnalysis());
     }
   }, [state, dispatch, downloadList]);
-
   const handleStopAnalysis = useCallback(() => {
     analysisAbortRef.current = true;
     dispatch(uiActions.stopAnalysis());
@@ -108,9 +106,8 @@ export const useAppAnalysis = () => {
   useEffect(() => {
     networkResourceRef.current = networkResource;
   }, [networkResource]);
+  
   useEffect(() => {
-    staticResourceRef.current = staticResource;
-  }, [staticResource]);  useEffect(() => {
     staticResourceRef.current = staticResource;
   }, [staticResource]);
 

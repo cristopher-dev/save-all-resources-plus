@@ -3,6 +3,24 @@ import * as zip from '@zip.js/zip.js';
 import { applyAllFilters } from './fileFilters';
 import { downloadBlobDirectly, downloadIndividualFile as downloadIndividualFileHelper } from './fileDownload';
 
+// Función helper para generar nombre de archivo único basado en el origen
+export const generateOriginFilename = (origin, originIndex = 0, totalOrigins = 1) => {
+  try {
+    const url = new URL(origin);
+    let hostname = url.hostname.replace(/([^A-Za-z0-9.])/g, '_');
+    
+    // Solo agregar sufijo si hay múltiples orígenes
+    if (totalOrigins > 1) {
+      hostname += `_${originIndex + 1}`;
+    }
+    
+    return hostname + '.zip';
+  } catch (error) {
+    console.error('[FILENAME]: Error generating filename for origin:', origin, error);
+    return totalOrigins > 1 ? `resources_${originIndex + 1}.zip` : 'resources.zip';
+  }
+};
+
 export const resolveDuplicatedResources = (resourceList = []) => {
   const resolvedListByKey = {};
   const result = [];
@@ -46,7 +64,7 @@ export const resolveDuplicatedResources = (resourceList = []) => {
   return result;
 };
 
-export const downloadZipFile = (toDownload, options, eachDoneCallback, callback) => {
+export const downloadZipFile = (toDownload, options, eachDoneCallback, callback, customFilename = null) => {
   try {
     const blobWrite = new zip.BlobWriter('application/zip');
     const zipWriter = new zip.ZipWriter(blobWrite);
@@ -87,7 +105,7 @@ export const downloadZipFile = (toDownload, options, eachDoneCallback, callback)
       toDownload,
       options,
       eachDoneCallback,
-      downloadCompleteZip.bind(this, zipWriter, blobWrite, wrappedCallback)
+      downloadCompleteZip.bind(this, zipWriter, blobWrite, wrappedCallback, customFilename)
     );
     
   } catch (error) {
@@ -206,9 +224,17 @@ export const addItemsToZipWriter = (zipWriter, items, options, eachDoneCallback,
   return rest;
 };
 
-export const downloadCompleteZip = (zipWriter, blobWriter, callback) => {
+export const downloadCompleteZip = (zipWriter, blobWriter, callback, customFilename = null) => {
   zipWriter.close();
   blobWriter.getData().then((blob) => {
+    // Si se proporciona un nombre personalizado, usarlo directamente
+    if (customFilename) {
+      console.log('[DOWNLOAD]: Using custom filename:', customFilename);
+      downloadBlobDirectly(blob, customFilename);
+      callback();
+      return;
+    }
+    
     // Verificar si el contexto de DevTools está disponible
     try {
       if (chrome?.devtools?.inspectedWindow?.tabId && chrome?.tabs?.get) {

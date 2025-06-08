@@ -9,29 +9,20 @@ import {
   StatusBadge,
   ActionSection,
   ButtonGroup,
-  StatsContainer,
-  StatItem,
 } from './styles';
 import ResetButton from 'devtoolApp/components/ResetButton';
 import Button from 'devtoolApp/components/Button';
 import ResourcePreview from 'devtoolApp/components/DownloadList/ResourcePreview';
 import { useStore } from 'devtoolApp/store';
-import { INITIAL_STATE as UI_INITIAL_STATE } from 'devtoolApp/store/ui';
 import * as uiActions from 'devtoolApp/store/ui';
 import { useAppSaveAllResource } from '../../hooks/useAppSaveAllResource';
 import { useAppAnalysis } from '../../hooks/useAppAnalysis';
 import {
-  FaEye,
-  FaDownload,
-  FaSave,
-  FaFileArchive,
-  FaCog,
-  FaChartLine,
   FaGlobe,
+  FaSave,
   FaStop,
   FaExclamationTriangle,
 } from 'react-icons/fa';
-import packageJson from '/package.json';
 
 export const Header = (props) => {
   const { state, dispatch, theme } = useStore();
@@ -53,20 +44,17 @@ export const Header = (props) => {
       const sizes = ['B', 'KB', 'MB', 'GB'];
       const i = Math.floor(Math.log(bytes) / Math.log(k));
       return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-    };
-
-    return {
+    };    return {
       totalResources,
       totalSize: formatSize(totalSize),
-      isProcessing: status !== UI_INITIAL_STATE.status || isAnalyzing,
+      isProcessing: status !== 'Listo para escanear...' || isAnalyzing,
     };
   }, [items, status, isAnalyzing]);
-
   const saveText = useMemo(() => {
     if (isAnalyzing) {
       return 'Escaneando...';
     }
-    if (status !== UI_INITIAL_STATE.status) {
+    if (status !== 'Listo para escanear...') {
       return 'Procesando...';
     }
     if (isSaving) {
@@ -77,7 +65,7 @@ export const Header = (props) => {
     }
     return 'Escanear';
   }, [status, isSaving, isAnalyzing, analysisCompleted, stats.totalResources]);
-  const isActionDisabled = status !== UI_INITIAL_STATE.status || isSaving;
+  const isActionDisabled = status !== 'Listo para escanear...' || isSaving;
   // El botón de vista previa solo debe estar deshabilitado si no hay recursos para mostrar
   const isPreviewDisabled = stats.totalResources === 0;
 
@@ -109,9 +97,8 @@ export const Header = (props) => {
     console.log('[HEADER]: Force resetting saving state');
     dispatch(uiActions.forceResetSaving());
   };
-
   // Detectar si el botón ha estado bloqueado por mucho tiempo
-  const isStuckSaving = isSaving && status !== UI_INITIAL_STATE.status;
+  const isStuckSaving = isSaving && status !== 'Listo para escanear...';
 
   return (
     <HeaderWrapper>

@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState, useCallback } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import {
   AddButtonWrapper,
   DownloadListHeader,
@@ -24,7 +24,6 @@ import LogSection from './LogSection';
 import OptionSection from './OptionSection';
 import AnalysisStatus from '../AnalysisStatus';
 import { FaTrash, FaCheckSquare, FaSquare, FaFileAlt, FaImage, FaCode, FaFont, FaPlayCircle, FaInfoCircle, FaBars, FaEye } from 'react-icons/fa';
-import { MdDownloading } from 'react-icons/md';
 
 // Función para obtener el tipo de archivo y su icono
 const getFileInfo = (url) => {

@@ -118,32 +118,7 @@ export const StatusBadge = styled.span.withConfig({
   }}
 `;
 
-export const StatsContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  
-  @media (max-width: 768px) {
-    justify-content: space-between;
-  }
-`;
 
-export const StatItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-  color: ${props => props.theme.colors.textSecondary};
-  font-weight: 500;
-  
-  svg {
-    color: ${props => props.theme.colors.primary};
-  }
-  
-  span {
-    white-space: nowrap;
-  }
-`;
 
 export const ActionSection = styled.div`
   display: flex;
