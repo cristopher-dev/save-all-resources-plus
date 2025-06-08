@@ -1,14 +1,8 @@
 import React, { useCallback, useMemo } from 'react';
-import { Toggle } from '../../Toggle';
 import { 
   OptionSectionWrapper, 
   SectionHeader, 
   SectionTitle, 
-  OptionsGrid, 
-  OptionItem, 
-  OptionInfo, 
-  OptionLabel, 
-  OptionDescription,
   ActionSection,
   ActionRow,
   StatusIndicator,
@@ -19,7 +13,6 @@ import {
   StatsNumber,
   StatsLabel
 } from './styles';
-import * as optionActions from 'devtoolApp/store/option';
 import * as uiActions from 'devtoolApp/store/ui';
 import useStore from 'devtoolApp/store';
 import Button from '../../Button';
@@ -32,8 +25,6 @@ import {
   FaCode, 
   FaCheckCircle,
   FaSpinner,
-  FaFilter,
-  FaMagic,
   FaInfoCircle,
   FaChartBar,
   FaEye,
@@ -44,23 +35,12 @@ export const OptionSection = () => {
   const { handleOnSave } = useAppSaveAllResource();  const {
     dispatch,
     state: {
-      option: { ignoreNoContentFile, beautifyFile },
       ui: { isSaving, selectedResources = {}, analysisCompleted, isAnalyzing },
       downloadList,
     },
-  } = useStore();
-
-  const selectedCount = Object.values(selectedResources).filter(Boolean).length;
+  } = useStore();  const selectedCount = Object.values(selectedResources).filter(Boolean).length;
   const hasSelections = selectedCount > 0;
   const totalResources = downloadList.length;
-
-  const handleIgnoreNoContentFile = useCallback((willIgnore) => {
-    dispatch(optionActions.setIgnoreNoContentFile(willIgnore));
-  }, [dispatch]);
-
-  const handleBeautifyFile = useCallback((willBeautify) => {
-    dispatch(optionActions.setBeautifyFile(willBeautify));
-  }, [dispatch]);
 
   const handleDownloadSelected = useCallback(async (event) => {
     event.stopPropagation();
@@ -112,58 +92,9 @@ export const OptionSection = () => {
           <StatsCard className="stats-card">
             <StatsNumber>{Math.round((selectedCount / totalResources) * 100) || 0}%</StatsNumber>
             <StatsLabel>Progreso</StatsLabel>
-          </StatsCard>
-        </ActionRow>
+          </StatsCard>        </ActionRow>
       )}
 
-      <OptionsGrid>
-        <OptionItem style={{ '--animation-delay': 1 }}>
-          <OptionInfo>
-            <OptionLabel>
-              <AnimatedIcon>
-                <FaFilter />
-              </AnimatedIcon>
-              Filtrar archivos sin contenido
-              <InfoTooltip data-tooltip="Los archivos vacíos o sin contenido válido serán excluidos automáticamente">
-                <FaInfoCircle style={{ marginLeft: '8px', fontSize: '12px', color: 'var(--color-text-secondary)' }} />
-              </InfoTooltip>
-            </OptionLabel>
-            <OptionDescription>
-              Excluye automáticamente los archivos que no tienen contenido válido o están vacíos
-            </OptionDescription>
-          </OptionInfo>
-          <Toggle 
-            noInteraction={isSaving} 
-            isToggled={ignoreNoContentFile} 
-            onToggle={handleIgnoreNoContentFile}
-            activeColor="primary"
-          />
-        </OptionItem>
-
-        <OptionItem style={{ '--animation-delay': 2 }}>
-          <OptionInfo>
-            <OptionLabel>
-              <AnimatedIcon>
-                <FaMagic />
-              </AnimatedIcon>
-              Embellecimiento de código
-              <InfoTooltip data-tooltip="Formatea y mejora la legibilidad del código descargado">
-                <FaInfoCircle style={{ marginLeft: '8px', fontSize: '12px', color: 'var(--color-text-secondary)' }} />
-              </InfoTooltip>
-            </OptionLabel>
-            <OptionDescription>
-              Formatea y embellece automáticamente archivos HTML, CSS, JavaScript y JSON
-            </OptionDescription>
-          </OptionInfo>
-          <Toggle 
-            noInteraction={isSaving} 
-            isToggled={beautifyFile} 
-            onToggle={handleBeautifyFile}
-            activeColor="secondary"
-          />
-        </OptionItem>
-      </OptionsGrid>
-      
       <ActionSection>
         <ActionRow>          {!isSaving ? (
             <Button 
