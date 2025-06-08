@@ -17,7 +17,6 @@ import * as downloadListActions from 'devtoolApp/store/downloadList';
 import * as uiActions from 'devtoolApp/store/ui';
 import LogSection from './LogSection';
 import OptionSection from './OptionSection';
-import ConfigurationPresets from './ConfigurationPresets';
 import AdvancedFilters from './AdvancedFilters';
 import ScheduledDownload from './ScheduledDownload';
 import DependencyAnalysis from './DependencyAnalysis';
@@ -96,11 +95,9 @@ export const DownloadList = () => {
 
   const allResources = useMemo(() => [...staticResource, ...networkResource], [staticResource, networkResource]);
 
-  return (
-    <DownloadListWrapper>
+  return (    <DownloadListWrapper>
       <AnalysisStatus />
       <OptionSection />
-      <ConfigurationPresets />
       <AdvancedFilters />
       <ScheduledDownload />
       <DependencyAnalysis />
