@@ -5,8 +5,8 @@
   "browserslist": [
     "> 0.5%, last 2 versions, not dead"
   ],
-  "repository": "git@github.com:up209d/ResourcesSaverExt.git",
-  "author": "up209d <up209d@gmail.com>",
+  "repository": "git@github.com:cristopher-dev/ResourcesSaverExt-dev.git",
+  "author": "Cristopher Arévalo <cristopher.dev@gmail.com>",
   "license": "GPL-3.0+",
   "scripts": {
     "dev": "yarn cp && parcel watch ./src/*.html --no-hmr --dist-dir unpacked2x",

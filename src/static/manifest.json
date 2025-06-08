@@ -2,8 +2,8 @@
   "name": "Save All Resources plus",
   "version": "2.0.6",
   "description": "Store and download all your web resources, manteniendo la estructura de carpetas.",
-  "author": "up209d",
-  "homepage_url": "https://github.com/up209d/ResourcesSaverExt",
+  "author": "Cristopher Arévalo",
+  "homepage_url": "https://github.com/cristopher-dev/ResourcesSaverExt-dev",
   "icons": {
     "128": "icon.png"
   },

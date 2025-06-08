@@ -2,7 +2,7 @@
   "name": "resource-saver-namer",
   "version": "0.0.0",
   "main": "index.js",
-  "author": "up209d <up209d@gmail.com>",
+  "author": "Cristopher Arévalo <cristopher.dev@gmail.com>",
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {},
