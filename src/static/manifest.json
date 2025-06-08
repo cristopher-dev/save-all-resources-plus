@@ -1,5 +1,5 @@
 {
-  "name": "Web Resource Vault",
+  "name": "Save All Resources plus",
   "version": "2.0.6",
   "description": "Store and download all your web resources, manteniendo la estructura de carpetas.",
   "author": "up209d",
@@ -9,7 +9,7 @@
   },
   "action": {
     "default_icon": "icon.png",
-    "default_title": "Web Resource Vault",
+    "default_title": "Save All Resources plus",
     "default_popup": "popup.html"
   },
   "background": {

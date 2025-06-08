@@ -288,7 +288,7 @@ window.onload = async () => {
     
     // Mostrar estado de inicialización
     if (attempt === 1 && !forceInit) {
-      showInitStatus('Inicializando Web Resource Vault...', 'info', 0);
+      showInitStatus('Inicializando Save All Resources plus...', 'info', 0);
     } else if (forceInit) {
       showInitStatus('Inicializando en modo de respaldo...', 'warning', 0);
     } else if (attempt > 1) {
@@ -319,7 +319,7 @@ window.onload = async () => {
           showInitStatus(
             forceInit ? 
               'Inicializado en modo de respaldo. Algunas funciones pueden estar limitadas.' : 
-              'Web Resource Vault inicializado correctamente',
+              'Save All Resources plus inicializado correctamente',
             forceInit ? 'warning' : 'success',
             forceInit ? 0 : 2000
           );
@@ -398,7 +398,7 @@ window.onload = async () => {
     container.innerHTML = `
       <div style="padding: 20px; text-align: center; color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 4px; margin: 20px;">
         <h3>Error de Inicialización</h3>
-        <p>No se pudo inicializar Web Resource Vault correctamente.</p>
+        <p>No se pudo inicializar Save All Resources plus correctamente.</p>
         <p>Error: ${error.message}</p>
         <p>Por favor, recarga la página o reinicia las DevTools.</p>
         <button onclick="location.reload()" style="margin-top: 10px; padding: 8px 16px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">

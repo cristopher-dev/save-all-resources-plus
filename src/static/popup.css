@@ -44,6 +44,7 @@ body {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   margin: 0;
   padding: 0;
+  color: black;
 }
 
 * {
@@ -64,7 +65,7 @@ ul li {
   margin: 0 0 12px 0;
   padding: 0;
   line-height: 1.6;
-  color: white;
+  color: black;
 }
 
 input[type='checkbox'] {
@@ -85,14 +86,14 @@ a {
   outline: none;
   text-decoration: none;
   transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-  color: #667eea;
+  color: black;
   font-weight: 500;
 }
 a:visited {
-  color: #667eea;
+  color: black;
 }
 a:hover {
-  color: #764ba2;
+  color: #333333;
   transform: translateY(-1px);
 }
 
@@ -134,11 +135,7 @@ a:hover {
   margin-bottom: 20px;
   font-size: 24px;
   font-weight: 700;
-  color: #2d3748;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: black;
   position: relative;
   animation: fadeInDown 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
 }
@@ -202,7 +199,7 @@ a:hover {
 }
 
 .sub-title {
-  color: #667eea;
+  color: black;
   font-size: 13px;
   font-weight: 600;
   display: block;
@@ -245,7 +242,7 @@ a:hover {
   vertical-align: text-top;
   border: 0;
   background-color: #2aa32a;
-  color: white;
+  color: black;
   padding: 3px 5px;
   transition: all 0.3s ease-out;
   animation: fadeInLeft 1s both cubic-bezier(0.1, 0.71, 0.28, 1.14) 0s 1;
@@ -282,6 +279,7 @@ a:hover {
 }
 .up-content #debug ul li {
   padding: 15px;
+  color: black;
   animation: fadeInLeft 1s both cubic-bezier(0.1, 0.71, 0.28, 1.14) 0.05s 1;
 }
 .up-content #debug ul li:nth-child(1) {
@@ -317,11 +315,10 @@ a:hover {
   position: absolute;
   font-size: 11px;
   width: 200px;
-  left: -90px;
-  top: -20px;
+  left: -90px;  top: -20px;
   padding: 5px 5px 5px 10px;
   background-color: indianred;
-  color: white;
+  color: black;
   opacity: 0;
   transition: all 0.5s cubic-bezier(0.1, 0.71, 0.28, 1.14);
 }
@@ -348,11 +345,10 @@ a:hover {
 #status {
   margin-bottom: 10px;
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-  padding: 16px 20px;
-  border-radius: 10px;
+  padding: 16px 20px;  border-radius: 10px;
   word-break: break-all;
   word-wrap: break-word;  border: 1px solid rgba(102, 126, 234, 0.2);
-  color: white;
+  color: black;
   font-weight: 500;
 }
 
@@ -367,7 +363,7 @@ a:hover {
   position: absolute;
   top: 12px;
   left: 12px;
-  color: rgba(102, 126, 234, 0.8);
+  color: black;
   pointer-events: none;
   background: rgba(255, 255, 255, 0.9);
   padding: 4px 8px;
@@ -377,7 +373,7 @@ a:hover {
 }
 
 .success {
-  color: #10b981;
+  color: black;
   font-weight: 600;
   background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
   padding: 2px 8px;
@@ -386,7 +382,7 @@ a:hover {
 }
 
 .failed {
-  color: red;
+  color: black;
 }
 
 /* Instruction Cards */
@@ -444,18 +440,14 @@ a:hover {
 .step-content h3 {
   font-size: 16px;
   font-weight: 600;
-  color: white;
+  color: black;
   margin-bottom: 8px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 .step-content p {
   font-size: 14px;
   line-height: 1.6;
-  color: white;
+  color: black;
   margin: 0;
 }
 
@@ -585,12 +577,12 @@ a:hover {
 /* Efectos de selección de texto */
 ::selection {
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
-  color: #1a202c;
+  color: black;
 }
 
 ::-moz-selection {
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
-  color: #1a202c;
+  color: black;
 }
 
 /* Responsive design */
