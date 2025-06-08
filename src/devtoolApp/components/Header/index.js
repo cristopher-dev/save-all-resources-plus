@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { withTheme } from 'styled-components';
-import { 
-  HeaderWrapper, 
+import {
+  HeaderWrapper,
   HeaderContent,
   BrandSection,
   BrandTitle,
@@ -10,7 +10,7 @@ import {
   ActionSection,
   ButtonGroup,
   StatsContainer,
-  StatItem
+  StatItem,
 } from './styles';
 import ResetButton from 'devtoolApp/components/ResetButton';
 import Button from 'devtoolApp/components/Button';
@@ -20,16 +20,16 @@ import { INITIAL_STATE as UI_INITIAL_STATE } from 'devtoolApp/store/ui';
 import * as uiActions from 'devtoolApp/store/ui';
 import { useAppSaveAllResource } from '../../hooks/useAppSaveAllResource';
 import { useAppAnalysis } from '../../hooks/useAppAnalysis';
-import { 
-  FaEye, 
-  FaDownload, 
-  FaSave, 
-  FaFileArchive, 
+import {
+  FaEye,
+  FaDownload,
+  FaSave,
+  FaFileArchive,
   FaCog,
   FaChartLine,
   FaGlobe,
   FaStop,
-  FaExclamationTriangle
+  FaExclamationTriangle,
 } from 'react-icons/fa';
 import packageJson from '/package.json';
 
@@ -37,7 +37,7 @@ export const Header = (props) => {
   const { state, dispatch, theme } = useStore();
   const {
     ui: { status, isSaving, isAnalyzing, analysisCompleted },
-    downloadList: { items = [] }
+    downloadList: { items = [] },
   } = state;
   const { handleOnSave } = useAppSaveAllResource();
   const { handleStartAnalysis, handleStopAnalysis } = useAppAnalysis();
@@ -58,7 +58,7 @@ export const Header = (props) => {
     return {
       totalResources,
       totalSize: formatSize(totalSize),
-      isProcessing: status !== UI_INITIAL_STATE.status || isAnalyzing
+      isProcessing: status !== UI_INITIAL_STATE.status || isAnalyzing,
     };
   }, [items, status, isAnalyzing]);
 
@@ -84,7 +84,7 @@ export const Header = (props) => {
   const handleMainAction = (event) => {
     event.stopPropagation();
     if (isActionDisabled) return;
-    
+
     if (analysisCompleted && stats.totalResources > 0) {
       handleOnSave();
     } else {
@@ -124,37 +124,27 @@ export const Header = (props) => {
               <BrandSubtitle>Gestor Inteligente de Recursos Web</BrandSubtitle>
             </div>
           </div>
-          
+
           <StatusBadge variant={stats.isProcessing ? 'warning' : 'success'}>
-            {isAnalyzing ? 'Escaneando...' : stats.isProcessing ? 'Procesando...' : analysisCompleted ? 'Listo para guardar' : 'Listo'}
+            {isAnalyzing
+              ? 'Escaneando...'
+              : stats.isProcessing
+                ? 'Procesado...'
+                : analysisCompleted
+                  ? 'Listo para guardar'
+                  : 'Listo'}
           </StatusBadge>
         </BrandSection>
-
-        <StatsContainer>
-          <StatItem>
-            <FaFileArchive size={14} />
-            <span>{stats.totalResources} recursos</span>
-          </StatItem>
-          <StatItem>
-            <FaChartLine size={14} />
-            <span>{stats.totalSize}</span>
-          </StatItem>
-        </StatsContainer>        <ActionSection>
+        <ActionSection>
           <ButtonGroup>
-              {isAnalyzing ? (
-              <Button 
-                onClick={handleStopClick} 
-                variant="danger"
-                size="sm"
-                loading={true}
-                isScanning={isAnalyzing}
-              >
+            {isAnalyzing ? (
+              <Button onClick={handleStopClick} variant="danger" size="sm" loading={true} isScanning={isAnalyzing}>
                 <FaStop />
                 Detener
               </Button>
             ) : (
-              <Button 
-                onClick={handleMainAction} 
+              <Button
+                onClick={handleMainAction}
                 disabled={isActionDisabled}
                 variant="primary"
                 size="sm"
@@ -165,10 +155,10 @@ export const Header = (props) => {
                 {saveText}
               </Button>
             )}
-            
+
             {isStuckSaving && (
-              <Button 
-                onClick={handleForceReset} 
+              <Button
+                onClick={handleForceReset}
                 variant="warning"
                 size="sm"
                 title="Resetear estado de guardado si está bloqueado"
@@ -177,16 +167,13 @@ export const Header = (props) => {
                 Desbloquear
               </Button>
             )}
-            
+
             <ResetButton />
           </ButtonGroup>
         </ActionSection>
       </HeaderContent>
 
-      <ResourcePreview 
-        isOpen={showPreview} 
-        onClose={() => setShowPreview(false)} 
-      />
+      <ResourcePreview isOpen={showPreview} onClose={() => setShowPreview(false)} />
     </HeaderWrapper>
   );
 };
