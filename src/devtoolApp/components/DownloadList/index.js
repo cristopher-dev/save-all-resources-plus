@@ -18,11 +18,6 @@ import * as uiActions from 'devtoolApp/store/ui';
 import LogSection from './LogSection';
 import OptionSection from './OptionSection';
 import AdvancedFilters from './AdvancedFilters';
-import ScheduledDownload from './ScheduledDownload';
-import DependencyAnalysis from './DependencyAnalysis';
-import IntelligentCache from './IntelligentCache';
-import EnhancedCompression from './EnhancedCompression';
-import ExportOptions from './ExportOptions';
 import AnalysisStatus from '../AnalysisStatus';
 import { FaTrash, FaCheckSquare, FaSquare } from 'react-icons/fa';
 import { MdDownloading } from 'react-icons/md';
@@ -91,14 +86,10 @@ export const DownloadList = () => {
   const totalCount = downloadList.length;
 
   const allResources = useMemo(() => [...staticResource, ...networkResource], [staticResource, networkResource]);
-
   return (    <DownloadListWrapper>
       <AnalysisStatus />
       <OptionSection />
-      <AdvancedFilters />      <ScheduledDownload />
-      <DependencyAnalysis />      <IntelligentCache />
-      <EnhancedCompression />
-      <ExportOptions />
+      <AdvancedFilters />
       <DownloadListHeader>
         Download List:
         <div style={{ fontSize: '12px', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '12px' }}>
