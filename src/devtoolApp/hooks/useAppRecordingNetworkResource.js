@@ -5,19 +5,31 @@ import useStore from '../store';
 import { initializeNetworkResourceRecording, checkDevtoolsAvailability } from './useAppRecordingNetworkResourceHelpers';
 
 export const useAppRecordingNetworkResource = () => {
-  const { dispatch } = useStore();
+  const { state, dispatch } = useStore();
+  const { ui: { isAnalyzing } } = state;
+  
   useEffect(() => {
+    // Solo inicializar la grabación si el análisis está activo
+    if (!isAnalyzing) {
+      return;
+    }
+    
     if (!checkDevtoolsAvailability()) {
       const retryTimer = setTimeout(() => {
-        if (checkDevtoolsAvailability()) {
+        if (checkDevtoolsAvailability() && isAnalyzing) {
           initializeNetworkResourceRecording(dispatch, processNetworkResourceToStore, networkResourceActions);
         }
       }, 500);
       return () => clearTimeout(retryTimer);
     }
+    
     initializeNetworkResourceRecording(dispatch, processNetworkResourceToStore, networkResourceActions);
+    
     return () => {
-      dispatch(networkResourceActions.resetNetworkResource());
+      // Solo limpiar si ya no está analizando
+      if (!isAnalyzing) {
+        dispatch(networkResourceActions.resetNetworkResource());
+      }
     };
-  }, [dispatch]);
+  }, [dispatch, isAnalyzing]);
 };

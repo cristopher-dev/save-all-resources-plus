@@ -10,8 +10,14 @@ export function handleResourceStability({
   staticResource,
   dispatch,
   uiActions,
-  downloadListActions
+  downloadListActions,
+  isAnalyzing = false
 }) {
+  // Solo procesar si el análisis está activo
+  if (!isAnalyzing) {
+    return;
+  }
+  
   if (currentResourceCount !== lastResourceCountRef.current) {
     lastResourceCountRef.current = currentResourceCount;
     stableCountRef.current = 0;

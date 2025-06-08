@@ -73,8 +73,13 @@ export const AnalysisStatus = () => {
   const totalResources = networkResource.length + staticResource.length;
   const isInterrupted = status.includes('detenido') || status.includes('interrumpido');
   
-  // No mostrar si no hay recursos o si está en estado idle
-  if (totalResources === 0 && status === 'Idle...') {
+  // No mostrar si no hay análisis activo y está en estado inicial
+  if (!isAnalyzing && !analysisCompleted && status === 'Listo para escanear...') {
+    return null;
+  }
+  
+  // No mostrar si no hay recursos y no está analizando
+  if (totalResources === 0 && !isAnalyzing) {
     return null;
   }
 

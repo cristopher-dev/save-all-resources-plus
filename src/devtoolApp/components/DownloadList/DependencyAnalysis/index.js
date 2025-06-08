@@ -61,9 +61,12 @@ const DependencyAnalysis = () => {
       .reduce((acc, [url, resource]) => ({ ...acc, [url]: resource }), {});
   }, [analyzeDependencies.dependencies, selectedFilter]);
 
-  // Ejecutar análisis automático
+  // Ejecutar análisis automático solo si el análisis principal ya está completado
   useEffect(() => {
-    if (downloadList.length > 1 && !analyzing && !analysisCompleted && !analysisInterrupted) {
+    // Solo ejecutar análisis de dependencias si el análisis principal del UI ya fue completado
+    const mainAnalysisCompleted = isAnalyzing || analysisCompleted;
+    
+    if (downloadList.length > 1 && !analyzing && mainAnalysisCompleted && !analysisInterrupted) {
       setAnalyzing(true);
       dispatch(uiActions.setStatus('Iniciando análisis de dependencias...'));
       
@@ -72,14 +75,13 @@ const DependencyAnalysis = () => {
         if (!analysisInterrupted) {
           setDependencyTree(analyzeDependencies.dependencies);
           setAnalyzing(false);
-          dispatch(uiActions.setAnalysisCompleted());
           dispatch(uiActions.setStatus('Análisis de dependencias completado'));
         }
       }, 2000);
 
       return () => clearTimeout(analysisTimeout);
     }
-  }, [downloadList, analyzeDependencies.dependencies, analyzing, analysisCompleted, analysisInterrupted, dispatch]);
+  }, [downloadList, analyzeDependencies.dependencies, analyzing, isAnalyzing, analysisCompleted, analysisInterrupted, dispatch]);
 
   const stopAnalysis = () => {
     setAnalysisInterrupted(true);

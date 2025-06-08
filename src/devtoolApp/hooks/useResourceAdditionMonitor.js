@@ -19,8 +19,8 @@ export const useResourceAdditionMonitor = (timeoutMs = 3000) => {
   const currentResourceCount = networkResource.length + staticResource.length;
 
   useEffect(() => {
-    // Si ya se completó el análisis, no hacer nada
-    if (analysisCompleted) {
+    // Solo actuar si ya se completó el análisis O si el análisis está activo
+    if (analysisCompleted || !isAnalyzing) {
       return;
     }
 
@@ -34,7 +34,8 @@ export const useResourceAdditionMonitor = (timeoutMs = 3000) => {
       staticResource,
       dispatch,
       uiActions,
-      downloadListActions
+      downloadListActions,
+      isAnalyzing
     });
     
     // Cleanup
@@ -43,7 +44,7 @@ export const useResourceAdditionMonitor = (timeoutMs = 3000) => {
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [currentResourceCount, analysisCompleted, dispatch, timeoutMs, networkResource, staticResource]);
+  }, [currentResourceCount, analysisCompleted, isAnalyzing, dispatch, timeoutMs, networkResource, staticResource]);
 
   // Función para reiniciar el monitoreo
   const resetMonitoring = () => {
@@ -58,7 +59,7 @@ export const useResourceAdditionMonitor = (timeoutMs = 3000) => {
   return {
     currentResourceCount,
     resetMonitoring,
-    isMonitoring: !analysisCompleted && currentResourceCount > 0,
+    isMonitoring: isAnalyzing && currentResourceCount > 0,
   };
 };
 
