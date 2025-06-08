@@ -3,7 +3,7 @@ import { useAppTheme } from './useAppTheme';
 import { isColorDark, getContrastTextColor, getContrastingStyles } from '../themes';
 
 export const useContrastColor = () => {
-  const theme = useAppTheme();
+  const { theme } = useAppTheme();
   
   return useMemo(() => ({
     // Función para obtener el color de texto contrastante

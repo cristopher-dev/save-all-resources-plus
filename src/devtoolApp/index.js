@@ -52,10 +52,9 @@ export const DevToolApp = ({ initialChromeTab }) => {
 
 export const App = (props) => {
   const { initialChromeTab } = props;
-  const [state, dispatch] = useStoreConfigure();
-  return (
+  const [state, dispatch] = useStoreConfigure();  return (
     <StoreContext.Provider value={useMemo(() => ({ state, dispatch }), [state, dispatch])}>
-      <ThemeProvider theme={useAppTheme()}>
+      <ThemeProvider theme={useAppTheme().theme}>
         <DevToolApp initialChromeTab={initialChromeTab} />
       </ThemeProvider>
     </StoreContext.Provider>

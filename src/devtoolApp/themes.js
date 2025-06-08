@@ -223,20 +223,130 @@ export const getTheme = (key) => {
   console.log('[DEVTOOL] getTheme: Requested key:', key);
   console.log('[DEVTOOL] getTheme: Available themes:', Object.keys(THEMES));
   
-  const theme = THEMES[key] || THEMES[THEME_KEYS.LIGHT];
+  let theme = THEMES[key] || THEMES[THEME_KEYS.LIGHT];
   
-  if (!theme) {
-    console.error('[DEVTOOL] getTheme: No theme found for key:', key, 'Available keys:', Object.keys(THEMES));
-    // Crear un tema básico de emergencia
-    return {
+  // Validación más estricta de la estructura del tema
+  if (!theme || !theme.colors) {
+    console.error('[DEVTOOL] getTheme: Invalid theme structure for key:', key, 'Theme:', theme);
+    // Crear un tema básico de emergencia con estructura completa
+    theme = {
       name: 'emergency',
+      isDark: false,
+      factor: 1,
+      white: '#ffffff',
+      black: '#000000',
+      elasticBezier: 'cubic-bezier(0.1, 0.71, 0.28, 1.14)',
+      smoothBezier: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      borderRadius: 8,
       colors: {
         primary: '#1283c3',
+        primaryHover: '#0d6ba3',
+        primaryLight: '#e3f2fd',
+        secondary: '#10b981',
+        secondaryHover: '#059669',
+        secondaryLight: '#ecfdf5',
+        success: '#10b981',
+        successHover: '#059669',
+        successBackground: '#ecfdf5',
+        successBorder: '#a7f3d0',
+        warning: '#f59e0b',
+        warningHover: '#d97706',
+        warningBackground: '#fffbeb',
+        warningBorder: '#fed7aa',
+        error: '#ef4444',
+        errorHover: '#dc2626',
+        errorBackground: '#fef2f2',
+        errorBorder: '#fecaca',
+        info: '#3b82f6',
+        infoBackground: '#eff6ff',
+        infoBorder: '#bfdbfe',
+        text: '#111827',
+        textSecondary: '#4b5563',
+        textMuted: '#6b7280',
+        textDisabled: '#9ca3af',
         background: '#ffffff',
-        text: '#000000',
-        white: '#ffffff'
+        backgroundSecondary: '#f9fafb',
+        backgroundAlt: '#f3f4f6',
+        backgroundHover: '#f3f4f6',
+        surface: '#ffffff',
+        surfaceHover: '#f9fafb',
+        surfaceActive: '#f3f4f6',
+        border: '#e5e7eb',
+        borderLight: '#f3f4f6',
+        borderStrong: '#d1d5db',
+        shadow: 'rgba(0, 0, 0, 0.1)',
+        shadowStrong: 'rgba(0, 0, 0, 0.15)',
+        white: '#ffffff',
+        black: '#000000'
+      },
+      grayScale: {
+        gray0: '#ffffff',
+        gray1: '#f9fafb',
+        gray2: '#f3f4f6',
+        gray3: '#e5e7eb',
+        gray4: '#d1d5db',
+        gray5: '#9ca3af',
+        gray9: '#111827',
+        gray10: '#374151',
+        gray20: '#6b7280'
+      },
+      spacing: {
+        xs: '4px',
+        sm: '8px',
+        md: '16px',
+        lg: '24px',
+        xl: '32px',
+        '2xl': '48px'
+      },
+      typography: {
+        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+        fontSize: {
+          xs: '12px',
+          sm: '14px',
+          base: '16px',
+          lg: '18px',
+          xl: '20px',
+          '2xl': '24px'
+        },
+        fontWeight: {
+          light: 300,
+          normal: 400,
+          medium: 500,
+          semibold: 600,
+          bold: 700
+        },
+        lineHeight: {
+          tight: 1.25,
+          normal: 1.5,
+          relaxed: 1.625
+        }
+      },
+      animations: {
+        fast: '150ms',
+        normal: '250ms',
+        slow: '350ms'
+      },
+      zIndex: {
+        dropdown: 1000,
+        sticky: 1020,
+        fixed: 1030,
+        modal: 1040,
+        popover: 1050,
+        tooltip: 1060
       }
     };
+  }
+  
+  // Segunda validación para asegurar propiedades críticas
+  if (!theme.colors || !theme.colors.primary) {
+    console.error('[DEVTOOL] getTheme: Theme missing critical colors property');
+    theme.colors = theme.colors || {};
+    theme.colors.primary = theme.colors.primary || '#1283c3';
+    theme.colors.background = theme.colors.background || '#ffffff';
+    theme.colors.text = theme.colors.text || '#000000';
+    theme.colors.white = theme.colors.white || '#ffffff';
+    theme.colors.surface = theme.colors.surface || '#ffffff';
+    theme.colors.border = theme.colors.border || '#e5e7eb';
   }
   
   console.log('[DEVTOOL] getTheme: Returning theme for key:', key, 'Theme name:', theme.name);

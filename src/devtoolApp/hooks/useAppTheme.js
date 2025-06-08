@@ -37,8 +37,7 @@ export const useAppTheme = () => {
       console.error('[DEVTOOL] useAppTheme: Error setting background color:', error);
     }
   }, [currentTheme]);
-
   window.debugTheme = currentTheme;
 
-  return currentTheme;
+  return { theme: currentTheme };
 };

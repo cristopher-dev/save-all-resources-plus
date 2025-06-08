@@ -46,7 +46,7 @@ const CACHE_POLICIES = {
 const IntelligentCache = () => {
   const { state } = useStore();
   const { downloadList } = state;
-  const theme = useAppTheme();
+  const { theme } = useAppTheme();
   
   const [expanded, setExpanded] = useState(false);
   const [cacheData, setCacheData] = useState({});
