@@ -17,7 +17,6 @@ import * as downloadListActions from 'devtoolApp/store/downloadList';
 import * as uiActions from 'devtoolApp/store/ui';
 import LogSection from './LogSection';
 import OptionSection from './OptionSection';
-import AdvancedFilters from './AdvancedFilters';
 import AnalysisStatus from '../AnalysisStatus';
 import { FaTrash, FaCheckSquare, FaSquare } from 'react-icons/fa';
 import { MdDownloading } from 'react-icons/md';
@@ -85,11 +84,9 @@ export const DownloadList = () => {
   const selectedCount = Object.values(selectedResources).filter(Boolean).length;
   const totalCount = downloadList.length;
 
-  const allResources = useMemo(() => [...staticResource, ...networkResource], [staticResource, networkResource]);
-  return (    <DownloadListWrapper>
+  const allResources = useMemo(() => [...staticResource, ...networkResource], [staticResource, networkResource]);  return (    <DownloadListWrapper>
       <AnalysisStatus />
       <OptionSection />
-      <AdvancedFilters />
       <DownloadListHeader>
         Download List:
         <div style={{ fontSize: '12px', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '12px' }}>
