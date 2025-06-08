@@ -65,7 +65,10 @@ const ScheduledDownload = () => {
     remaining: 0,
   });
 
-  const toggleExpanded = () => setExpanded(!expanded);
+  const toggleExpanded = (event) => {
+    event.stopPropagation();
+    setExpanded(!expanded);
+  };
 
   // Procesar cola de descargas
   const processQueue = useCallback(() => {
@@ -73,7 +76,8 @@ const ScheduledDownload = () => {
   }, [downloadQueue, batchSize]);
 
   // Agregar descarga a la cola
-  const addToQueue = () => {
+  const addToQueue = (event) => {
+    event.stopPropagation();
     const newItems = downloadList.slice(1).map((item, index) => ({
       id: `download_${Date.now()}_${index}`,
       url: item.url,
@@ -93,17 +97,20 @@ const ScheduledDownload = () => {
   const calculateScheduleTime = () => calculateScheduleTimeHelper(scheduleType, delayMinutes, scheduleTime, recurringInterval);
 
   // Remover elemento de la cola
-  const removeFromQueue = (id) => {
+  const removeFromQueue = (id) => (event) => {
+    event.stopPropagation();
     setDownloadQueue(prev => prev.filter(item => item.id !== id));
   };
 
   // Pausar/reanudar procesamiento
-  const toggleProcessing = () => {
+  const toggleProcessing = (event) => {
+    event.stopPropagation();
     setIsProcessing(!isProcessing);
   };
 
   // Limpiar cola
-  const clearQueue = () => {
+  const clearQueue = (event) => {
+    event.stopPropagation();
     setDownloadQueue([]);
     setProcessingStats({ completed: 0, failed: 0, remaining: 0 });
   };
@@ -293,7 +300,7 @@ const ScheduledDownload = () => {
                   
                   <QueueActions>
                     <QueueActionButton 
-                      onClick={() => removeFromQueue(item.id)}
+                      onClick={removeFromQueue(item.id)}
                       disabled={item.status === 'processing'}
                     >
                       <FaTrash />

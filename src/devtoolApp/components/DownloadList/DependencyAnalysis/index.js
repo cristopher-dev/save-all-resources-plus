@@ -95,7 +95,11 @@ const DependencyAnalysis = () => {
     // El useEffect se encargará de reiniciar el análisis
   };
 
-  const exportDependencyReport = () => {
+  const exportDependencyReport = (event) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     const report = {
       timestamp: new Date().toISOString(),
       mainUrl: downloadList[0]?.url || '',
@@ -111,6 +115,22 @@ const DependencyAnalysis = () => {
     a.download = `dependency-analysis-${new Date().getTime()}.json`;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const handleFilterChange = (type) => (event) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    setSelectedFilter(type);
+  };
+
+  const handleReanalyze = (event) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    setAnalyzing(true);
   };
 
   const totalResources = downloadList.length - 1;
@@ -225,7 +245,7 @@ const DependencyAnalysis = () => {
                   <FilterButton
                     key={type}
                     active={selectedFilter === type}
-                    onClick={() => setSelectedFilter(type)}
+                    onClick={handleFilterChange(type)}
                   >
                     {type === 'all' ? 'Todos' : type.toUpperCase()}
                     {type !== 'all' && ` (${Object.values(analyzeDependencies.dependencies).filter(r => r.type === type).length})`}
@@ -266,7 +286,7 @@ const DependencyAnalysis = () => {
               
               <Button 
                 color="secondary" 
-                onClick={() => setAnalyzing(true)}
+                onClick={handleReanalyze}
               >
                 <FaSearch style={{ marginRight: '8px' }} />
                 Re-analizar

@@ -46,9 +46,13 @@ const AdvancedFilters = () => {
   const [newDomain, setNewDomain] = useState('');
   const [newExtension, setNewExtension] = useState('');
 
-  const toggleExpanded = () => setExpanded(!expanded);
+  const toggleExpanded = (event) => {
+    event.stopPropagation();
+    setExpanded(!expanded);
+  };
 
-  const handleFileTypeToggle = (fileType) => {
+  const handleFileTypeToggle = (fileType) => (event) => {
+    event.stopPropagation();
     // Map to existing store structure
     const toggleAction = {
       images: optionActions.setIncludeImages,
@@ -80,7 +84,8 @@ const AdvancedFilters = () => {
     }
   };
 
-  const addDomain = () => {
+  const addDomain = (event) => {
+    if (event) event.stopPropagation();
     if (newDomain.trim()) {
       const domains = [...(option.excludeDomains || []), newDomain.trim()];
       dispatch(optionActions.setExcludeDomains(domains));
@@ -88,12 +93,14 @@ const AdvancedFilters = () => {
     }
   };
 
-  const removeDomain = (domain) => {
+  const removeDomain = (domain) => (event) => {
+    event.stopPropagation();
     const domains = (option.excludeDomains || []).filter(d => d !== domain);
     dispatch(optionActions.setExcludeDomains(domains));
   };
 
-  const addExtension = () => {
+  const addExtension = (event) => {
+    if (event) event.stopPropagation();
     if (newExtension.trim()) {
       const extensions = [...(option.customFileExtensions || []), newExtension.trim()];
       dispatch(optionActions.setCustomFileExtensions(extensions));
@@ -101,7 +108,8 @@ const AdvancedFilters = () => {
     }
   };
 
-  const removeExtension = (extension) => {
+  const removeExtension = (extension) => (event) => {
+    event.stopPropagation();
     const extensions = (option.customFileExtensions || []).filter(e => e !== extension);
     dispatch(optionActions.setCustomFileExtensions(extensions));
   };
@@ -161,7 +169,7 @@ const AdvancedFilters = () => {
                   <FileTypeItem
                     key={key}
                     $checked={isChecked}
-                    onClick={() => handleFileTypeToggle(key)}
+                    onClick={handleFileTypeToggle(key)}
                   >
                     <FileTypeIcon>{icon}</FileTypeIcon>
                     <FileTypeLabel $checked={isChecked}>
@@ -221,7 +229,7 @@ const AdvancedFilters = () => {
             {(option.excludeDomains || []).map((domain) => (
               <Tag key={domain}>
                 {domain}
-                <TagRemove onClick={() => removeDomain(domain)}>
+                <TagRemove onClick={removeDomain(domain)}>
                   <FaTimes />
                 </TagRemove>
               </Tag>
@@ -231,7 +239,7 @@ const AdvancedFilters = () => {
               placeholder="Agregar dominio..."
               value={newDomain}
               onChange={(e) => setNewDomain(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && addDomain()}
+              onKeyPress={(e) => e.key === 'Enter' && addDomain(e)}
             />
           </TagsContainer>
         </FilterSection>
@@ -245,7 +253,7 @@ const AdvancedFilters = () => {
             {(option.customFileExtensions || []).map((extension) => (
               <Tag key={extension}>
                 .{extension}
-                <TagRemove onClick={() => removeExtension(extension)}>
+                <TagRemove onClick={removeExtension(extension)}>
                   <FaTimes />
                 </TagRemove>
               </Tag>
@@ -255,7 +263,7 @@ const AdvancedFilters = () => {
               placeholder="Agregar extensión (sin punto)..."
               value={newExtension}
               onChange={(e) => setNewExtension(e.target.value.replace('.', ''))}
-              onKeyPress={(e) => e.key === 'Enter' && addExtension()}
+              onKeyPress={(e) => e.key === 'Enter' && addExtension(e)}
             />
           </TagsContainer>
         </FilterSection>

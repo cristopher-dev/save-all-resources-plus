@@ -16,7 +16,8 @@ export const ParserModal = (props) => {
   );
   const handleTextArea = useMemo(() => (e) => setTextArea(e.target.value), []);
   const handleUrls = useMemo(
-    () => () => {
+    () => (event) => {
+      event.stopPropagation();
       if (textArea) {
         textArea
           .split('\n')
@@ -31,8 +32,19 @@ export const ParserModal = (props) => {
       }
       onClose && onClose();
     },
-    [textArea, dispatch]
+    [textArea, dispatch, onClose]
   );
+
+  const handleClose = (event) => {
+    event.stopPropagation();
+    onClose && onClose();
+  };
+
+  const handleBackdropClick = (event) => {
+    if (event.target === event.currentTarget) {
+      handleClose(event);
+    }
+  };
 
   useEffect(() => {
     if (!isOpen) {
@@ -42,14 +54,14 @@ export const ParserModal = (props) => {
 
   return (
     <ParserModalWrapper isOpen={isOpen}>
-      <ParserModalBackdrop onClick={onClose} />
+      <ParserModalBackdrop onClick={handleBackdropClick} />
       <ParserTextContainer isOpen={isOpen}>
         <ParserTextArea placeholder={`Enter URL list that you want to parse...`} onChange={handleTextArea} value={textArea} />
         <ParserTextButtonGroup>
           <Button color={`primary`} onClick={handleUrls}>
             Parse URLs
           </Button>
-          <Button color={`danger`} onClick={onClose}>
+          <Button color={`danger`} onClick={handleClose}>
             Cancel
           </Button>
         </ParserTextButtonGroup>

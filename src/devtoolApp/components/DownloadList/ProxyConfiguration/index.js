@@ -104,19 +104,31 @@ const ProxyConfiguration = () => {
     });
   };
 
-  const handleBypassRuleAdd = () => {
+  const handleBypassRuleAdd = (event) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     const newRule = prompt('Ingrese el dominio o patrón para omitir el proxy:');
     if (newRule && newRule.trim()) {
       handleConfigChange('bypassList', [...proxyConfig.bypassList, newRule.trim()]);
     }
   };
 
-  const handleBypassRuleRemove = (index) => {
+  const handleBypassRuleRemove = (index) => (event) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     const newList = proxyConfig.bypassList.filter((_, i) => i !== index);
     handleConfigChange('bypassList', newList);
   };
 
-  const testProxyConnection = async () => {
+  const testProxyConnection = async (event) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     setIsTestingConnection(true);
     setTestResult(null);
 
@@ -168,7 +180,11 @@ const ProxyConfiguration = () => {
     }
   };
 
-  const applyPreset = (preset) => {
+  const applyPreset = (preset) => (event) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     const newConfig = { ...proxyConfig, ...preset.config };
     setProxyConfig(newConfig);
     optionStore.setState(state => ({
@@ -177,7 +193,11 @@ const ProxyConfiguration = () => {
     }));
   };
 
-  const detectSystemProxy = async () => {
+  const detectSystemProxy = async (event) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     // Simular detección de proxy del sistema
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -219,7 +239,13 @@ const ProxyConfiguration = () => {
                 <ProxyOption
                   key={type}
                   $selected={proxyConfig.type === type}
-                  onClick={() => handleConfigChange('type', type)}
+                  onClick={(event) => {
+                    if (event) {
+                      event.preventDefault();
+                      event.stopPropagation();
+                    }
+                    handleConfigChange('type', type);
+                  }}
                 >
                   {type.toUpperCase()}
                 </ProxyOption>
@@ -340,7 +366,7 @@ const ProxyConfiguration = () => {
         <SectionTitle>Presets de Configuración</SectionTitle>
         <PresetGrid>
           {proxyPresets.map((preset, index) => (
-            <PresetCard key={index} onClick={() => applyPreset(preset)}>
+            <PresetCard key={index} onClick={(event) => applyPreset(preset)(event)}>
               <PresetTitle>{preset.name}</PresetTitle>
               <PresetDescription>{preset.description}</PresetDescription>
             </PresetCard>
@@ -354,7 +380,7 @@ const ProxyConfiguration = () => {
           {proxyConfig.bypassList.map((rule, index) => (
             <RuleItem key={index}>
               <RuleInput value={rule} readOnly />
-              <RuleButton onClick={() => handleBypassRuleRemove(index)}>
+              <RuleButton onClick={(event) => handleBypassRuleRemove(index)(event)}>
                 ❌
               </RuleButton>
             </RuleItem>

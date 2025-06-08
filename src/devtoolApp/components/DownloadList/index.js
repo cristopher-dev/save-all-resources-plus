@@ -43,10 +43,17 @@ export const DownloadList = () => {
   
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleClose = useMemo(() => () => setIsModalOpen(false), []);
-  const handleOpen = useMemo(() => () => setIsModalOpen(true), []);
+  const handleClose = useMemo(() => (event) => {
+    if (event) event.stopPropagation();
+    setIsModalOpen(false);
+  }, []);
+  const handleOpen = useMemo(() => (event) => {
+    event.stopPropagation();
+    setIsModalOpen(true);
+  }, []);
   const handleReset = useMemo(
-    () => () => {
+    () => (event) => {
+      event.stopPropagation();
       // Reset download list (except main page)
       downloadList.slice(1).forEach((item) => dispatch(downloadListActions.removeDownloadItem(item)));
       // Reset analysis and UI state
@@ -54,8 +61,12 @@ export const DownloadList = () => {
     },
     [downloadList, dispatch]
   );
-  const handleRemove = (item) => () => dispatch(downloadListActions.removeDownloadItem(item));
-  const handleLog = (currentLog) => () => {
+  const handleRemove = (item) => (event) => {
+    event.stopPropagation();
+    dispatch(downloadListActions.removeDownloadItem(item));
+  };
+  const handleLog = (currentLog) => (event) => {
+    event.stopPropagation();
     if (log?.url === currentLog?.url) {
       return dispatch(uiActions.setLog());
     }
@@ -66,7 +77,8 @@ export const DownloadList = () => {
     dispatch(uiActions.toggleResourceSelection(url));
   };
 
-  const handleSelectAll = () => {
+  const handleSelectAll = (event) => {
+    event.stopPropagation();
     const allUrls = downloadList.reduce((acc, item) => {
       acc[item.url] = true;
       return acc;
@@ -74,7 +86,8 @@ export const DownloadList = () => {
     dispatch(uiActions.setSelectedResources(allUrls));
   };
 
-  const handleDeselectAll = () => {
+  const handleDeselectAll = (event) => {
+    event.stopPropagation();
     dispatch(uiActions.clearSelectedResources());
   };
 

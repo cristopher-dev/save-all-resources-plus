@@ -6,20 +6,34 @@ export const Button = ({
   size = 'md',
   children, 
   onClick, 
-  disabled,
-  loading,
-  fullWidth,
+  disabled = false,
+  loading = false,
+  fullWidth = false,
   color, // legacy support
+  type = 'button',
   ...restProps 
 }) => {
   // Filter out any remaining custom props that shouldn't go to DOM
   const { primary, secondary, ...domProps } = restProps;
   
+  // Handle click with proper event propagation
+  const handleClick = (event) => {
+    if (disabled || loading) {
+      event.preventDefault();
+      return;
+    }
+    
+    if (onClick && typeof onClick === 'function') {
+      onClick(event);
+    }
+  };
+  
   return (
     <ButtonWrapper 
+      type={type}
       variant={color || variant} // legacy color prop support
       size={size}
-      onClick={onClick} 
+      onClick={handleClick} 
       disabled={disabled || loading}
       fullWidth={fullWidth}
       {...domProps}

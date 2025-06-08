@@ -146,11 +146,36 @@ const ResourcePreview = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
+  // Event handlers para botones
+  const handleClose = (event) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    onClose && onClose();
+  };
+
+  const handleTypeFilterAll = (event) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    setSelectedType('all');
+  };
+
+  const handleTypeFilter = (type) => (event) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    setSelectedType(type);
+  };
+
   return (
     <PreviewContainer>
       <PreviewHeader>
         <PreviewTitle>🔍 Vista Previa de Recursos ({totalCount})</PreviewTitle>
-        <CloseButton onClick={onClose}>
+        <CloseButton onClick={handleClose}>
           <FaTimes />
         </CloseButton>
       </PreviewHeader>
@@ -165,7 +190,7 @@ const ResourcePreview = ({ isOpen, onClose }) => {
         <TypeFilter>
           <TypeBadge 
             $active={selectedType === 'all'}
-            onClick={() => setSelectedType('all')}
+            onClick={handleTypeFilterAll}
           >
             Todos
           </TypeBadge>
@@ -176,7 +201,7 @@ const ResourcePreview = ({ isOpen, onClose }) => {
                 key={type}
                 $active={selectedType === type}
                 color={typeColors[type]}
-                onClick={() => setSelectedType(type)}
+                onClick={handleTypeFilter(type)}
               >
                 <Icon size={12} />
                 {type} ({stats[type].count})

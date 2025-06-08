@@ -125,7 +125,13 @@ const EnhancedCompression = () => {
   const [compressionResults, setCompressionResults] = useState([]);
   const [previewMode, setPreviewMode] = useState(false);
 
-  const toggleExpanded = () => setExpanded(!expanded);
+  const toggleExpanded = (event) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    setExpanded(!expanded);
+  };
 
   // Estadísticas calculadas
   const compressionStats = useMemo(() => simulateCompressionStats(downloadList, selectedFormat, compressionLevel, COMPRESSION_FORMATS), [downloadList, selectedFormat, compressionLevel]);
@@ -165,12 +171,20 @@ const EnhancedCompression = () => {
   }, [compressionStats, selectedFormat, password, splitArchive, splitSize]);
 
   // Eliminar resultado
-  const deleteResult = useCallback((id) => {
+  const deleteResult = useCallback((id) => (event) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     setCompressionResults(prev => prev.filter(result => result.id !== id));
   }, []);
 
   // Descargar resultado (simulado)
-  const downloadResult = useCallback((result) => {
+  const downloadResult = useCallback((result) => (event) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     // En una implementación real, aquí se descargaría el archivo
     console.log('Descargando:', result.filename);
   }, []);
@@ -231,7 +245,13 @@ const EnhancedCompression = () => {
               <FormatOption
                 key={key}
                 selected={selectedFormat === key}
-                onClick={() => setSelectedFormat(key)}
+                onClick={(event) => {
+                  if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                  }
+                  setSelectedFormat(key);
+                }}
               >
                 <FormatIcon>{format.icon}</FormatIcon>
                 <FormatName>{format.name}</FormatName>
@@ -374,7 +394,13 @@ const EnhancedCompression = () => {
           <CompressionActions>
             <ActionButton 
               color="primary" 
-              onClick={startCompression}
+              onClick={(event) => {
+                if (event) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                }
+                startCompression();
+              }}
               disabled={compressing || compressionStats.totalFiles === 0}
             >
               {compressing ? <FaSpinner className="spinning" /> : <FaCompressArrowsAlt />}
@@ -383,7 +409,13 @@ const EnhancedCompression = () => {
             
             <ActionButton 
               color="secondary" 
-              onClick={() => setPreviewMode(!previewMode)}
+              onClick={(event) => {
+                if (event) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                }
+                setPreviewMode(!previewMode);
+              }}
               disabled={compressionStats.totalFiles === 0}
             >
               <FaCog />
@@ -431,14 +463,14 @@ const EnhancedCompression = () => {
                     <ActionButton
                       size="small"
                       color="primary"
-                      onClick={() => downloadResult(result)}
+                      onClick={(event) => downloadResult(result)(event)}
                     >
                       <FaDownload />
                     </ActionButton>
                     <ActionButton
                       size="small"
                       color="danger"
-                      onClick={() => deleteResult(result.id)}
+                      onClick={(event) => deleteResult(result.id)(event)}
                     >
                       ×
                     </ActionButton>

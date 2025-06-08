@@ -27,9 +27,26 @@ const ResetButton = ({ variant = 'outline', size = 'sm' }) => {
   const [showConfirm, setShowConfirm] = useState(false);
   const { dispatch } = useStore();
 
-  const handleReset = () => {
+  const handleShowModal = (event) => {
+    event.stopPropagation();
+    setShowConfirm(true);
+  };
+
+  const handleCloseModal = (event) => {
+    event.stopPropagation();
+    setShowConfirm(false);
+  };
+
+  const handleReset = (event) => {
+    event.stopPropagation();
     setShowConfirm(false);
     resetAppState(dispatch);
+  };
+
+  const handleOverlayClick = (event) => {
+    if (event.target === event.currentTarget) {
+      handleCloseModal(event);
+    }
   };
 
   return (
@@ -37,7 +54,7 @@ const ResetButton = ({ variant = 'outline', size = 'sm' }) => {
       <ResetButtonWrapper 
         variant={variant}
         size={size}
-        onClick={() => setShowConfirm(true)}
+        onClick={handleShowModal}
         title="Reiniciar aplicación"
       >
         <FaRedo />
@@ -46,14 +63,15 @@ const ResetButton = ({ variant = 'outline', size = 'sm' }) => {
 
       {showConfirm && (
         <ConfirmModal>
-          <ModalOverlay onClick={() => setShowConfirm(false)} />
+          <ModalOverlay onClick={handleOverlayClick} />
           <ModalContent>
             <div className="modal-header">
               <FaExclamationTriangle size={24} />
               <h3>¿Reiniciar la aplicación?</h3>
               <button 
                 className="close-btn"
-                onClick={() => setShowConfirm(false)}
+                onClick={handleCloseModal}
+                type="button"
               >
                 <FaTimes />
               </button>
@@ -69,7 +87,7 @@ const ResetButton = ({ variant = 'outline', size = 'sm' }) => {
             <div className="modal-footer">
               <Button 
                 variant="ghost" 
-                onClick={() => setShowConfirm(false)}
+                onClick={handleCloseModal}
               >
                 Cancelar
               </Button>

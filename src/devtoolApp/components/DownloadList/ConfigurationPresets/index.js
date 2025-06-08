@@ -81,7 +81,8 @@ const ConfigurationPresets = () => {
     localStorage.setItem('resourcesSaverPresets', JSON.stringify(presets));
   };
 
-  const applyPreset = (presetConfig) => {
+  const applyPreset = (presetConfig, event) => {
+    if (event) event.stopPropagation();
     Object.keys(presetConfig).forEach(key => {
       if (key in optionActions) {
         dispatch(optionActions[key](presetConfig[key]));
@@ -89,7 +90,8 @@ const ConfigurationPresets = () => {
     });
   };
 
-  const saveCurrentAsPreset = () => {
+  const saveCurrentAsPreset = (event) => {
+    if (event) event.stopPropagation();
     if (!newPresetName.trim()) return;
     
     const currentConfig = {
@@ -111,7 +113,8 @@ const ConfigurationPresets = () => {
     setNewPresetName('');
   };
 
-  const deletePreset = (presetName) => {
+  const deletePreset = (presetName, event) => {
+    if (event) event.stopPropagation();
     const newPresets = { ...customPresets };
     delete newPresets[presetName];
     saveCustomPresets(newPresets);
@@ -131,14 +134,14 @@ const ConfigurationPresets = () => {
             <PresetName>{name}</PresetName>
             <PresetActions>
               <PresetButton 
-                onClick={() => applyPreset(config)}
+                onClick={(e) => applyPreset(config, e)}
                 title="Aplicar preset"
               >
                 <FaDownload size={12} />
               </PresetButton>
               {!DEFAULT_PRESETS[name] && (
                 <DeletePresetButton 
-                  onClick={() => deletePreset(name)}
+                  onClick={(e) => deletePreset(name, e)}
                   title="Eliminar preset"
                 >
                   <FaTrash size={10} />

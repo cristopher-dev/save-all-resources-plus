@@ -34,7 +34,12 @@ const ExportOptions = () => {
     return [...networkResource, ...staticResource];
   }, [networkResource, staticResource]);
 
-  const handleDownload = useCallback(async () => {
+  const handleDownload = useCallback(async (event) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    
     setIsExporting(true);
     setExportProgress(0);
 

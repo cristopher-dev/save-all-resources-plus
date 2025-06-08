@@ -153,7 +153,8 @@ const SystemNotifications = () => {
   }, []);
 
   // Solicitar permisos de notificación
-  const requestNotificationPermission = useCallback(async () => {
+  const requestNotificationPermission = useCallback(async (event) => {
+    if (event) event.stopPropagation();
     if ('Notification' in window) {
       const permission = await Notification.requestPermission();
       setNotificationPermission(permission);
@@ -163,7 +164,8 @@ const SystemNotifications = () => {
   }, []);
 
   // Enviar notificación de prueba
-  const sendTestNotification = useCallback(async (type) => {
+  const sendTestNotification = useCallback(async (type, event) => {
+    if (event) event.stopPropagation();
     setTestingNotification(type);
     
     try {
@@ -222,7 +224,8 @@ const SystemNotifications = () => {
   }, []);
 
   // Marcar notificación como leída
-  const markAsRead = useCallback((id) => {
+  const markAsRead = useCallback((id, event) => {
+    if (event) event.stopPropagation();
     setNotificationHistory(prev =>
       prev.map(notification =>
         notification.id === id ? { ...notification, read: true } : notification
@@ -231,7 +234,8 @@ const SystemNotifications = () => {
   }, []);
 
   // Eliminar notificación del historial
-  const deleteNotification = useCallback((id) => {
+  const deleteNotification = useCallback((id, event) => {
+    if (event) event.stopPropagation();
     setNotificationHistory(prev => prev.filter(notification => notification.id !== id));
   }, []);
 
@@ -309,7 +313,7 @@ const SystemNotifications = () => {
                   </SettingRow>
                   
                   <TestButton
-                    onClick={() => sendTestNotification(key)}
+                    onClick={(e) => sendTestNotification(key, e)}
                     disabled={!isEnabled || testingNotification === key}
                   >
                     {testingNotification === key ? 'Enviando...' : 'Probar'}
@@ -469,7 +473,7 @@ const SystemNotifications = () => {
                       {!notification.read && (
                         <TestButton
                           size="small"
-                          onClick={() => markAsRead(notification.id)}
+                          onClick={(e) => markAsRead(notification.id, e)}
                         >
                           <FaCheck />
                         </TestButton>
@@ -477,7 +481,7 @@ const SystemNotifications = () => {
                       <TestButton
                         size="small"
                         color="danger"
-                        onClick={() => deleteNotification(notification.id)}
+                        onClick={(e) => deleteNotification(notification.id, e)}
                       >
                         <FaTimes />
                       </TestButton>

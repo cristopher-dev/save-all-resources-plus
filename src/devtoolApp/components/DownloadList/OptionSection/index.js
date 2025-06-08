@@ -30,7 +30,8 @@ export const OptionSection = () => {
     dispatch(optionActions.setBeautifyFile(willBeautify));
   }, [dispatch]);
 
-  const handleDownloadSelected = useCallback(async () => {
+  const handleDownloadSelected = useCallback(async (event) => {
+    event.stopPropagation();
     if (hasSelections) {
       console.log(`[DOWNLOAD]: Starting download of ${selectedCount} selected resources`);
     } else {
@@ -39,7 +40,8 @@ export const OptionSection = () => {
     await handleOnSave();
   }, [handleOnSave, hasSelections, selectedCount]);
 
-  const handleStopDownload = useCallback(() => {
+  const handleStopDownload = useCallback((event) => {
+    event.stopPropagation();
     dispatch(uiActions.setIsSaving(false));
     dispatch(uiActions.setStatus('Descarga cancelada por el usuario'));
   }, [dispatch]);

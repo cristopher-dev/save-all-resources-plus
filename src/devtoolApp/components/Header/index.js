@@ -76,14 +76,29 @@ export const Header = (props) => {
     return 'Escanear';
   }, [status, isSaving, isAnalyzing, analysisCompleted, stats.totalResources]);
 
-  const isActionDisabled = status !== UI_INITIAL_STATE.status || isSaving || isAnalyzing;
+  const isActionDisabled = status !== UI_INITIAL_STATE.status || isSaving;
 
-  const handleMainAction = () => {
+  const handleMainAction = (event) => {
+    event.stopPropagation();
+    if (isActionDisabled) return;
+    
     if (analysisCompleted && stats.totalResources > 0) {
       handleOnSave();
     } else {
       handleStartAnalysis();
     }
+  };
+
+  const handlePreviewClick = (event) => {
+    event.stopPropagation();
+    if (!isActionDisabled) {
+      setShowPreview(true);
+    }
+  };
+
+  const handleStopClick = (event) => {
+    event.stopPropagation();
+    handleStopAnalysis();
   };
 
   return (
@@ -117,7 +132,7 @@ export const Header = (props) => {
         <ActionSection>
           <ButtonGroup>
             <Button 
-              onClick={() => setShowPreview(true)} 
+              onClick={handlePreviewClick} 
               disabled={isActionDisabled}
               variant="ghost"
               size="sm"
@@ -128,7 +143,7 @@ export const Header = (props) => {
             
             {isAnalyzing ? (
               <Button 
-                onClick={handleStopAnalysis} 
+                onClick={handleStopClick} 
                 variant="danger"
                 size="sm"
               >

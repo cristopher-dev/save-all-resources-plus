@@ -6,7 +6,10 @@ export const Toggle = (props) => {
   const [isInternalToggled, setIsInternalToggled] = useState(initialToggle);
 
   const handleToggle = useMemo(
-    () => () => {
+    () => (event) => {
+      if (event) {
+        event.stopPropagation();
+      }
       setIsInternalToggled(!isInternalToggled);
       onToggle && onToggle(!isInternalToggled);
     },

@@ -255,7 +255,11 @@ const IntegrityValidation = () => {
     }
   };
 
-  const exportHistory = () => {
+  const exportHistory = (event) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     const dataStr = JSON.stringify(validationHistory, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
     
@@ -340,7 +344,13 @@ const IntegrityValidation = () => {
                 <HashOption
                   key={type}
                   $selected={integrityConfig.selectedHashType === type}
-                  onClick={() => handleConfigChange('selectedHashType', type)}
+                  onClick={(event) => {
+                    if (event) {
+                      event.preventDefault();
+                      event.stopPropagation();
+                    }
+                    handleConfigChange('selectedHashType', type);
+                  }}
                 >
                   {type}
                 </HashOption>
@@ -419,7 +429,13 @@ const IntegrityValidation = () => {
                       {currentHash}
                     </div>
                     <ActionButton
-                      onClick={() => navigator.clipboard.writeText(currentHash)}
+                      onClick={(event) => {
+                        if (event) {
+                          event.preventDefault();
+                          event.stopPropagation();
+                        }
+                        navigator.clipboard.writeText(currentHash);
+                      }}
                       title="Copiar hash"
                     >
                       📋
@@ -475,7 +491,13 @@ const IntegrityValidation = () => {
           <SectionTitle>Historial de Validaciones</SectionTitle>
           <div style={{ display: 'flex', gap: '8px' }}>
             <ActionButton onClick={exportHistory}>📤 Exportar</ActionButton>
-            <ActionButton onClick={clearHistory}>🗑️ Limpiar</ActionButton>
+            <ActionButton onClick={(event) => {
+              if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+              }
+              clearHistory();
+            }}>🗑️ Limpiar</ActionButton>
           </div>
         </div>
 

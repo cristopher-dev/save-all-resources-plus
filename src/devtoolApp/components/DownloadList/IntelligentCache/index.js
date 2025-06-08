@@ -128,6 +128,30 @@ const IntelligentCache = () => {
     });
   }, []);
 
+  const handleCachePolicyChange = (key) => (event) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    setCachePolicy(key);
+  };
+
+  const handleOpenUrl = (url) => (event) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    window.open(url, '_blank');
+  };
+
+  const handleRemoveCacheItem = (hash) => (event) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    removeCacheItem(hash);
+  };
+
   const compressCache = useCallback(() => {
     // Simular re-compresión con mejor ratio
     setCacheStats(prev => ({
@@ -186,7 +210,7 @@ const IntelligentCache = () => {
                   <PolicyButton
                     key={key}
                     active={cachePolicy === key}
-                    onClick={() => setCachePolicy(key)}
+                    onClick={handleCachePolicyChange(key)}
                   >
                     {policy.label}
                     <small>({policy.description})</small>
@@ -296,14 +320,14 @@ const IntelligentCache = () => {
                     <ActionButton 
                       size="small" 
                       color="primary" 
-                      onClick={() => window.open(item.url, '_blank')}
+                      onClick={handleOpenUrl(item.url)}
                     >
                       <FaExternalLinkAlt />
                     </ActionButton>
                     <ActionButton 
                       size="small" 
                       color="danger" 
-                      onClick={() => removeCacheItem(hash)}
+                      onClick={handleRemoveCacheItem(hash)}
                     >
                       <FaTrash />
                     </ActionButton>
