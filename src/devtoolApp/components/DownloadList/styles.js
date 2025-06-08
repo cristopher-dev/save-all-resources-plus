@@ -38,7 +38,15 @@ export const DownloadListItemWrapper = styled.div`
   ${(props) =>
     props.highlighted
       ? css`
-          background-color: ${rgba(props.theme.primary, 0.2)};
+          background-color: ${(() => {
+            const primaryColor = props.theme.colors?.primary || props.theme.primary || '#1283c3';
+            try {
+              return rgba(primaryColor, 0.2);
+            } catch (error) {
+              console.warn('Error applying rgba to primary color:', primaryColor, error);
+              return `${primaryColor}33`; // Fallback con transparencia en hex
+            }
+          })()};
           font-weight: 800;
           position: relative;
         `
@@ -47,7 +55,15 @@ export const DownloadListItemWrapper = styled.div`
   ${(props) =>
     props.done
       ? css`
-          background-color: ${rgba(props.theme.secondary, 0.2)};
+          background-color: ${(() => {
+            const secondaryColor = props.theme.colors?.secondary || props.theme.secondary || '#10b981';
+            try {
+              return rgba(secondaryColor, 0.2);
+            } catch (error) {
+              console.warn('Error applying rgba to secondary color:', secondaryColor, error);
+              return `${secondaryColor}33`; // Fallback con transparencia en hex
+            }
+          })()};
           font-weight: 800;
           position: relative;
         `

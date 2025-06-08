@@ -64,18 +64,34 @@ export const LogSectionListItem = styled.li`
   margin-bottom: 1px;
   font-size: 12px;
   transition: background-color 0.3s ease-out;
-  background-color: ${(props) => rgba(props.bgColor ? props.theme[props.bgColor] : props.theme.grayScale.gray9, 0.75)};
-  color: ${(props) => props.theme.white};
+  background-color: ${(props) => {
+    const baseColor = props.bgColor ? props.theme[props.bgColor] : props.theme.grayScale?.gray9 || props.theme.colors?.backgroundAlt || '#374151';
+    try {
+      return rgba(baseColor, 0.75);
+    } catch (error) {
+      console.warn('Error applying rgba to color:', baseColor, error);
+      return `${baseColor}BF`; // Fallback con transparencia en hex
+    }
+  }};
+  color: ${(props) => props.theme.colors?.white || props.theme.white || '#ffffff'};
   word-wrap: anywhere;
   &:first-child {
-    border-top-left-radius: ${(props) => props.theme.borderRadius}px;
-    border-top-right-radius: ${(props) => props.theme.borderRadius}px;
+    border-top-left-radius: ${(props) => props.theme.borderRadius || 8}px;
+    border-top-right-radius: ${(props) => props.theme.borderRadius || 8}px;
   }
   &:last-child {
-    border-bottom-left-radius: ${(props) => props.theme.borderRadius}px;
-    border-bottom-right-radius: ${(props) => props.theme.borderRadius}px;
+    border-bottom-left-radius: ${(props) => props.theme.borderRadius || 8}px;
+    border-bottom-right-radius: ${(props) => props.theme.borderRadius || 8}px;
   }
   &:hover {
-    background-color: ${(props) => rgba(props.bgColor ? props.theme[props.bgColor] : props.theme.grayScale.gray9, 1.0)};
+    background-color: ${(props) => {
+      const baseColor = props.bgColor ? props.theme[props.bgColor] : props.theme.grayScale?.gray9 || props.theme.colors?.backgroundAlt || '#374151';
+      try {
+        return rgba(baseColor, 1.0);
+      } catch (error) {
+        console.warn('Error applying rgba to color:', baseColor, error);
+        return baseColor; // Fallback sin transparencia
+      }
+    }};
   }
 `;

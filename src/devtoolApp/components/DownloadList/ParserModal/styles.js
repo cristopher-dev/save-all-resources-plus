@@ -26,7 +26,15 @@ export const ParserModalBackdrop = styled.div`
   z-index: ${Z_INDEX + 1};
   width: 100%;
   height: 100%;
-  background-color: ${(props) => rgba(props.theme.black, 0.75)};
+  background-color: ${(props) => {
+    const blackColor = props.theme.colors?.black || props.theme.black || '#000000';
+    try {
+      return rgba(blackColor, 0.75);
+    } catch (error) {
+      console.warn('Error applying rgba to black color:', blackColor, error);
+      return 'rgba(0, 0, 0, 0.75)'; // Fallback directo
+    }
+  }};
 `;
 
 export const ParserTextContainer = styled.div.withConfig({
@@ -57,8 +65,16 @@ export const ParserTextArea = styled.textarea`
   height: 310px;
   padding: 20px;
   border: none;
-  border-radius: ${(props) => props.theme.borderRadius}px;
-  background-color: ${(props) => rgba(props.theme.black, 0.05)};
+  border-radius: ${(props) => props.theme.borderRadius || 8}px;
+  background-color: ${(props) => {
+    const blackColor = props.theme.colors?.black || props.theme.black || '#000000';
+    try {
+      return rgba(blackColor, 0.05);
+    } catch (error) {
+      console.warn('Error applying rgba to black color:', blackColor, error);
+      return 'rgba(0, 0, 0, 0.05)'; // Fallback directo
+    }
+  }};
   outline: none;
   resize: none;
 `;
