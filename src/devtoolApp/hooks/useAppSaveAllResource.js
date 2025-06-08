@@ -31,44 +31,48 @@ export const useAppSaveAllResource = () => {
       dispatch(uiActions.setStatus('Error: API de pestañas no disponible'));
       return;
     }
+    
+    // Log de debug para verificar recursos disponibles
+    console.log('[SAVE ALL]: Available resources before download:', {
+      networkResources: networkResource?.length || 0,
+      staticResources: staticResource?.length || 0,
+      downloadListLength: downloadList.length,
+      selectedResources: Object.keys(selectedResources).length
+    });
+    
     console.log('[SAVE ALL]: Starting save operation with tabId:', chrome.devtools.inspectedWindow.tabId);
-    dispatch(uiActions.setIsSaving(true));
-
-    // Timeout de seguridad para resetear isSaving en caso de que algo falle
+    dispatch(uiActions.setIsSaving(true));    // Timeout de seguridad para resetear isSaving en caso de que algo falle
     const safetyTimeout = setTimeout(() => {
       console.warn('[SAVE ALL]: Safety timeout reached, resetting isSaving state');
       dispatch(uiActions.setIsSaving(false));
       dispatch(uiActions.setStatus('Operación de guardado interrumpida por timeout'));
     }, 60000); // 60 segundos
+    
     try {
-      for (let i = 0; i < downloadList.length; i++) {
-        const downloadItem = downloadList[i];
-        const hasSelectedItems = Object.values(selectedResources).some(isSelected => isSelected);
-        if (hasSelectedItems && !selectedResources[downloadItem.url]) {
-          continue;
-        }
-        dispatch(uiActions.setSavingIndex(i));
+      const hasSelectedItems = Object.values(selectedResources).some(isSelected => isSelected);
+      
+      if (hasSelectedItems) {
+        // Cuando hay recursos seleccionados, descargar solo los seleccionados UNA SOLA VEZ
+        console.log('[SAVE ALL]: Downloading selected resources only');
+        dispatch(uiActions.setSavingIndex(0));
+        
         await new Promise(async (resolve, reject) => {
-          let loaded = true;
           let downloadCompleted = false;
           
-          // Timeout específico para cada descarga
           const downloadTimeout = setTimeout(() => {
             if (!downloadCompleted) {
-              console.error('[SAVE ALL]: Download timeout for item:', downloadItem.url);
-              dispatch(uiActions.setStatus(`Timeout en descarga: ${downloadItem.url}`));
+              console.error('[SAVE ALL]: Download timeout for selected resources');
+              dispatch(uiActions.setStatus(`Timeout en descarga de recursos seleccionados`));
               resolve();
             }
-          }, 30000); // 30 segundos por descarga
+          }, 30000);
           
           try {
-            if (i > 0 || tab?.url !== downloadItem.url) {
-              loaded = await waitForTabLoad(chrome.devtools.inspectedWindow.tabId, downloadItem, dispatch, uiActions, tab);
-            }
             const allResources = [
-              ...(networkResourceRef.current || []),
-              ...(staticResourceRef.current || []),
+              ...(networkResource || []),
+              ...(staticResource || []),
             ];
+            
             const toDownload = filterResourcesForDownload(
               allResources,
               advancedFilters,
@@ -76,7 +80,14 @@ export const useAppSaveAllResource = () => {
               selectedResources,
               hasSelectedItems
             );
-            if (loaded && toDownload.length) {
+            
+            console.log('[SAVE ALL]: Selected resources to download:', {
+              allResourcesCount: allResources.length,
+              toDownloadCount: toDownload.length,
+              selectedResourcesUrls: toDownload.map(r => r.url)
+            });
+            
+            if (toDownload.length) {
               downloadZipFile(
                 toDownload,
                 { ignoreNoContentFile, beautifyFile },
@@ -86,11 +97,9 @@ export const useAppSaveAllResource = () => {
                 () => {
                   downloadCompleted = true;
                   clearTimeout(downloadTimeout);
-                  logResourceByUrl(dispatch, downloadItem.url, toDownload);
-                  if (i + 1 !== downloadList.length) {
-                    dispatch(resetNetworkResource());
-                    dispatch(resetStaticResource());
-                  }
+                  toDownload.forEach(resource => {
+                    logResourceByUrl(dispatch, resource.url, [resource]);
+                  });
                   resolve();
                 }
               );
@@ -107,7 +116,79 @@ export const useAppSaveAllResource = () => {
             resolve();
           }
         });
-        await new Promise(res => setTimeout(res, 50));
+        
+      } else {
+        // Cuando NO hay recursos seleccionados, descargar todos por sitio/URL
+        console.log('[SAVE ALL]: Downloading all resources by site');
+        for (let i = 0; i < downloadList.length; i++) {
+          const downloadItem = downloadList[i];
+          dispatch(uiActions.setSavingIndex(i));
+          
+          await new Promise(async (resolve, reject) => {
+            let loaded = true;
+            let downloadCompleted = false;
+            
+            const downloadTimeout = setTimeout(() => {
+              if (!downloadCompleted) {
+                console.error('[SAVE ALL]: Download timeout for item:', downloadItem.url);
+                dispatch(uiActions.setStatus(`Timeout en descarga: ${downloadItem.url}`));
+                resolve();
+              }
+            }, 30000);
+            
+            try {
+              if (i > 0 || tab?.url !== downloadItem.url) {
+                loaded = await waitForTabLoad(chrome.devtools.inspectedWindow.tabId, downloadItem, dispatch, uiActions, tab);
+              }
+              
+              const allResources = [
+                ...(networkResource || []),
+                ...(staticResource || []),
+              ];
+              
+              const toDownload = filterResourcesForDownload(
+                allResources,
+                advancedFilters,
+                resolveDuplicatedResources,
+                selectedResources,
+                hasSelectedItems
+              );
+              
+              console.log('[SAVE ALL]: Resources to download for site:', {
+                allResourcesCount: allResources.length,
+                toDownloadCount: toDownload.length,
+                downloadItemUrl: downloadItem.url
+              });
+              
+              if (loaded && toDownload.length) {
+                downloadZipFile(
+                  toDownload,
+                  { ignoreNoContentFile, beautifyFile },
+                  (item, isDone) => {
+                    dispatch(uiActions.setStatus(`Compressed: ${item.url} Processed: ${isDone}`));
+                  },
+                  () => {
+                    downloadCompleted = true;
+                    clearTimeout(downloadTimeout);
+                    logResourceByUrl(dispatch, downloadItem.url, toDownload);
+                    resolve();
+                  }
+                );
+              } else {
+                downloadCompleted = true;
+                clearTimeout(downloadTimeout);
+                resolve();
+              }
+            } catch (error) {
+              downloadCompleted = true;
+              clearTimeout(downloadTimeout);
+              console.error('[SAVE ALL]: Error in download process:', error);
+              dispatch(uiActions.setStatus('Error en descarga de recursos: ' + error.message));
+              resolve();
+            }
+          });
+          await new Promise(res => setTimeout(res, 50));
+        }
       }
       clearTimeout(safetyTimeout);
       dispatch(uiActions.setStatus(UI_INITIAL_STATE.status));
@@ -119,7 +200,7 @@ export const useAppSaveAllResource = () => {
       dispatch(uiActions.setStatus('Error durante el guardado: ' + error.message));
       dispatch(uiActions.setIsSaving(false));
     }
-  }, [state, dispatch, tab, selectedResources]);
+  }, [state, dispatch, tab, selectedResources, networkResource, staticResource]);
 
   useEffect(() => {
     networkResourceRef.current = networkResource;
