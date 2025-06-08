@@ -1,5 +1,7 @@
 // Helpers para useAppSaveAllResource
 
+import { applyAdvancedFilters } from '../utils/file';
+
 export function waitForTabLoad(tabId, downloadItem, dispatch, uiActions, tab) {
   return new Promise((resolve) => {
     try {
