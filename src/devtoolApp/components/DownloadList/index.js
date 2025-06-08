@@ -23,7 +23,6 @@ import DependencyAnalysis from './DependencyAnalysis';
 import IntelligentCache from './IntelligentCache';
 import EnhancedCompression from './EnhancedCompression';
 import ProxyConfiguration from './ProxyConfiguration';
-import IntegrityValidation from './IntegrityValidation';
 import ExportOptions from './ExportOptions';
 import AnalysisStatus from '../AnalysisStatus';
 import { FaTrash, FaCheckSquare, FaSquare } from 'react-icons/fa';
@@ -98,11 +97,9 @@ export const DownloadList = () => {
       <AnalysisStatus />
       <OptionSection />
       <AdvancedFilters />      <ScheduledDownload />
-      <DependencyAnalysis />
-      <IntelligentCache />
+      <DependencyAnalysis />      <IntelligentCache />
       <EnhancedCompression />
       <ProxyConfiguration />
-      <IntegrityValidation />
       <ExportOptions />
       <DownloadListHeader>
         Download List:
