@@ -30,17 +30,23 @@ export const DownloadList = () => {
     staticResource = [],
     networkResource = [],
   } = state;
-  
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleClose = useMemo(() => (event) => {
-    if (event) event.stopPropagation();
-    setIsModalOpen(false);
-  }, []);
-  const handleOpen = useMemo(() => (event) => {
-    event.stopPropagation();
-    setIsModalOpen(true);
-  }, []);
+  const handleClose = useMemo(
+    () => (event) => {
+      if (event) event.stopPropagation();
+      setIsModalOpen(false);
+    },
+    []
+  );
+  const handleOpen = useMemo(
+    () => (event) => {
+      event.stopPropagation();
+      setIsModalOpen(true);
+    },
+    []
+  );
   const handleReset = useMemo(
     () => (event) => {
       event.stopPropagation();
@@ -84,27 +90,21 @@ export const DownloadList = () => {
   const selectedCount = Object.values(selectedResources).filter(Boolean).length;
   const totalCount = downloadList.length;
 
-  const allResources = useMemo(() => [...staticResource, ...networkResource], [staticResource, networkResource]);  return (    <DownloadListWrapper>
-      <AnalysisStatus />      <OptionSection />
+  const allResources = useMemo(() => [...staticResource, ...networkResource], [staticResource, networkResource]);
+  return (
+    <DownloadListWrapper>
+      <AnalysisStatus /> <OptionSection />
       <DownloadListHeader>
         <div style={{ fontSize: '12px', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '12px' }}>
           <span style={{ color: '#666' }}>
             {selectedCount > 0 ? `${selectedCount} de ${totalCount} seleccionados` : `${totalCount} recursos disponibles`}
           </span>
           <div style={{ display: 'flex', gap: '8px' }}>
-            <Button 
-              color="secondary" 
-              onClick={handleSelectAll}
-              style={{ fontSize: '10px', padding: '2px 8px' }}
-            >
+            <Button color="secondary" onClick={handleSelectAll} style={{ fontSize: '10px', padding: '2px 8px' }}>
               <FaCheckSquare style={{ marginRight: '4px' }} />
               Todos
             </Button>
-            <Button 
-              color="secondary" 
-              onClick={handleDeselectAll}
-              style={{ fontSize: '10px', padding: '2px 8px' }}
-            >
+            <Button color="secondary" onClick={handleDeselectAll} style={{ fontSize: '10px', padding: '2px 8px' }}>
               <FaSquare style={{ marginRight: '4px' }} />
               Ninguno
             </Button>
@@ -145,14 +145,6 @@ export const DownloadList = () => {
           );
         })}
       </DownloadListContainer>
-      <AddButtonWrapper>
-        <Button color={`primary`} onClick={handleOpen} disabled={isSaving}>
-          + Add URLs
-        </Button>
-        <Button color={`danger`} onClick={handleReset} disabled={isSaving}>
-          Reset
-        </Button>
-      </AddButtonWrapper>
       <ParserModal isOpen={isModalOpen} onClose={handleClose} />
     </DownloadListWrapper>
   );
