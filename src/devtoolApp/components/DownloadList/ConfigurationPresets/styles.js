@@ -66,6 +66,7 @@ export const PresetButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 
   &:hover {
     background: ${props => props.theme.colors.primaryHover};
@@ -74,6 +75,17 @@ export const PresetButton = styled.button`
 
   &:active {
     transform: translateY(0);
+  }
+
+  &.applied {
+    background: #10B981;
+    animation: pulse 0.3s ease-in-out;
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
   }
 `;
 
@@ -125,6 +137,7 @@ export const SavePresetButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 32px;
 
   &:hover:not(:disabled) {
     background: ${props => props.theme.colors.successHover};
@@ -133,5 +146,9 @@ export const SavePresetButton = styled.button`
 
   &:active:not(:disabled) {
     transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.5;
   }
 `;
