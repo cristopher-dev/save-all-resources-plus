@@ -26,6 +26,65 @@ import AnalysisStatus from '../AnalysisStatus';
 import { FaTrash, FaCheckSquare, FaSquare, FaFileAlt, FaImage, FaCode, FaFont, FaPlayCircle, FaInfoCircle, FaBars, FaEye } from 'react-icons/fa';
 import { MdDownloading } from 'react-icons/md';
 
+// Función para obtener el tipo de archivo y su icono
+const getFileInfo = (url) => {
+  const fileName = url.split('/').pop() || '';
+  const extension = fileName.split('.').pop()?.toLowerCase() || '';
+  
+  const fileTypes = {
+    images: { 
+      extensions: ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'bmp', 'ico'],
+      icon: '🖼️',
+      color: '#ef4444',
+      label: 'Imagen'
+    },
+    styles: { 
+      extensions: ['css', 'scss', 'sass', 'less'],
+      icon: '🎨',
+      color: '#10b981',
+      label: 'Estilos'
+    },
+    scripts: { 
+      extensions: ['js', 'ts', 'jsx', 'tsx', 'mjs'],
+      icon: '⚡',
+      color: '#f59e0b',
+      label: 'Script'
+    },
+    fonts: { 
+      extensions: ['woff', 'woff2', 'ttf', 'eot', 'otf'],
+      icon: '🔤',
+      color: '#8b5cf6',
+      label: 'Fuente'
+    },
+    documents: { 
+      extensions: ['html', 'htm', 'xml', 'pdf', 'txt', 'md'],
+      icon: '📄',
+      color: '#3b82f6',
+      label: 'Documento'
+    },
+    data: { 
+      extensions: ['json', 'xml', 'csv', 'yaml', 'yml'],
+      icon: '📊',
+      color: '#06b6d4',
+      label: 'Datos'
+    }
+  };
+
+  for (const [type, config] of Object.entries(fileTypes)) {
+    if (config.extensions.includes(extension)) {
+      return { type, ...config, extension };
+    }
+  }
+
+  return { 
+    type: 'other', 
+    icon: '📁', 
+    color: '#6b7280', 
+    label: 'Archivo',
+    extension 
+  };
+};
+
 export const DownloadList = () => {
   const { state, dispatch } = useStore();
   const {
@@ -35,8 +94,17 @@ export const DownloadList = () => {
     staticResource = [],
     networkResource = [],
   } = state;
-
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeFilters, setActiveFilters] = useState({
+    images: true,
+    styles: true,
+    scripts: true,
+    fonts: true,
+    documents: true,
+    data: true,
+    other: true
+  });
+  
   const handleClose = useMemo(
     () => (event) => {
       if (event) event.stopPropagation();
@@ -83,91 +151,78 @@ export const DownloadList = () => {
     }, {});
     dispatch(uiActions.setSelectedResources(allUrls));
   }, [downloadList, dispatch]);
-
   const handleDeselectAll = useCallback((event) => {
     event.stopPropagation();
     dispatch(uiActions.clearSelectedResources());
   }, [dispatch]);
 
+  const handleFilterToggle = useCallback((filterType) => {
+    setActiveFilters(prev => ({
+      ...prev,
+      [filterType]: !prev[filterType]
+    }));
+  }, []);
+
+  const handleFilterAll = useCallback(() => {
+    setActiveFilters({
+      images: true,
+      styles: true,
+      scripts: true,
+      fonts: true,
+      documents: true,
+      data: true,
+      other: true
+    });
+  }, []);
+
+  const handleFilterNone = useCallback(() => {
+    setActiveFilters({
+      images: false,
+      styles: false,
+      scripts: false,
+      fonts: false,
+      documents: false,
+      data: false,
+      other: false
+    });
+  }, []);
   const selectedCount = Object.values(selectedResources).filter(Boolean).length;
   const totalCount = downloadList.length;
+  // Filtrar lista por tipos activos
+  const filteredDownloadList = useMemo(() => {
+    return downloadList.filter(item => {
+      const fileInfo = getFileInfo(item.url);
+      return activeFilters[fileInfo.type];
+    });
+  }, [downloadList, activeFilters]);
 
+  const filteredSelectedCount = Object.entries(selectedResources)
+    .filter(([url, selected]) => {
+      if (!selected) return false;
+      const item = downloadList.find(item => item.url === url);
+      if (!item) return false;
+      const fileInfo = getFileInfo(item.url);
+      return activeFilters[fileInfo.type];
+    }).length;
   const allResources = useMemo(() => [...staticResource, ...networkResource], [staticResource, networkResource]);
-
-  // Función para obtener el tipo de archivo y su icono
-  const getFileInfo = (url) => {
-    const fileName = url.split('/').pop() || '';
-    const extension = fileName.split('.').pop()?.toLowerCase() || '';
-    
-    const fileTypes = {
-      images: { 
-        extensions: ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'bmp', 'ico'],
-        icon: '🖼️',
-        color: '#ef4444',
-        label: 'Imagen'
-      },
-      styles: { 
-        extensions: ['css', 'scss', 'sass', 'less'],
-        icon: '🎨',
-        color: '#10b981',
-        label: 'Estilos'
-      },
-      scripts: { 
-        extensions: ['js', 'ts', 'jsx', 'tsx', 'mjs'],
-        icon: '⚡',
-        color: '#f59e0b',
-        label: 'Script'
-      },
-      fonts: { 
-        extensions: ['woff', 'woff2', 'ttf', 'eot', 'otf'],
-        icon: '🔤',
-        color: '#8b5cf6',
-        label: 'Fuente'
-      },
-      documents: { 
-        extensions: ['html', 'htm', 'xml', 'pdf', 'txt', 'md'],
-        icon: '📄',
-        color: '#3b82f6',
-        label: 'Documento'
-      },
-      data: { 
-        extensions: ['json', 'xml', 'csv', 'yaml', 'yml'],
-        icon: '📊',
-        color: '#06b6d4',
-        label: 'Datos'
-      }
-    };
-
-    for (const [type, config] of Object.entries(fileTypes)) {
-      if (config.extensions.includes(extension)) {
-        return { type, ...config, extension };
-      }
-    }
-
-    return { 
-      type: 'other', 
-      icon: '📁', 
-      color: '#6b7280', 
-      label: 'Archivo',
-      extension 
-    };
-  };
-
   // Estadísticas por tipo de archivo
   const fileStats = useMemo(() => {
     const stats = {};
     downloadList.forEach(item => {
       const fileInfo = getFileInfo(item.url);
       if (!stats[fileInfo.type]) {
-        stats[fileInfo.type] = { count: 0, selected: 0, ...fileInfo };
+        stats[fileInfo.type] = { count: 0, selected: 0, filtered: 0, ...fileInfo };
       }
       stats[fileInfo.type].count++;
       if (selectedResources[item.url]) {
         stats[fileInfo.type].selected++;
       }
+      if (activeFilters[fileInfo.type]) {
+        stats[fileInfo.type].filtered++;
+      }
     });
     return stats;
-  }, [downloadList, selectedResources]);
+  }, [downloadList, selectedResources, activeFilters]);
 
   return (
     <DownloadListWrapper>
@@ -245,8 +300,7 @@ export const DownloadList = () => {
                 opacity: 0.1
               }}>
                 <CircularProgress percentage={totalCount > 0 ? (totalCount / 100) * 100 : 0} />
-              </div>
-              <div style={{ 
+              </div>              <div style={{ 
                 fontSize: '24px', 
                 fontWeight: '700', 
                 color: '#60a5fa',
@@ -254,7 +308,7 @@ export const DownloadList = () => {
                 position: 'relative',
                 zIndex: 1
               }}>
-                {totalCount}
+                {filteredDownloadList.length}
               </div>
               <div style={{ 
                 fontSize: '11px', 
@@ -263,7 +317,7 @@ export const DownloadList = () => {
                 letterSpacing: '0.5px',
                 fontWeight: '500'
               }}>
-                Total Recursos
+                Recursos Visibles
               </div>
             </div>
             
@@ -284,16 +338,15 @@ export const DownloadList = () => {
                 opacity: 0.1
               }}>
                 <CircularProgress percentage={totalCount > 0 ? (selectedCount / totalCount) * 100 : 0} />
-              </div>
-              <div style={{ 
+              </div>              <div style={{ 
                 fontSize: '24px', 
                 fontWeight: '700', 
-                color: selectedCount > 0 ? '#34d399' : 'rgba(255, 255, 255, 0.5)',
-                textShadow: selectedCount > 0 ? '0 0 10px rgba(52, 211, 153, 0.3)' : 'none',
+                color: filteredSelectedCount > 0 ? '#34d399' : 'rgba(255, 255, 255, 0.5)',
+                textShadow: filteredSelectedCount > 0 ? '0 0 10px rgba(52, 211, 153, 0.3)' : 'none',
                 position: 'relative',
                 zIndex: 1
               }}>
-                {selectedCount}
+                {filteredSelectedCount}
               </div>
               <div style={{ 
                 fontSize: '11px', 
@@ -312,14 +365,13 @@ export const DownloadList = () => {
               borderRadius: '8px',
               textAlign: 'center',
               border: '1px solid rgba(255, 255, 255, 0.1)'
-            }}>
-              <div style={{ 
+            }}>              <div style={{ 
                 fontSize: '24px', 
                 fontWeight: '700', 
-                color: selectedCount > 0 ? '#fbbf24' : 'rgba(255, 255, 255, 0.5)',
-                textShadow: selectedCount > 0 ? '0 0 10px rgba(251, 191, 36, 0.3)' : 'none'
+                color: filteredSelectedCount > 0 ? '#fbbf24' : 'rgba(255, 255, 255, 0.5)',
+                textShadow: filteredSelectedCount > 0 ? '0 0 10px rgba(251, 191, 36, 0.3)' : 'none'
               }}>
-                {totalCount > 0 ? Math.round((selectedCount / totalCount) * 100) : 0}%
+                {filteredDownloadList.length > 0 ? Math.round((filteredSelectedCount / filteredDownloadList.length) * 100) : 0}%
               </div>
               <div style={{ 
                 fontSize: '11px', 
@@ -371,8 +423,7 @@ export const DownloadList = () => {
             padding: '12px 16px',
             borderRadius: '8px',
             border: '1px solid rgba(255, 255, 255, 0.1)'
-          }}>
-            <span style={{ 
+          }}>            <span style={{ 
               color: 'rgba(255, 255, 255, 0.9)', 
               fontSize: '13px', 
               fontWeight: '500',
@@ -381,9 +432,9 @@ export const DownloadList = () => {
               gap: '8px'
             }}>
               <FaFileAlt size={12} />
-              {selectedCount > 0 
-                ? `${selectedCount} de ${totalCount} recursos seleccionados` 
-                : `${totalCount} recursos disponibles para descarga`
+              {filteredSelectedCount > 0 
+                ? `${filteredSelectedCount} de ${filteredDownloadList.length} recursos seleccionados` 
+                : `${filteredDownloadList.length} recursos visibles para descarga`
               }
             </span>
             
@@ -438,15 +489,167 @@ export const DownloadList = () => {
                 <FaSquare style={{ marginRight: '6px' }} />
                 Ninguno
               </Button>
+            </div>          </div>
+        </div>
+
+        {/* Sección de Filtros */}
+        <div style={{ 
+          background: 'rgba(255, 255, 255, 0.05)',
+          padding: '16px',
+          borderRadius: '8px',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          marginTop: '12px'
+        }}>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'space-between',
+            marginBottom: '12px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ 
+                background: 'linear-gradient(135deg, #8b5cf6, #a855f7)',
+                padding: '6px',
+                borderRadius: '6px',
+                color: 'white'
+              }}>
+                🔍
+              </div>
+              <span style={{ 
+                color: 'white', 
+                fontSize: '14px', 
+                fontWeight: '600' 
+              }}>
+                Filtros por Tipo
+              </span>
+            </div>
+            
+            <div style={{ display: 'flex', gap: '6px' }}>
+              <Button 
+                color="secondary" 
+                onClick={handleFilterAll}
+                style={{ 
+                  fontSize: '10px', 
+                  padding: '4px 8px',
+                  background: 'rgba(16, 185, 129, 0.2)',
+                  border: '1px solid rgba(16, 185, 129, 0.3)',
+                  color: '#34d399',
+                  fontWeight: '500'
+                }}
+              >
+                Todos
+              </Button>
+              <Button 
+                color="secondary" 
+                onClick={handleFilterNone}
+                style={{ 
+                  fontSize: '10px', 
+                  padding: '4px 8px',
+                  background: 'rgba(239, 68, 68, 0.2)',
+                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                  color: '#f87171',
+                  fontWeight: '500'
+                }}
+              >
+                Ninguno
+              </Button>
             </div>
           </div>
+
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', 
+            gap: '8px'
+          }}>
+            {Object.entries(fileStats).map(([type, stats]) => (
+              <div
+                key={type}
+                onClick={() => handleFilterToggle(type)}
+                style={{
+                  background: activeFilters[type] 
+                    ? `linear-gradient(135deg, ${stats.color}20, ${stats.color}10)` 
+                    : 'rgba(255, 255, 255, 0.05)',
+                  border: activeFilters[type] 
+                    ? `1px solid ${stats.color}40` 
+                    : '1px solid rgba(255, 255, 255, 0.1)',
+                  padding: '10px 8px',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  textAlign: 'center',
+                  transition: 'all 0.3s ease',
+                  opacity: activeFilters[type] ? 1 : 0.6,
+                  transform: activeFilters[type] ? 'scale(1)' : 'scale(0.96)'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'scale(1.02)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = activeFilters[type] ? 'scale(1)' : 'scale(0.96)';
+                }}
+              >
+                <div style={{ 
+                  fontSize: '16px', 
+                  marginBottom: '4px',
+                  filter: activeFilters[type] ? 'none' : 'grayscale(100%)'
+                }}>
+                  {stats.icon}
+                </div>
+                <div style={{ 
+                  fontSize: '12px', 
+                  fontWeight: '600',
+                  color: activeFilters[type] ? stats.color : 'rgba(255, 255, 255, 0.5)',
+                  marginBottom: '2px'
+                }}>
+                  {stats.count}
+                </div>
+                <div style={{ 
+                  fontSize: '9px', 
+                  color: 'rgba(255, 255, 255, 0.7)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  fontWeight: '500'
+                }}>
+                  {stats.label}
+                </div>
+                {stats.selected > 0 && (
+                  <div style={{ 
+                    fontSize: '8px', 
+                    color: '#34d399',
+                    marginTop: '2px',
+                    fontWeight: '600'
+                  }}>
+                    ✓ {stats.selected}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Contador de filtros aplicados */}
+          <div style={{ 
+            marginTop: '12px',
+            padding: '8px 12px',
+            background: 'rgba(255, 255, 255, 0.05)',
+            borderRadius: '6px',
+            textAlign: 'center',
+            fontSize: '11px',
+            color: 'rgba(255, 255, 255, 0.8)'
+          }}>
+            Mostrando {filteredDownloadList.length} de {totalCount} recursos
+            {filteredSelectedCount > 0 && (
+              <span style={{ color: '#34d399', marginLeft: '8px' }}>
+                • {filteredSelectedCount} seleccionados
+              </span>
+            )}
+          </div>
         </div>
-      </DownloadListHeader>
-      <DownloadListContainer>        {downloadList.map((item, index) => {
+      </DownloadListHeader>      <DownloadListContainer>        {filteredDownloadList.map((item, index) => {
           if (!item) return null; // Protección contra item nulo
           const foundLog = downloadLog.find((i) => i.url === item.url);
           const logExpanded = log && log.url === item.url;
           const isChecked = selectedResources[item.url] || false;
+          const originalIndex = downloadList.findIndex(originalItem => originalItem.url === item.url);
+          
           return (
             <React.Fragment key={item.url}>
               <DownloadListItemWrapper highlighted={tab && item.url === tab.url} done={!!foundLog} logExpanded={logExpanded}>
@@ -477,7 +680,7 @@ export const DownloadList = () => {
                       {logExpanded ? `🙈 Ocultar Log` : `👁️ Ver Log`}
                     </Button>
                   )}
-                  {!isSaving && index !== 0 && (
+                  {!isSaving && originalIndex !== 0 && (
                     <Button 
                       color={`danger`} 
                       onClick={handleRemove(item)}
@@ -490,7 +693,7 @@ export const DownloadList = () => {
                       <FaTrash />
                     </Button>
                   )}
-                  {isSaving && savingIndex === index && (
+                  {isSaving && savingIndex === originalIndex && (
                     <div style={{ 
                       display: 'flex', 
                       alignItems: 'center', 
