@@ -3,7 +3,9 @@ import styled from 'styled-components';
 import { useStore } from 'devtoolApp/store';
 import { FaSpinner, FaCheck, FaExclamationTriangle } from 'react-icons/fa';
 
-const AnalysisStatusContainer = styled.div`
+const AnalysisStatusContainer = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'isCompleted' && prop !== 'isAnalyzing' && prop !== 'isInterrupted'
+})`
   padding: 12px 16px;
   margin: 8px 0;
   border-radius: 6px;
@@ -26,7 +28,9 @@ const AnalysisStatusContainer = styled.div`
   transition: all 0.3s ease;
 `;
 
-const StatusIcon = styled.div`
+const StatusIcon = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'isCompleted' && prop !== 'isAnalyzing' && prop !== 'isInterrupted'
+})`
   color: ${props => {
     if (props.isCompleted) return props.theme.colors.success;
     if (props.isAnalyzing) return props.theme.colors.primary;

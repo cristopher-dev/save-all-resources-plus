@@ -282,7 +282,9 @@ export const HistoryList = styled.div`
   border-radius: 6px;
 `;
 
-export const HistoryItem = styled.div`
+export const HistoryItem = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'status'
+})`
   padding: 12px 16px;
   border-bottom: 1px solid ${props => props.theme.border};
   display: flex;

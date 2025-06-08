@@ -2,7 +2,9 @@
 import styled, { css } from 'styled-components';
 
 // Card componente reutilizable
-export const Card = styled.div`
+export const Card = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'variant' && prop !== 'padding' && prop !== 'clickable'
+})`
   background: ${props => props.theme.colors.surface};
   border: 1px solid ${props => props.theme.colors.border};
   border-radius: var(--border-radius-lg);
@@ -61,7 +63,9 @@ export const Grid = styled.div`
 `;
 
 // Flex utilitarios
-export const Flex = styled.div`
+export const Flex = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'align' && prop !== 'justify' && prop !== 'gap' && prop !== 'direction' && prop !== 'wrap' && prop !== 'responsive'
+})`
   display: flex;
   align-items: ${props => props.align || 'center'};
   justify-content: ${props => props.justify || 'flex-start'};
@@ -78,7 +82,9 @@ export const Flex = styled.div`
 `;
 
 // Texto con variantes
-export const Text = styled.span`
+export const Text = styled.span.withConfig({
+  shouldForwardProp: (prop) => prop !== 'variant' && prop !== 'size' && prop !== 'weight' && prop !== 'truncate' && prop !== 'center'
+})`
   color: ${props => {
     switch(props.variant) {
       case 'primary': return props.theme.colors.primary;
@@ -123,7 +129,9 @@ export const Text = styled.span`
 `;
 
 // Badge/Chip componente
-export const Badge = styled.span`
+export const Badge = styled.span.withConfig({
+  shouldForwardProp: (prop) => prop !== 'variant'
+})`
   display: inline-flex;
   align-items: center;
   gap: 4px;

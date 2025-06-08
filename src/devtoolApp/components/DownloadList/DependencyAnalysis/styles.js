@@ -8,7 +8,9 @@ export const DependencyAnalysisContainer = styled.div`
   overflow: hidden;
 `;
 
-export const DependencyAnalysisHeader = styled.div`
+export const DependencyAnalysisHeader = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'expanded'
+})`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -32,7 +34,9 @@ export const DependencyAnalysisTitle = styled.h3`
   gap: 8px;
 `;
 
-export const DependencyAnalysisContent = styled.div`
+export const DependencyAnalysisContent = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'expanded'
+})`
   padding: ${({ expanded }) => expanded ? '16px' : '0'};
   max-height: ${({ expanded }) => expanded ? '600px' : '0'};
   overflow: hidden;

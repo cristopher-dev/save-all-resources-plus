@@ -40,7 +40,9 @@ export const NotificationContainer = styled.div`
   animation: ${fadeIn} 0.3s ease-out;
 `;
 
-export const NotificationHeader = styled.div`
+export const NotificationHeader = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'expanded'
+})`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -59,7 +61,9 @@ export const NotificationTitle = styled.h3`
   gap: 8px;
 `;
 
-export const NotificationContent = styled.div`
+export const NotificationContent = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'expanded'
+})`
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -128,7 +132,9 @@ export const NotificationTypes = styled.div`
   gap: 12px;
 `;
 
-export const TypeCard = styled.div`
+export const TypeCard = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'enabled' && prop !== 'disabled'
+})`
   background: ${props => props.theme.cardBackground || props.theme.background};
   border: 1px solid ${props => props.enabled ? props.theme.primary : props.theme.border};
   border-radius: 6px;
@@ -140,7 +146,9 @@ export const TypeCard = styled.div`
   }
 `;
 
-export const TypeIcon = styled.div`
+export const TypeIcon = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'enabled'
+})`
   font-size: 18px;
   color: ${props => props.enabled ? props.theme.primary : props.theme.textSecondary};
   margin-bottom: 8px;
@@ -222,7 +230,9 @@ export const NotificationHistory = styled.div`
   border-radius: 4px;
 `;
 
-export const HistoryItem = styled.div`
+export const HistoryItem = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'read'
+})`
   padding: 12px;
   border-bottom: 1px solid ${props => props.theme.border};
   display: flex;

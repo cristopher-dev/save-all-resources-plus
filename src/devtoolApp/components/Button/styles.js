@@ -113,7 +113,9 @@ const getSizeStyles = (size) => {
   }
 };
 
-export const ButtonWrapper = styled.button`
+export const ButtonWrapper = styled.button.withConfig({
+  shouldForwardProp: (prop) => prop !== 'variant' && prop !== 'size' && prop !== 'fullWidth'
+})`
   position: relative;
   display: inline-flex;
   align-items: center;

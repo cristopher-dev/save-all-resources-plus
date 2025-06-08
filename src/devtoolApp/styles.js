@@ -77,7 +77,9 @@ export const Grid = styled.div`
 `;
 
 // Componente de badge/chip
-export const Badge = styled.span`
+export const Badge = styled.span.withConfig({
+  shouldForwardProp: (prop) => prop !== 'variant'
+})`
   display: inline-flex;
   align-items: center;
   padding: 4px 12px;

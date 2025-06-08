@@ -4,7 +4,9 @@ import { ButtonWrapper } from 'devtoolApp/components/Button/styles';
 
 export const Z_INDEX = 9;
 
-export const ParserModalWrapper = styled.div`
+export const ParserModalWrapper = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'isOpen'
+})`
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease-in-out;
@@ -27,7 +29,9 @@ export const ParserModalBackdrop = styled.div`
   background-color: ${(props) => rgba(props.theme.black, 0.75)};
 `;
 
-export const ParserTextContainer = styled.div`
+export const ParserTextContainer = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'isOpen'
+})`
   position: absolute;
   width: 80vw;
   height: 400px;

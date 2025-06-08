@@ -77,7 +77,9 @@ export const BrandSubtitle = styled.p`
   }
 `;
 
-export const StatusBadge = styled.span`
+export const StatusBadge = styled.span.withConfig({
+  shouldForwardProp: (prop) => prop !== 'variant'
+})`
   display: inline-flex;
   align-items: center;
   padding: 6px 12px;

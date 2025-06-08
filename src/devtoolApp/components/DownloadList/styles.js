@@ -66,7 +66,9 @@ export const DownloadListButtonGroup = styled.div`
   justify-content: flex-end;
 `;
 
-export const DownloadListItemUrl = styled.div`
+export const DownloadListItemUrl = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'active'
+})`
   overflow-wrap: anywhere;
   padding-right: 20px;
   line-height: 20px;
