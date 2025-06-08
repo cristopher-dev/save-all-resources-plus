@@ -95,12 +95,11 @@ export const generateThemeConfig = (factor, baseShade, isDark = false) => {
       info: isDark ? colors.blueLight : colors.info,
       infoBackground: isDark ? rgba(colors.blueLight, 0.15) : '#eff6ff',
       infoBorder: isDark ? rgba(colors.blueLight, 0.3) : '#bfdbfe',
-      
-      // Texto
-      text: isDark ? colors.gray[100] : colors.gray[900],
-      textSecondary: isDark ? colors.gray[300] : colors.gray[600],
-      textMuted: isDark ? colors.gray[400] : colors.gray[500],
-      textDisabled: isDark ? colors.gray[600] : colors.gray[400],
+        // Texto - TODAS LAS FUENTES EN BLANCO
+      text: colors.white,
+      textSecondary: colors.white,
+      textMuted: colors.white,
+      textDisabled: colors.white,
       
       // Fondos
       background: isDark ? colors.gray[900] : colors.white,

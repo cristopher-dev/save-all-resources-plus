@@ -13,7 +13,7 @@ export const DownloadListHeader = styled.h2`
   flex-flow: row nowrap;
   justify-content: space-between;
   align-items: center;
-  color: ${(props) => props.theme.text};
+  color: ${(props) => props.theme.colors.white || '#ffffff'};
 `;
 
 export const DownloadListContainer = styled.div`

@@ -64,7 +64,7 @@ ul li {
   margin: 0 0 12px 0;
   padding: 0;
   line-height: 1.6;
-  color: #4a5568;
+  color: white;
 }
 
 input[type='checkbox'] {
@@ -351,9 +351,8 @@ a:hover {
   padding: 16px 20px;
   border-radius: 10px;
   word-break: break-all;
-  word-wrap: break-word;
-  border: 1px solid rgba(102, 126, 234, 0.2);
-  color: #4a5568;
+  word-wrap: break-word;  border: 1px solid rgba(102, 126, 234, 0.2);
+  color: white;
   font-weight: 500;
 }
 
@@ -445,7 +444,7 @@ a:hover {
 .step-content h3 {
   font-size: 16px;
   font-weight: 600;
-  color: #374151;
+  color: white;
   margin-bottom: 8px;
   background: linear-gradient(135deg, #667eea, #764ba2);
   -webkit-background-clip: text;
@@ -456,7 +455,7 @@ a:hover {
 .step-content p {
   font-size: 14px;
   line-height: 1.6;
-  color: #6b7280;
+  color: white;
   margin: 0;
 }
 

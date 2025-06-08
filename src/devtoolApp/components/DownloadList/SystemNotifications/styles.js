@@ -52,7 +52,7 @@ export const NotificationHeader = styled.div.withConfig({
 `;
 
 export const NotificationTitle = styled.h3`
-  color: ${props => props.theme.text};
+  color: ${props => props.theme.colors.white || '#ffffff'};
   margin: 0;
   font-size: 18px;
   font-weight: 600;
@@ -77,7 +77,7 @@ export const NotificationSection = styled.div`
 `;
 
 export const NotificationSectionTitle = styled.h4`
-  color: ${props => props.theme.text};
+  color: ${props => props.theme.colors.white || '#ffffff'};
   margin: 0 0 12px 0;
   font-size: 14px;
   font-weight: 500;
@@ -97,7 +97,7 @@ export const SettingRow = styled.div`
 `;
 
 export const SettingLabel = styled.label`
-  color: ${props => props.theme.text};
+  color: ${props => props.theme.colors.white || '#ffffff'};
   font-size: 12px;
   font-weight: 500;
   flex: 1;
@@ -111,7 +111,7 @@ export const SettingSelect = styled.select`
   background: ${props => props.theme.inputBackground || props.theme.background};
   border: 1px solid ${props => props.theme.border};
   border-radius: 4px;
-  color: ${props => props.theme.text};
+  color: ${props => props.theme.colors.white || '#ffffff'};
   font-size: 11px;
   padding: 4px 8px;
 `;
@@ -120,7 +120,7 @@ export const SettingInput = styled.input`
   background: ${props => props.theme.inputBackground || props.theme.background};
   border: 1px solid ${props => props.theme.border};
   border-radius: 4px;
-  color: ${props => props.theme.text};
+  color: ${props => props.theme.colors.white || '#ffffff'};
   font-size: 11px;
   padding: 4px 8px;
   width: 100px;
@@ -155,7 +155,7 @@ export const TypeIcon = styled.div.withConfig({
 `;
 
 export const TypeName = styled.h5`
-  color: ${props => props.theme.text};
+  color: ${props => props.theme.colors.white || '#ffffff'};
   margin: 0 0 4px 0;
   font-size: 14px;
   font-weight: 500;
@@ -292,7 +292,7 @@ export const PermissionButton = styled.button`
 
 export const StatusBadge = styled.span`
   background: ${props => props.active ? props.theme.success : props.theme.border};
-  color: ${props => props.active ? '#fff' : props.theme.text};
+  color: ${props => props.active ? '#fff' : (props.theme.colors.white || '#ffffff')};
   padding: 4px 8px;
   border-radius: 12px;
   font-size: 12px;
