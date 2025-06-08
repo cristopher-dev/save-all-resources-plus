@@ -4,7 +4,7 @@ import { ButtonWrapper } from '../Button/styles';
 import { ImSpinner10 } from 'react-icons/im';
 import React from 'react';
 
-// Animaciones
+// Animations
 const fadeInUp = keyframes`
   from {
     opacity: 0;
@@ -99,7 +99,7 @@ export const DownloadListContainer = styled.div`
   max-height: 60vh;
   overflow-y: auto;
   
-  /* Scrollbar personalizado */
+  /* Custom scrollbar */
   &::-webkit-scrollbar {
     width: 8px;
   }
@@ -140,7 +140,7 @@ export const DownloadListContainer = styled.div`
     }
   }
 
-  /* Accesibilidad - mejora para navegación por teclado */
+  /* Accessibility - improved for keyboard navigation */
   &:focus-within {
     outline: 2px solid #10b981;
     outline-offset: 2px;
@@ -163,7 +163,7 @@ export const DownloadListItemWrapper = styled.div.withConfig({
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
   
-  /* Accesibilidad */
+  /* Accessibility */
   cursor: pointer;
   role: listitem;
   tabindex: 0;
@@ -175,7 +175,7 @@ export const DownloadListItemWrapper = styled.div.withConfig({
     background: rgba(255, 255, 255, 0.08);
   }
   
-  /* Focus para accesibilidad */
+  /* Focus for accessibility */
   &:focus {
     outline: 2px solid #10b981;
     outline-offset: 2px;
@@ -203,7 +203,7 @@ export const DownloadListItemWrapper = styled.div.withConfig({
     }
   }
 
-  /* Reducir animaciones para usuarios que prefieren movimiento reducido */
+  /* Reduce animations for users who prefer reduced motion */
   @media (prefers-reduced-motion: reduce) {
     transition: background-color 0.2s ease, border-color 0.2s ease;
     
@@ -345,7 +345,7 @@ export const DownloadListItemUrl = styled.div.withConfig({
             50% { opacity: 0.5; }
           }
 
-          /* Responsive para elemento activo */
+          /* Responsive for active element */
           @media (max-width: 768px) {
             padding-left: 12px;
           }
@@ -388,7 +388,7 @@ export const Spinner = styled(({ className }) => {
   filter: drop-shadow(0 0 5px rgba(251, 191, 36, 0.4));
 `;
 
-// Checkbox personalizado mejorado
+// Enhanced custom checkbox
 export const CustomCheckbox = styled.input.attrs({ type: 'checkbox' })`
   appearance: none;
   width: 18px;
@@ -401,7 +401,7 @@ export const CustomCheckbox = styled.input.attrs({ type: 'checkbox' })`
   transition: all 0.3s ease;
   margin-right: 12px;
   
-  /* Accesibilidad - label asociado */
+  /* Accessibility - associated label */
   &:focus {
     outline: 2px solid #10b981;
     outline-offset: 2px;
@@ -457,7 +457,7 @@ export const CustomCheckbox = styled.input.attrs({ type: 'checkbox' })`
     }
   }
 
-  /* Mejoras para dispositivos táctiles */
+  /* Improvements for touch devices */
   @media (pointer: coarse) {
     width: 20px;
     height: 20px;
@@ -467,7 +467,7 @@ export const CustomCheckbox = styled.input.attrs({ type: 'checkbox' })`
     }
   }
 
-  /* Reducir animaciones para usuarios que prefieren movimiento reducido */
+  /* Reduce animations for users who prefer reduced motion */
   @media (prefers-reduced-motion: reduce) {
     transition: background-color 0.2s ease, border-color 0.2s ease;
     
@@ -477,7 +477,7 @@ export const CustomCheckbox = styled.input.attrs({ type: 'checkbox' })`
   }
 `;
 
-// Mejorar botones con efectos visuales
+// Improve buttons with visual effects
 export const EnhancedButton = styled.button`
   display: flex;
   align-items: center;
@@ -517,7 +517,7 @@ export const EnhancedButton = styled.button`
   }
 `;
 
-// Indicador de tipo de archivo
+// File type indicator
 export const FileTypeIndicator = styled.div`
   display: inline-flex;
   align-items: center;
@@ -567,7 +567,7 @@ export const FileTypeIndicator = styled.div`
   }
 `;
 
-// Tooltip mejorado
+// Improved tooltip
 export const Tooltip = styled.div`
   position: relative;
   
@@ -599,7 +599,7 @@ export const Tooltip = styled.div`
   }
 `;
 
-// Componente de progreso circular para estadísticas
+// Circular progress component for stats
 export const CircularProgress = styled.div`
   position: relative;
   width: 60px;
@@ -631,7 +631,7 @@ export const CircularProgress = styled.div`
   }
 `;
 
-// Badge de estado mejorado
+// Improved status badge
 export const StatusBadge = styled.span`
   display: inline-flex;
   align-items: center;
@@ -680,7 +680,7 @@ export const StatusBadge = styled.span`
   }}
 `;
 
-// Efecto de ondas para elementos interactivos
+// Ripple effect for interactive elements
 export const RippleEffect = styled.div`
   position: relative;
   overflow: hidden;
@@ -704,7 +704,7 @@ export const RippleEffect = styled.div`
   }
 `;
 
-// Skeleton loader para carga
+// Skeleton loader for loading state
 export const SkeletonLoader = styled.div`
   background: linear-gradient(90deg, 
     rgba(255, 255, 255, 0.1) 25%, 
@@ -718,7 +718,7 @@ export const SkeletonLoader = styled.div`
   width: ${props => props.width || '100%'};
 `;
 
-// Mejorar la accesibilidad con focus visible
+// Improve accessibility with visible focus
 export const AccessibleButton = styled.button`
   position: relative;
   
@@ -732,7 +732,7 @@ export const AccessibleButton = styled.button`
   }
 `;
 
-// Notificación flotante
+// Floating notification
 export const FloatingNotification = styled.div`
   position: fixed;
   top: 20px;

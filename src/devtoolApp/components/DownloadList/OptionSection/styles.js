@@ -282,7 +282,7 @@ export const ActionRow = styled.div`
   gap: 16px;
   flex-wrap: wrap;
   
-  /* Grilla especial para estadísticas */
+  /* Special grid for statistics */
   &.stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -386,7 +386,7 @@ export const ProgressIndicator = styled.div`
   }
 `;
 
-// Nuevo componente para tooltips informativos
+// New component for informational tooltips
 export const InfoTooltip = styled.div`
   position: relative;
   display: inline-block;
@@ -431,7 +431,7 @@ export const InfoTooltip = styled.div`
   }
 `;
 
-// Componente para iconos con efectos
+// Component for icons with effects
 export const AnimatedIcon = styled.div`
   display: inline-flex;
   align-items: center;
@@ -460,7 +460,7 @@ export const AnimatedIcon = styled.div`
   }
 `;
 
-// Componente para estadísticas mejoradas
+// Component for enhanced statistics
 export const StatsCard = styled.div`
   background: linear-gradient(135deg, ${props => props.theme.colors.backgroundAlt}, ${props => props.theme.colors.surface});
   border: 1px solid ${props => props.theme.colors.borderLight};

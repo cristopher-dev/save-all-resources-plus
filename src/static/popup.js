@@ -1,8 +1,8 @@
 //console.log('Hello from -> Popup');
 
-// Añadir efectos de hover y animaciones mejoradas
+// Add hover effects and improved animations
 const addInteractiveEffects = () => {
-  // Agregar efectos de hover a los steps
+  // Add hover effects to steps
   document.querySelectorAll('.step').forEach((step, index) => {
     step.addEventListener('mouseenter', () => {
       step.style.transform = 'translateY(-4px) scale(1.02)';
@@ -14,7 +14,7 @@ const addInteractiveEffects = () => {
     });
   });
 
-  // Agregar animación suave al título
+  // Add smooth animation to the title
   const heading = document.querySelector('.heading');
   if (heading) {
     heading.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
@@ -23,7 +23,7 @@ const addInteractiveEffects = () => {
     heading.style.backgroundClip = 'text';
   }
 
-  // Agregar efectos sutiles a los iconos
+  // Add subtle effects to icons
   document.querySelectorAll('.step-icon').forEach(icon => {
     icon.addEventListener('mouseenter', () => {
       icon.style.transform = 'rotate(10deg) scale(1.1)';
@@ -37,10 +37,10 @@ const addInteractiveEffects = () => {
 };
 
 window.onload = () => {
-  // Inicializar efectos interactivos
+  // Initialize interactive effects
   addInteractiveEffects();
 
-  // Agregar animación de entrada escalonada
+  // Add staggered entry animation
   setTimeout(() => {
     document.querySelectorAll('.step').forEach((step, index) => {
       step.style.opacity = '0';
@@ -55,7 +55,7 @@ window.onload = () => {
   }, 100);
 };
 
-// Agregar efectos de ripple a botones
+// Add ripple effects to buttons
 const addRippleEffect = () => {
   document.querySelectorAll('button').forEach(btn => {
     btn.addEventListener('click', (e) => {
@@ -130,7 +130,7 @@ const handleSwitchVersion = (version) => {
     }
   }
   
-  // Mostrar feedback visual
+  // Show visual feedback
   showVersionChangeNotification(version);
 };
 
@@ -160,11 +160,11 @@ const showVersionChangeNotification = (version) => {
 };
 
 window.onload = () => {
-  // Inicializar efectos interactivos
+  // Initialize interactive effects
   addInteractiveEffects();
   addRippleEffect();
   
-  // Event listeners para cambio de versión
+  // Event listeners for version change
   const version18Btn = document.getElementById('switch-version-1-8');
   const version19Btn = document.getElementById('switch-version-1-9');
   const version2Btn = document.getElementById('switch-version-2');
@@ -187,7 +187,7 @@ window.onload = () => {
     });
   }
 
-  // Establecer versión activa inicial
+  // Set initial active version
   const version = localStorage.getItem('resources-saver-version') || '2';
 
   if (version === '2' && version2Btn) {
@@ -198,7 +198,7 @@ window.onload = () => {
     version18Btn.classList.add('active');
   }
 
-  // Agregar animación de entrada escalonada
+  // Add staggered entry animation
   setTimeout(() => {
     document.querySelectorAll('.step').forEach((step, index) => {
       step.style.animationDelay = `${0.1 + index * 0.1}s`;
