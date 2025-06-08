@@ -13,26 +13,24 @@ const ResetButton = ({ variant = 'outline', size = 'sm' }) => {
   const [showConfirm, setShowConfirm] = useState(false);
   const { dispatch } = useStore();
   const { handleStartAnalysis } = useAppAnalysis();
-
-  // Función para reiniciar el estado de la aplicación sin recargar la página
+  // Function to reset the application state without reloading the page
   const resetAppState = () => {
-    console.log('[RESET]: Reiniciando estado de la aplicación sin recargar página');
+    console.log('[RESET]: Resetting application state without reloading page');
     
-    // Reiniciar todos los stores al estado inicial
+    // Reset all stores to initial state
     dispatch(networkResourceActions.resetNetworkResource());
     dispatch(staticResourceActions.resetStaticResource());
     dispatch(uiActions.resetAnalysis());
-    
-    // Reiniciar la lista de descargas
+      // Reset download list
     dispatch(downloadListActions.resetDownloadList());
     
-    // Iniciar automáticamente el análisis después del reset
+    // Automatically start analysis after reset
     setTimeout(() => {
       handleStartAnalysis();
-      console.log('[RESET]: Análisis iniciado automáticamente después del reset');
+      console.log('[RESET]: Analysis started automatically after reset');
     }, 100);
     
-    console.log('[RESET]: Estado de la aplicación reiniciado exitosamente');
+    console.log('[RESET]: Application state successfully reset');
   };
 
   const handleShowModal = (event) => {
@@ -61,11 +59,10 @@ const ResetButton = ({ variant = 'outline', size = 'sm' }) => {
       <ResetButtonWrapper 
         variant={variant}
         size={size}
-        onClick={handleShowModal}
-        title="Reiniciar aplicación"
+        onClick={handleShowModal}        title="Restart application"
       >
         <FaRedo />
-        Reiniciar
+        Restart
       </ResetButtonWrapper>
 
       {showConfirm && (
@@ -74,7 +71,7 @@ const ResetButton = ({ variant = 'outline', size = 'sm' }) => {
           <ModalContent>
             <div className="modal-header">
               <FaExclamationTriangle size={24} />
-              <h3>¿Reiniciar la aplicación?</h3>
+              <h3>Restart the application?</h3>
               <button 
                 className="close-btn"
                 onClick={handleCloseModal}
@@ -83,14 +80,13 @@ const ResetButton = ({ variant = 'outline', size = 'sm' }) => {
                 <FaTimes />
               </button>
             </div>
-              <div className="modal-body">
-              <p>
-                Esto reiniciará completamente la aplicación, limpiará todos los datos 
-                y volverá a activar el escáner automáticamente.
+              <div className="modal-body">              <p>
+                This will completely restart the application, clear all data,
+                and automatically reactivate the scanner.
               </p>
               <p>
-                Se perderán todos los datos no guardados, pero el escáner comenzará 
-                inmediatamente después del reinicio.
+                All unsaved data will be lost, but the scanner will start
+                immediately after the restart.
               </p>
             </div>
             

@@ -116,7 +116,7 @@ const ResourcePreview = ({ isOpen, onClose }) => {
         );
       } catch (error) {
         console.error('[PREVIEW]: Error creating image src:', error);
-        return <NoPreviewMessage>Error al cargar la vista previa de imagen</NoPreviewMessage>;
+        return <NoPreviewMessage>Error loading image preview</NoPreviewMessage>;
       }
     }
     
@@ -129,7 +129,7 @@ const ResourcePreview = ({ isOpen, onClose }) => {
           displayContent = atob(resource.content);
         } catch (error) {
           console.error('[PREVIEW]: Error decoding base64 content:', error);
-          return <NoPreviewMessage>Error al decodificar contenido base64</NoPreviewMessage>;
+          return <NoPreviewMessage>Error decoding base64 content</NoPreviewMessage>;
         }
       }
       
@@ -141,7 +141,7 @@ const ResourcePreview = ({ isOpen, onClose }) => {
       );
     }
     
-    return <NoPreviewMessage>Vista previa no disponible para este tipo de archivo ({fileType})</NoPreviewMessage>;
+    return <NoPreviewMessage>Preview not available for this file type ({fileType})</NoPreviewMessage>;
   };
 
   if (!isOpen) return null;
@@ -174,7 +174,7 @@ const ResourcePreview = ({ isOpen, onClose }) => {
   return (
     <PreviewContainer>
       <PreviewHeader>
-        <PreviewTitle>🔍 Vista Previa de Recursos ({totalCount})</PreviewTitle>
+        <PreviewTitle>🔍 Resource Preview ({totalCount})</PreviewTitle>
         <CloseButton onClick={handleClose}>
           <FaTimes />
         </CloseButton>
@@ -183,7 +183,7 @@ const ResourcePreview = ({ isOpen, onClose }) => {
       <FilterControls>
         <SearchInput
           type="text"
-          placeholder="Buscar recursos..."
+          placeholder="Search resources..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
@@ -192,7 +192,7 @@ const ResourcePreview = ({ isOpen, onClose }) => {
             $active={selectedType === 'all'}
             onClick={handleTypeFilterAll}
           >
-            Todos
+            All
           </TypeBadge>
           {Object.keys(stats).map(type => {
             const Icon = typeIcons[type];
@@ -213,13 +213,13 @@ const ResourcePreview = ({ isOpen, onClose }) => {
 
       <ResourceStats>
         <StatsItem>
-          📊 Total: {totalCount} recursos
+          📊 Total: {totalCount} resources
         </StatsItem>
         <StatsItem>
-          💾 Tamaño: {Math.round(totalSize / 1024)} KB
+          💾 Size: {Math.round(totalSize / 1024)} KB
         </StatsItem>
         <StatsItem>
-          📈 Promedio: {totalCount > 0 ? Math.round(totalSize / totalCount / 1024) : 0} KB/archivo
+          📈 Average: {totalCount > 0 ? Math.round(totalSize / totalCount / 1024) : 0} KB/file
         </StatsItem>
       </ResourceStats>
       
@@ -235,7 +235,7 @@ const ResourcePreview = ({ isOpen, onClose }) => {
                 <ResourceInfo>
                   <ResourceName>
                     <Icon size={14} color={typeColors[fileType]} />
-                    {resource.saveAs?.name || resource.url.split('/').pop() || 'Sin nombre'}
+                    {resource.saveAs?.name || resource.url.split('/').pop() || 'Unnamed'}
                   </ResourceName>
                   <ResourceMeta>
                     {Math.round(fileSize / 1024)} KB • {fileType}

@@ -285,14 +285,14 @@ export const DownloadList = () => {
                 color: 'white',
                 textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
               }}>
-                📋 Lista de Recursos
+                📋 Resource List
               </h3>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <FaInfoCircle 
                 size={14} 
                 style={{ color: 'rgba(255, 255, 255, 0.7)', cursor: 'help' }}
-                title="Selecciona los recursos que deseas descargar"
+                title="Select the resources you want to download"
               />
               <FaEye 
                 size={14} 
@@ -340,7 +340,7 @@ export const DownloadList = () => {
                 letterSpacing: '0.5px',
                 fontWeight: '500'
               }}>
-                Recursos Visibles
+                Visible Resources
               </div>
             </div>
             
@@ -377,8 +377,7 @@ export const DownloadList = () => {
                 textTransform: 'uppercase',
                 letterSpacing: '0.5px',
                 fontWeight: '500'
-              }}>
-                Seleccionados
+              }}>                Selected
               </div>
             </div>
 
@@ -403,7 +402,7 @@ export const DownloadList = () => {
                 letterSpacing: '0.5px',
                 fontWeight: '500'
               }}>
-                Progreso
+                Progress
               </div>
             </div>
 
@@ -455,9 +454,8 @@ export const DownloadList = () => {
               gap: '8px'
             }}>
               <FaFileAlt size={12} />
-              {filteredSelectedCount > 0 
-                ? `${filteredSelectedCount} de ${filteredDownloadList.length} recursos seleccionados` 
-                : `${filteredDownloadList.length} recursos visibles para descarga`
+              {filteredSelectedCount > 0                ? `${filteredSelectedCount} of ${filteredDownloadList.length} resources selected` 
+                : `${filteredDownloadList.length} resources visible for download`
               }
             </span>
             
@@ -510,7 +508,7 @@ export const DownloadList = () => {
                 }}
               >
                 <FaSquare style={{ marginRight: '6px' }} />
-                Ninguno
+                None
               </Button>
             </div>          </div>
         </div>
@@ -750,8 +748,7 @@ export const DownloadList = () => {
                       border: '1px solid rgba(251, 191, 36, 0.3)'
                     }}>
                       <Spinner />
-                      <span style={{ color: '#fbbf24', fontSize: '11px', fontWeight: '500' }}>
-                        Descargando...
+                      <span style={{ color: '#fbbf24', fontSize: '11px', fontWeight: '500' }}>                        Downloading...
                       </span>
                     </div>
                   )}

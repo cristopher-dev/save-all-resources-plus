@@ -23,19 +23,19 @@ export const useAppAnalysis = () => {
 
     console.log('[ANALYSIS]: Starting analysis operation with tabId:', chrome.devtools.inspectedWindow.tabId);
     
-    // Resetear flag de abort
+    // Reset abort flag
     analysisAbortRef.current = false;
     
-    // Iniciar el análisis
+    // Start analysis
     dispatch(uiActions.startAnalysis());
     
     try {
-      // Limpiar recursos anteriores
+      // Clear previous resources
       dispatch(resetNetworkResource());
       dispatch(resetStaticResource());
       
-      // Fase 1: Análisis inicial de la página actual
-      dispatch(uiActions.setStatus('Iniciando análisis de recursos...'));
+      // Phase 1: Initial analysis of the current page
+      dispatch(uiActions.setStatus('Starting resource analysis...'));
       await new Promise(resolve => setTimeout(resolve, 500));
       
       if (analysisAbortRef.current) {
@@ -44,7 +44,7 @@ export const useAppAnalysis = () => {
       }
       
       // Fase 2: Detectar recursos de red
-      dispatch(uiActions.setStatus('Detectando recursos de red...'));
+      dispatch(uiActions.setStatus('Detecting network resources...'));
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       if (analysisAbortRef.current) {
@@ -53,7 +53,7 @@ export const useAppAnalysis = () => {
       }
       
       // Fase 3: Analizar recursos estáticos
-      dispatch(uiActions.setStatus('Analizando recursos estáticos...'));
+      dispatch(uiActions.setStatus('Analyzing static resources...'));
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       if (analysisAbortRef.current) {
@@ -62,7 +62,7 @@ export const useAppAnalysis = () => {
       }
       
       // Fase 4: Procesamiento de dependencias
-      dispatch(uiActions.setStatus('Procesando dependencias...'));
+      dispatch(uiActions.setStatus('Processing dependencies...'));
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       if (analysisAbortRef.current) {
@@ -79,7 +79,7 @@ export const useAppAnalysis = () => {
           }
           
           const downloadItem = downloadList[i];
-          dispatch(uiActions.setStatus(`Analizando página: ${downloadItem.url} (${i + 1}/${downloadList.length})`));
+          dispatch(uiActions.setStatus(`Analyzing page: ${downloadItem.url} (${i + 1}/${downloadList.length})`));
           
           // Simular análisis por página
           await new Promise(resolve => setTimeout(resolve, 800));

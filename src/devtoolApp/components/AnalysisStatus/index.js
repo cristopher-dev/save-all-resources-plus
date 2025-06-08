@@ -71,7 +71,7 @@ export const AnalysisStatus = () => {
   } = state;
   
   const totalResources = networkResource.length + staticResource.length;
-  const isInterrupted = status.includes('detenido') || status.includes('interrumpido');
+  const isInterrupted = status.includes('stopped') || status.includes('interrupted');
   
   // Solo mostrar cuando el análisis está activo (isAnalyzing = true)
   // Se oculta automáticamente cuando el análisis termina (isAnalyzing = false)
@@ -88,7 +88,7 @@ export const AnalysisStatus = () => {
       return status;
     }
     // Durante el análisis activo, mostrar progreso
-    return `Analizando recursos... ${totalResources} detectados`;
+    return `Analyzing resources... ${totalResources} detected`;
   };
   return (
     <AnalysisStatusContainer 

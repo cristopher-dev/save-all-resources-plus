@@ -96,10 +96,10 @@ export const Status = () => {
       <StatusCard>
         <StatusHeader>
           <StatusIcon size={20} className={isProcessing ? 'spinning' : ''} />
-          <StatusTitle>Estado del Análisis</StatusTitle>
+          <StatusTitle>Analysis Status</StatusTitle>
         </StatusHeader>
         <MessageCard variant={isError ? 'danger' : getStatusVariant()}>
-          <span>{status || 'Esperando análisis...'}</span>
+          <span>{status || 'Waiting for analysis...'}</span>
         </MessageCard>
         {(totalResources > 0 || status === 'Análisis completado') && !isError && (
           <>
@@ -119,12 +119,12 @@ export const Status = () => {
                       <ResourceCount>{stat.count}</ResourceCount>
                       <ResourceLabel>
                         {key === 'scripts' && 'Scripts'}
-                        {key === 'styles' && 'Estilos'}
-                        {key === 'images' && 'Imágenes'}
+                        {key === 'styles' && 'Styles'}
+                        {key === 'images' && 'Images'}
                         {key === 'videos' && 'Videos'}
                         {key === 'audio' && 'Audio'}
-                        {key === 'fonts' && 'Fuentes'}
-                        {key === 'others' && 'Otros'}
+                        {key === 'fonts' && 'Fonts'}
+                        {key === 'others' && 'Others'}
                       </ResourceLabel>
                     </ResourceInfo>
                   </ResourceCard>

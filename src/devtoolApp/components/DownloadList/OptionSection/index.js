@@ -51,10 +51,10 @@ export const OptionSection = () => {
   const handleStopDownload = useCallback((event) => {
     event.stopPropagation();
     dispatch(uiActions.setIsSaving(false));
-    dispatch(uiActions.setStatus('Descarga cancelada por el usuario'));
+    dispatch(uiActions.setStatus('Download canceled by user'));
   }, [dispatch]);
 
-  // Cálculo de progreso para mejor UX
+  // Progress calculation for better UX
   const downloadProgress = useMemo(() => {
     if (!hasSelections && totalResources === 0) return 0;
     if (hasSelections) {
@@ -69,9 +69,9 @@ export const OptionSection = () => {
           <AnimatedIcon>
             <FaCog />
           </AnimatedIcon>
-          Opciones de Descarga
+          Download Options
         </SectionTitle>
-        <InfoTooltip data-tooltip="Configura las opciones de descarga según tus necesidades">
+        <InfoTooltip data-tooltip="Configure download options as needed">
           <FaInfoCircle style={{ color: 'var(--color-text-secondary)', cursor: 'help' }} />
         </InfoTooltip>
       </SectionHeader>      {/* Estadísticas de recursos */}
@@ -79,15 +79,15 @@ export const OptionSection = () => {
         <ActionRow className="stats-grid" style={{ marginBottom: '20px' }}>
           <StatsCard className="stats-card">
             <StatsNumber>{totalResources}</StatsNumber>
-            <StatsLabel>Total Recursos</StatsLabel>
+            <StatsLabel>Total Resources</StatsLabel>
           </StatsCard>
           <StatsCard className="stats-card">
             <StatsNumber>{selectedCount}</StatsNumber>
-            <StatsLabel>Seleccionados</StatsLabel>
+            <StatsLabel>Selected</StatsLabel>
           </StatsCard>
           <StatsCard className="stats-card">
             <StatsNumber>{Math.round((selectedCount / totalResources) * 100) || 0}%</StatsNumber>
-            <StatsLabel>Progreso</StatsLabel>
+            <StatsLabel>Progress</StatsLabel>
           </StatsCard>        </ActionRow>
       )}
 
@@ -122,11 +122,10 @@ export const OptionSection = () => {
                 e.target.style.transform = 'perspective(1000px) rotateX(0deg) translateY(0px)';
                 e.target.style.boxShadow = 'none';
               }}
-            >
-              <FaRocket style={{ fontSize: '16px', marginRight: '8px' }} />
+            >              <FaRocket style={{ fontSize: '16px', marginRight: '8px' }} />
               {hasSelections 
-                ? `Descargar Seleccionados (${selectedCount} de ${totalResources})` 
-                : `Descargar Todo (${totalResources} recursos)`
+                ? `Download Selected (${selectedCount} of ${totalResources})` 
+                : `Download All (${totalResources} resources)`
               }
             </Button>
           ) : (            <>
@@ -146,7 +145,7 @@ export const OptionSection = () => {
                 }}
               >
                 <FaStop style={{ fontSize: '16px' }} />
-                Cancelar Descarga
+                Cancel Download
               </Button>
               <ProgressIndicator />
             </>
@@ -156,9 +155,8 @@ export const OptionSection = () => {
         {analysisCompleted && !isSaving && (
           <ActionRow>
             <StatusIndicator>
-              <FaCheckCircle />
-              Análisis completado - {totalResources} recursos encontrados
-              {hasSelections && ` (${selectedCount} seleccionados)`}
+              <FaCheckCircle />              Analysis completed - {totalResources} resources found
+              {hasSelections && ` (${selectedCount} selected)`}
             </StatusIndicator>
           </ActionRow>
         )}
@@ -170,9 +168,8 @@ export const OptionSection = () => {
               color: '#f59e0b',
               borderColor: 'rgba(255, 193, 7, 0.3)'
             }}>
-              <FaSpinner className="fa-spin" />
-              Descarga en progreso... 
-              {hasSelections ? `${selectedCount} recursos` : `${totalResources} recursos`}
+              <FaSpinner className="fa-spin" />              Download in progress... 
+              {hasSelections ? `${selectedCount} resources` : `${totalResources} resources`}
             </StatusIndicator>
           </ActionRow>
         )}

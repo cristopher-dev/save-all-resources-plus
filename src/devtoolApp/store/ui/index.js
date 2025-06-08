@@ -23,7 +23,7 @@ export const INITIAL_STATE = {
   log: null,
   isSaving: false,
   savingIndex: 0,
-  status: `Listo para escanear...`,
+  status: `Ready to scan...`,
   analysisCompleted: false,
   selectedResources: {},
   isAnalyzing: false,
@@ -140,7 +140,7 @@ export const uiReducer = (state = INITIAL_STATE, action) => {
         ...state,
         analysisCompleted: true,
         isAnalyzing: false,
-        status: 'Análisis completado',
+        status: 'Analysis completed',
       };
     }
     case ACTIONS.SET_SELECTED_RESOURCES: {
@@ -169,7 +169,7 @@ export const uiReducer = (state = INITIAL_STATE, action) => {
         ...state,
         isAnalyzing: false,
         analysisCompleted: true,
-        status: 'Análisis detenido por el usuario',
+        status: 'Analysis stopped by user',
       };
     }
     case ACTIONS.RESET_ANALYSIS: {
@@ -178,7 +178,7 @@ export const uiReducer = (state = INITIAL_STATE, action) => {
         isAnalyzing: false,
         analysisCompleted: false,
         selectedResources: {},
-        status: 'Reiniciando análisis...',
+        status: 'Restarting analysis...',
       };
     }
     case ACTIONS.START_ANALYSIS: {
@@ -186,7 +186,7 @@ export const uiReducer = (state = INITIAL_STATE, action) => {
         ...state,
         isAnalyzing: true,
         analysisCompleted: false,
-        status: 'Iniciando escaneo de recursos...',
+        status: 'Starting resource scan...',
       };
     }
     case ACTIONS.FORCE_RESET_SAVING: {
@@ -194,7 +194,7 @@ export const uiReducer = (state = INITIAL_STATE, action) => {
         ...state,
         isSaving: false,
         savingIndex: 0,
-        status: 'Operación de guardado reseteada',
+        status: 'Save operation reset',
       };
     }
     default: {

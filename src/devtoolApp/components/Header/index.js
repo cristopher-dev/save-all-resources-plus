@@ -32,8 +32,7 @@ export const Header = (props) => {
   const { handleOnSave } = useAppSaveAllResource();
   const { handleStartAnalysis, handleStopAnalysis } = useAppAnalysis();
   const [showPreview, setShowPreview] = useState(false);
-
-  // Estadísticas de recursos
+  // Resource statistics
   const stats = useMemo(() => {
     const totalResources = items.length;
     const totalSize = items.reduce((acc, item) => acc + (item.size || 0), 0);
@@ -46,11 +45,11 @@ export const Header = (props) => {
     };    return {
       totalResources,
       totalSize: formatSize(totalSize),
-      isProcessing: status !== 'Listo para escanear...' || isAnalyzing,
+      isProcessing: status !== 'Ready to scan...' || isAnalyzing,
     };
-  }, [items, status, isAnalyzing]);  // Solo deshabilitar el botón cuando se está guardando
+  }, [items, status, isAnalyzing]);  // Only disable the button when saving
   const isActionDisabled = isSaving;
-  // El botón de vista previa solo debe estar deshabilitado si no hay recursos para mostrar
+  // The preview button should only be disabled if there are no resources to show
   const isPreviewDisabled = stats.totalResources === 0;  const handlePreviewClick = (event) => {
     event.stopPropagation();
     if (!isPreviewDisabled) {
@@ -67,9 +66,8 @@ export const Header = (props) => {
     event.stopPropagation();
     console.log('[HEADER]: Force resetting saving state');
     dispatch(uiActions.forceResetSaving());
-  };
-  // Detectar si el botón ha estado bloqueado por mucho tiempo
-  const isStuckSaving = isSaving && status !== 'Listo para escanear...';
+  };  // Detect if the button has been stuck for too long
+  const isStuckSaving = isSaving && status !== 'Ready to scan...';
 
   return (
     <HeaderWrapper>
@@ -79,17 +77,17 @@ export const Header = (props) => {
             <FaGlobe size={24} color={theme?.colors?.primary || '#1283c3'} />
             <div>
               <BrandTitle>Resource Vault</BrandTitle>
-              <BrandSubtitle>Gestor Inteligente de Recursos Web</BrandSubtitle>
+              <BrandSubtitle>Smart Web Resource Manager</BrandSubtitle>
             </div>
           </div>
 
           <StatusBadge variant={stats.isProcessing ? 'warning' : 'success'}>
             {isAnalyzing
-              ? 'Escaneando...'
+              ? 'Scanning...'
               : stats.isProcessing
-                ? 'Procesado...'
+                ? 'Processing...'
                 : analysisCompleted
-                  ? 'Listo para guardar'
+                  ? 'Ready to save'
                   : 'Listo'}
           </StatusBadge>
         </BrandSection>        <ActionSection>
@@ -110,7 +108,7 @@ export const Header = (props) => {
                     loading={isSaving}
                   >
                     <FaSave />
-                    Guardar en Vault
+                    Save to Vault
                   </Button>
                 )}
                 <Button
@@ -125,7 +123,7 @@ export const Header = (props) => {
                   loading={false}
                 >
                   <FaGlobe />
-                  {analysisCompleted && stats.totalResources > 0 ? 'Volver a escanear' : 'Escanear'}
+                  {analysisCompleted && stats.totalResources > 0 ? 'Rescan' : 'Scan'}
                 </Button>
               </>
             )}            {isStuckSaving && (
@@ -133,10 +131,10 @@ export const Header = (props) => {
                 onClick={handleForceReset}
                 variant="warning"
                 size="sm"
-                title="Resetear estado de guardado si está bloqueado"
+                title="Reset saving state if stuck"
               >
                 <FaExclamationTriangle />
-                Desbloquear
+                Unlock
               </Button>
             )}
 
