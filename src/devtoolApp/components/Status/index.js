@@ -73,9 +73,8 @@ export const Status = () => {
 
     return stats;
   }, [staticResource, networkResource]);
-
   const totalResources = staticResource.length + networkResource.length;
-  const isProcessing = status && status !== 'Listo para procesar recursos' && status !== 'Análisis completado';
+  const isProcessing = false; // Forzar que deje de girar
   const isError = status && status.toLowerCase().includes('error');
 
   const getStatusIcon = () => {
