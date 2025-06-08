@@ -141,15 +141,6 @@ export const Header = (props) => {
           </StatItem>
         </StatsContainer>        <ActionSection>
           <ButtonGroup>
-            <Button 
-              onClick={handlePreviewClick} 
-              disabled={isPreviewDisabled}
-              variant="ghost"
-              size="sm"
-            >
-              <FaEye />
-              Vista Previa
-            </Button>
               {isAnalyzing ? (
               <Button 
                 onClick={handleStopClick} 
