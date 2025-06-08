@@ -10,7 +10,6 @@ import {
   ActionSection,
   ButtonGroup,
 } from './styles';
-import ResetButton from 'devtoolApp/components/ResetButton';
 import Button from 'devtoolApp/components/Button';
 import ResourcePreview from 'devtoolApp/components/DownloadList/ResourcePreview';
 import { useStore } from 'devtoolApp/store';
@@ -49,38 +48,10 @@ export const Header = (props) => {
       totalSize: formatSize(totalSize),
       isProcessing: status !== 'Listo para escanear...' || isAnalyzing,
     };
-  }, [items, status, isAnalyzing]);
-  const saveText = useMemo(() => {
-    if (isAnalyzing) {
-      return 'Escaneando...';
-    }
-    if (status !== 'Listo para escanear...') {
-      return 'Procesando...';
-    }
-    if (isSaving) {
-      return 'Guardando recursos...';
-    }
-    if (analysisCompleted && stats.totalResources > 0) {
-      return 'Guardar en Vault';
-    }
-    return 'Escanear';
-  }, [status, isSaving, isAnalyzing, analysisCompleted, stats.totalResources]);
-  const isActionDisabled = status !== 'Listo para escanear...' || isSaving;
+  }, [items, status, isAnalyzing]);  // Solo deshabilitar el botón cuando se está guardando
+  const isActionDisabled = isSaving;
   // El botón de vista previa solo debe estar deshabilitado si no hay recursos para mostrar
-  const isPreviewDisabled = stats.totalResources === 0;
-
-  const handleMainAction = (event) => {
-    event.stopPropagation();
-    if (isActionDisabled) return;
-
-    if (analysisCompleted && stats.totalResources > 0) {
-      handleOnSave();
-    } else {
-      handleStartAnalysis();
-    }
-  };
-
-  const handlePreviewClick = (event) => {
+  const isPreviewDisabled = stats.totalResources === 0;  const handlePreviewClick = (event) => {
     event.stopPropagation();
     if (!isPreviewDisabled) {
       setShowPreview(true);
@@ -121,8 +92,7 @@ export const Header = (props) => {
                   ? 'Listo para guardar'
                   : 'Listo'}
           </StatusBadge>
-        </BrandSection>
-        <ActionSection>
+        </BrandSection>        <ActionSection>
           <ButtonGroup>
             {isAnalyzing ? (
               <Button onClick={handleStopClick} variant="danger" size="sm" loading={true} isScanning={isAnalyzing}>
@@ -130,20 +100,35 @@ export const Header = (props) => {
                 Detener
               </Button>
             ) : (
-              <Button
-                onClick={handleMainAction}
-                disabled={isActionDisabled}
-                variant="primary"
-                size="sm"
-                loading={isSaving}
-                isScanning={false}
-              >
-                <FaSave />
-                {saveText}
-              </Button>
-            )}
-
-            {isStuckSaving && (
+              <>
+                {analysisCompleted && stats.totalResources > 0 && (
+                  <Button
+                    onClick={handleOnSave}
+                    disabled={isSaving}
+                    variant="primary"
+                    size="sm"
+                    loading={isSaving}
+                  >
+                    <FaSave />
+                    Guardar en Vault
+                  </Button>
+                )}
+                <Button
+                  onClick={() => {
+                    if (!isSaving) {
+                      handleStartAnalysis();
+                    }
+                  }}
+                  disabled={isSaving}
+                  variant={analysisCompleted && stats.totalResources > 0 ? "secondary" : "primary"}
+                  size="sm"
+                  loading={false}
+                >
+                  <FaGlobe />
+                  {analysisCompleted && stats.totalResources > 0 ? 'Volver a escanear' : 'Escanear'}
+                </Button>
+              </>
+            )}            {isStuckSaving && (
               <Button
                 onClick={handleForceReset}
                 variant="warning"
@@ -155,7 +140,6 @@ export const Header = (props) => {
               </Button>
             )}
 
-            <ResetButton />
           </ButtonGroup>
         </ActionSection>
       </HeaderContent>
