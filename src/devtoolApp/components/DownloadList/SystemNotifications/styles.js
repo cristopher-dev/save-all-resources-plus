@@ -201,24 +201,47 @@ export const PreviewActions = styled.div`
   margin-top: 12px;
 `;
 
-export const TestButton = styled.button`
-  background: ${props => props.theme.colors.primary};
-  color: ${props => props.theme.colors.white};
+export const TestButton = styled.button.withConfig({
+  shouldForwardProp: (prop) => !['size', 'color'].includes(prop)
+})`
+  background: ${props => {
+    switch (props.color) {
+      case 'danger':
+        return props.theme.colors?.error || '#ef4444';
+      case 'warning':
+        return props.theme.colors?.warning || '#f59e0b';
+      case 'success':
+        return props.theme.colors?.success || '#10b981';
+      default:
+        return props.theme.colors?.primary || '#3b82f6';
+    }
+  }};
+  color: ${props => props.theme.colors?.white || '#ffffff'};
   border: none;
   border-radius: 4px;
-  padding: 6px 12px;
-  font-size: 11px;
+  padding: ${props => props.size === 'small' ? '4px 8px' : '6px 12px'};
+  font-size: ${props => props.size === 'small' ? '10px' : '11px'};
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
   
-  &:hover {
-    background: ${props => props.theme.primaryHover || props.theme.primary};
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+  
+  &:active:not(:disabled) {
+    transform: translateY(0);
   }
   
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    transform: none;
   }
 `;
 

@@ -234,11 +234,34 @@ const SystemNotifications = () => {
       )
     );
   }, []);
-
   // Eliminar notificación del historial
   const deleteNotification = useCallback((id, event) => {
     if (event) event.stopPropagation();
     setNotificationHistory(prev => prev.filter(notification => notification.id !== id));
+  }, []);
+
+  // Eliminar todas las notificaciones
+  const clearAllNotifications = useCallback((event) => {
+    if (event) event.stopPropagation();
+    if (confirm('¿Estás seguro de que quieres eliminar todas las notificaciones?')) {
+      setNotificationHistory([]);
+    }
+  }, []);
+
+  // Marcar todas como leídas
+  const markAllAsRead = useCallback((event) => {
+    if (event) event.stopPropagation();
+    setNotificationHistory(prev =>
+      prev.map(notification => ({ ...notification, read: true }))
+    );
+  }, []);
+
+  // Eliminar solo las notificaciones leídas
+  const deleteReadNotifications = useCallback((event) => {
+    if (event) event.stopPropagation();
+    if (confirm('¿Estás seguro de que quieres eliminar todas las notificaciones leídas?')) {
+      setNotificationHistory(prev => prev.filter(notification => !notification.read));
+    }
   }, []);
 
   // Estadísticas de notificaciones
@@ -444,12 +467,50 @@ const SystemNotifications = () => {
               )
             ))}
           </NotificationSettings>
-        </NotificationSection>
-
-        <NotificationSection>
-          <NotificationSectionTitle>
-            📝 Historial de Notificaciones ({notificationStats.total})
-          </NotificationSectionTitle>
+        </NotificationSection>        <NotificationSection>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            marginBottom: '12px' 
+          }}>
+            <NotificationSectionTitle>
+              📝 Historial de Notificaciones ({notificationStats.total})
+            </NotificationSectionTitle>
+            
+            {notificationHistory.length > 0 && (
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {notificationStats.unread > 0 && (
+                  <TestButton
+                    size="small"
+                    onClick={markAllAsRead}
+                    title="Marcar todas como leídas"
+                  >
+                    <FaCheck style={{ marginRight: '4px' }} />
+                    Marcar leídas
+                  </TestButton>
+                )}
+                <TestButton
+                  size="small"
+                  onClick={deleteReadNotifications}
+                  title="Eliminar notificaciones leídas"
+                  disabled={notificationHistory.filter(n => n.read).length === 0}
+                >
+                  <FaTimes style={{ marginRight: '4px' }} />
+                  Limpiar leídas
+                </TestButton>
+                <TestButton
+                  size="small"
+                  color="danger"
+                  onClick={clearAllNotifications}
+                  title="Eliminar todas las notificaciones"
+                >
+                  <FaTimes style={{ marginRight: '4px' }} />
+                  Eliminar todas
+                </TestButton>
+              </div>
+            )}
+          </div>
           
           {notificationHistory.length > 0 ? (
             <NotificationHistory>
