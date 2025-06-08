@@ -142,26 +142,48 @@ export const DownloadList = () => {
   const handleCheckboxChange = useCallback((url) => {
     dispatch(uiActions.toggleResourceSelection(url));
   }, [dispatch]);
-
   const handleSelectAll = useCallback((event) => {
     event.stopPropagation();
     const allUrls = downloadList.reduce((acc, item) => {
-      acc[item.url] = true;
+      const fileInfo = getFileInfo(item.url);
+      // Solo seleccionar recursos de tipos de filtros activos
+      if (activeFilters[fileInfo.type]) {
+        acc[item.url] = true;
+      }
       return acc;
     }, {});
     dispatch(uiActions.setSelectedResources(allUrls));
-  }, [downloadList, dispatch]);
+  }, [downloadList, activeFilters, dispatch]);
   const handleDeselectAll = useCallback((event) => {
     event.stopPropagation();
     dispatch(uiActions.clearSelectedResources());
   }, [dispatch]);
-
   const handleFilterToggle = useCallback((filterType) => {
+    const newFilterState = !activeFilters[filterType];
+    
     setActiveFilters(prev => ({
       ...prev,
-      [filterType]: !prev[filterType]
+      [filterType]: newFilterState
     }));
-  }, []);
+
+    // Si el filtro se desactiva, desmarcar todos los recursos de ese tipo
+    if (!newFilterState) {
+      const urlsToDeselect = downloadList
+        .filter(item => {
+          const fileInfo = getFileInfo(item.url);
+          return fileInfo.type === filterType;
+        })
+        .map(item => item.url);
+
+      if (urlsToDeselect.length > 0) {
+        const newSelectedResources = { ...selectedResources };
+        urlsToDeselect.forEach(url => {
+          delete newSelectedResources[url];
+        });
+        dispatch(uiActions.setSelectedResources(newSelectedResources));
+      }
+    }
+  }, [activeFilters, downloadList, selectedResources, dispatch]);
 
   const handleFilterAll = useCallback(() => {
     setActiveFilters({
@@ -174,7 +196,6 @@ export const DownloadList = () => {
       other: true
     });
   }, []);
-
   const handleFilterNone = useCallback(() => {
     setActiveFilters({
       images: false,
@@ -185,7 +206,10 @@ export const DownloadList = () => {
       data: false,
       other: false
     });
-  }, []);
+    
+    // Desmarcar todos los recursos cuando se desactivan todos los filtros
+    dispatch(uiActions.clearSelectedResources());
+  }, [dispatch]);
   const selectedCount = Object.values(selectedResources).filter(Boolean).length;
   const totalCount = downloadList.length;
   // Filtrar lista por tipos activos
