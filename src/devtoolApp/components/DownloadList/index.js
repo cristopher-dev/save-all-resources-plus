@@ -22,7 +22,6 @@ import ScheduledDownload from './ScheduledDownload';
 import DependencyAnalysis from './DependencyAnalysis';
 import IntelligentCache from './IntelligentCache';
 import EnhancedCompression from './EnhancedCompression';
-import SystemNotifications from './SystemNotifications';
 import ProxyConfiguration from './ProxyConfiguration';
 import IntegrityValidation from './IntegrityValidation';
 import ExportOptions from './ExportOptions';
@@ -98,12 +97,10 @@ export const DownloadList = () => {
   return (    <DownloadListWrapper>
       <AnalysisStatus />
       <OptionSection />
-      <AdvancedFilters />
-      <ScheduledDownload />
+      <AdvancedFilters />      <ScheduledDownload />
       <DependencyAnalysis />
       <IntelligentCache />
       <EnhancedCompression />
-      <SystemNotifications />
       <ProxyConfiguration />
       <IntegrityValidation />
       <ExportOptions />
