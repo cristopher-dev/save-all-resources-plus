@@ -7,25 +7,33 @@ import * as downloadListActions from '../../store/downloadList';
 import * as networkResourceActions from '../../store/networkResource';
 import * as staticResourceActions from '../../store/staticResource';
 import * as uiActions from '../../store/ui';
-
-// Función para reiniciar el estado de la aplicación sin recargar la página
-const resetAppState = (dispatch) => {
-  console.log('[RESET]: Reiniciando estado de la aplicación sin recargar página');
-  
-  // Reiniciar todos los stores al estado inicial
-  dispatch(networkResourceActions.resetNetworkResource());
-  dispatch(staticResourceActions.resetStaticResource());
-  dispatch(uiActions.resetAnalysis());
-  
-  // Reiniciar la lista de descargas
-  dispatch(downloadListActions.resetDownloadList());
-  
-  console.log('[RESET]: Estado de la aplicación reiniciado exitosamente');
-};
+import { useAppAnalysis } from '../../hooks/useAppAnalysis';
 
 const ResetButton = ({ variant = 'outline', size = 'sm' }) => {
   const [showConfirm, setShowConfirm] = useState(false);
   const { dispatch } = useStore();
+  const { handleStartAnalysis } = useAppAnalysis();
+
+  // Función para reiniciar el estado de la aplicación sin recargar la página
+  const resetAppState = () => {
+    console.log('[RESET]: Reiniciando estado de la aplicación sin recargar página');
+    
+    // Reiniciar todos los stores al estado inicial
+    dispatch(networkResourceActions.resetNetworkResource());
+    dispatch(staticResourceActions.resetStaticResource());
+    dispatch(uiActions.resetAnalysis());
+    
+    // Reiniciar la lista de descargas
+    dispatch(downloadListActions.resetDownloadList());
+    
+    // Iniciar automáticamente el análisis después del reset
+    setTimeout(() => {
+      handleStartAnalysis();
+      console.log('[RESET]: Análisis iniciado automáticamente después del reset');
+    }, 100);
+    
+    console.log('[RESET]: Estado de la aplicación reiniciado exitosamente');
+  };
 
   const handleShowModal = (event) => {
     event.stopPropagation();
@@ -36,11 +44,10 @@ const ResetButton = ({ variant = 'outline', size = 'sm' }) => {
     event.stopPropagation();
     setShowConfirm(false);
   };
-
   const handleReset = (event) => {
     event.stopPropagation();
     setShowConfirm(false);
-    resetAppState(dispatch);
+    resetAppState();
   };
 
   const handleOverlayClick = (event) => {
@@ -76,11 +83,14 @@ const ResetButton = ({ variant = 'outline', size = 'sm' }) => {
                 <FaTimes />
               </button>
             </div>
-            
-            <div className="modal-body">
+              <div className="modal-body">
               <p>
-                Esto recargará completamente la aplicación y se perderán 
-                todos los datos no guardados.
+                Esto reiniciará completamente la aplicación, limpiará todos los datos 
+                y volverá a activar el escáner automáticamente.
+              </p>
+              <p>
+                Se perderán todos los datos no guardados, pero el escáner comenzará 
+                inmediatamente después del reinicio.
               </p>
             </div>
             
@@ -90,13 +100,12 @@ const ResetButton = ({ variant = 'outline', size = 'sm' }) => {
                 onClick={handleCloseModal}
               >
                 Cancelar
-              </Button>
-              <Button 
+              </Button>              <Button 
                 variant="danger" 
                 onClick={handleReset}
               >
                 <FaRedo />
-                Reiniciar
+                Reiniciar y Escanear
               </Button>
             </div>
           </ModalContent>

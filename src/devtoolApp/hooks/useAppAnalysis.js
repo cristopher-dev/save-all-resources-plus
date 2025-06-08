@@ -14,9 +14,7 @@ export const useAppAnalysis = () => {
   const {
     downloadList,
     ui: { tab, isAnalyzing },
-  } = state;
-
-  const handleStartAnalysis = useCallback(async () => {
+  } = state;  const handleStartAnalysis = useCallback(async () => {
     // Verificar que el contexto de DevTools esté disponible antes de proceder
     if (!chrome?.devtools?.inspectedWindow?.tabId) {
       console.error('[ANALYSIS]: DevTools context not available - tabId missing');
@@ -110,8 +108,9 @@ export const useAppAnalysis = () => {
   useEffect(() => {
     networkResourceRef.current = networkResource;
   }, [networkResource]);
-
   useEffect(() => {
+    staticResourceRef.current = staticResource;
+  }, [staticResource]);  useEffect(() => {
     staticResourceRef.current = staticResource;
   }, [staticResource]);
 

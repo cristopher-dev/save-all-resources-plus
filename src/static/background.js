@@ -37,17 +37,15 @@ chrome.runtime.onInstalled.addListener((details) => {
   console.log('[BACKGROUND]: Extension installed/updated:', details.reason);
 });
 
-// Listener for connection errors
-document.addEventListener('DOMContentLoaded', () => {
-  chrome.runtime.onConnect.addListener((port) => {
-    console.log('[BACKGROUND]: New connection established:', port.name);
-    
-    port.onDisconnect.addListener(() => {
-      console.log('[BACKGROUND]: Connection disconnected:', port.name);
-      if (chrome.runtime.lastError) {
-        console.error('[BACKGROUND]: Connection error:', chrome.runtime.lastError.message);
-      }
-    });
+// Listener for connections (service workers don't need DOMContentLoaded)
+chrome.runtime.onConnect.addListener((port) => {
+  console.log('[BACKGROUND]: New connection established:', port.name);
+  
+  port.onDisconnect.addListener(() => {
+    console.log('[BACKGROUND]: Connection disconnected:', port.name);
+    if (chrome.runtime.lastError) {
+      console.error('[BACKGROUND]: Connection error:', chrome.runtime.lastError.message);
+    }
   });
 });
 
