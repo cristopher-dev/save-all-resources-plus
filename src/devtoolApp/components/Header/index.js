@@ -18,6 +18,7 @@ import ResourcePreview from 'devtoolApp/components/DownloadList/ResourcePreview'
 import { useStore } from 'devtoolApp/store';
 import { INITIAL_STATE as UI_INITIAL_STATE } from 'devtoolApp/store/ui';
 import { useAppSaveAllResource } from '../../hooks/useAppSaveAllResource';
+import { useAppAnalysis } from '../../hooks/useAppAnalysis';
 import { 
   FaEye, 
   FaDownload, 
@@ -25,17 +26,19 @@ import {
   FaFileArchive, 
   FaCog,
   FaChartLine,
-  FaGlobe
+  FaGlobe,
+  FaStop
 } from 'react-icons/fa';
 import packageJson from '/package.json';
 
 export const Header = (props) => {
   const { state, theme } = useStore();
   const {
-    ui: { status, isSaving },
+    ui: { status, isSaving, isAnalyzing, analysisCompleted },
     downloadList: { items = [] }
   } = state;
   const { handleOnSave } = useAppSaveAllResource();
+  const { handleStartAnalysis, handleStopAnalysis } = useAppAnalysis();
   const [showPreview, setShowPreview] = useState(false);
 
   // Estadísticas de recursos
@@ -53,18 +56,35 @@ export const Header = (props) => {
     return {
       totalResources,
       totalSize: formatSize(totalSize),
-      isProcessing: status !== UI_INITIAL_STATE.status
+      isProcessing: status !== UI_INITIAL_STATE.status || isAnalyzing
     };
-  }, [items, status]);
+  }, [items, status, isAnalyzing]);
 
   const saveText = useMemo(() => {
-    if (status !== UI_INITIAL_STATE.status) {
-      return 'Procesando recursos...';
+    if (isAnalyzing) {
+      return 'Escaneando...';
     }
-    return isSaving ? `Guardando recursos...` : `Guardar en Vault`;
-  }, [status, isSaving]);
+    if (status !== UI_INITIAL_STATE.status) {
+      return 'Procesando...';
+    }
+    if (isSaving) {
+      return 'Guardando recursos...';
+    }
+    if (analysisCompleted && stats.totalResources > 0) {
+      return 'Guardar en Vault';
+    }
+    return 'Escanear';
+  }, [status, isSaving, isAnalyzing, analysisCompleted, stats.totalResources]);
 
-  const isActionDisabled = status !== UI_INITIAL_STATE.status || isSaving;
+  const isActionDisabled = status !== UI_INITIAL_STATE.status || isSaving || isAnalyzing;
+
+  const handleMainAction = () => {
+    if (analysisCompleted && stats.totalResources > 0) {
+      handleOnSave();
+    } else {
+      handleStartAnalysis();
+    }
+  };
 
   return (
     <HeaderWrapper>
@@ -79,7 +99,7 @@ export const Header = (props) => {
           </div>
           
           <StatusBadge variant={stats.isProcessing ? 'warning' : 'success'}>
-            {stats.isProcessing ? 'Procesando...' : 'Listo'}
+            {isAnalyzing ? 'Escaneando...' : stats.isProcessing ? 'Procesando...' : analysisCompleted ? 'Listo para guardar' : 'Listo'}
           </StatusBadge>
         </BrandSection>
 
@@ -106,15 +126,26 @@ export const Header = (props) => {
               Vista Previa
             </Button>
             
-            <Button 
-              onClick={handleOnSave} 
-              disabled={isActionDisabled || stats.totalResources === 0}
-              variant="primary"
-              size="sm"
-            >
-              <FaSave />
-              {saveText}
-            </Button>
+            {isAnalyzing ? (
+              <Button 
+                onClick={handleStopAnalysis} 
+                variant="danger"
+                size="sm"
+              >
+                <FaStop />
+                Detener
+              </Button>
+            ) : (
+              <Button 
+                onClick={handleMainAction} 
+                disabled={isActionDisabled}
+                variant="primary"
+                size="sm"
+              >
+                <FaSave />
+                {saveText}
+              </Button>
+            )}
             
             <ResetButton />
           </ButtonGroup>

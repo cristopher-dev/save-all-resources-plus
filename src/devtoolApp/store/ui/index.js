@@ -14,6 +14,7 @@ export const ACTIONS = {
   CLEAR_SELECTED_RESOURCES: 'CLEAR_SELECTED_RESOURCES',
   STOP_ANALYSIS: 'STOP_ANALYSIS',
   RESET_ANALYSIS: 'RESET_ANALYSIS',
+  START_ANALYSIS: 'START_ANALYSIS',
 };
 
 export const INITIAL_STATE = {
@@ -21,7 +22,7 @@ export const INITIAL_STATE = {
   log: null,
   isSaving: false,
   savingIndex: 0,
-  status: `Idle...`,
+  status: `Listo para escanear...`,
   analysisCompleted: false,
   selectedResources: {},
   isAnalyzing: false,
@@ -77,6 +78,10 @@ export const stopAnalysis = () => ({
 
 export const resetAnalysis = () => ({
   type: ACTIONS.RESET_ANALYSIS,
+});
+
+export const startAnalysis = () => ({
+  type: ACTIONS.START_ANALYSIS,
 });
 
 let flashStatusTimeoutHandler = null;
@@ -169,6 +174,14 @@ export const uiReducer = (state = INITIAL_STATE, action) => {
         analysisCompleted: false,
         selectedResources: {},
         status: 'Reiniciando análisis...',
+      };
+    }
+    case ACTIONS.START_ANALYSIS: {
+      return {
+        ...state,
+        isAnalyzing: true,
+        analysisCompleted: false,
+        status: 'Iniciando escaneo de recursos...',
       };
     }
     default: {
