@@ -85,10 +85,8 @@ export const DownloadList = () => {
   const totalCount = downloadList.length;
 
   const allResources = useMemo(() => [...staticResource, ...networkResource], [staticResource, networkResource]);  return (    <DownloadListWrapper>
-      <AnalysisStatus />
-      <OptionSection />
+      <AnalysisStatus />      <OptionSection />
       <DownloadListHeader>
-        Download List:
         <div style={{ fontSize: '12px', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '12px' }}>
           <span style={{ color: '#666' }}>
             {selectedCount > 0 ? `${selectedCount} de ${totalCount} seleccionados` : `${totalCount} recursos disponibles`}
