@@ -101,6 +101,22 @@ body {
   }
 }
 
+// Animaciones para los checks de filtros
+@keyframes checkPulse {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 // Clases utilitarias
 .animate-fade-in {
   animation: fadeIn 0.3s ease-out;

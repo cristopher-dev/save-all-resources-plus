@@ -554,9 +554,7 @@ export const DownloadList = () => {
                 Ninguno
               </Button>
             </div>
-          </div>
-
-          <div style={{ 
+          </div>          <div style={{ 
             display: 'grid', 
             gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', 
             gap: '8px'
@@ -578,7 +576,8 @@ export const DownloadList = () => {
                   textAlign: 'center',
                   transition: 'all 0.3s ease',
                   opacity: activeFilters[type] ? 1 : 0.6,
-                  transform: activeFilters[type] ? 'scale(1)' : 'scale(0.96)'
+                  transform: activeFilters[type] ? 'scale(1)' : 'scale(0.96)',
+                  position: 'relative'
                 }}
                 onMouseEnter={(e) => {
                   e.target.style.transform = 'scale(1.02)';
@@ -587,10 +586,34 @@ export const DownloadList = () => {
                   e.target.style.transform = activeFilters[type] ? 'scale(1)' : 'scale(0.96)';
                 }}
               >
+                {/* Indicador de check para filtro activo */}
+                {activeFilters[type] && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '4px',
+                    right: '4px',
+                    background: stats.color,
+                    borderRadius: '50%',
+                    width: '16px',
+                    height: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '10px',
+                    color: 'white',
+                    fontWeight: 'bold',
+                    boxShadow: `0 0 8px ${stats.color}50`,
+                    animation: 'checkPulse 0.3s ease-out'
+                  }}>
+                    ✓
+                  </div>
+                )}
+                
                 <div style={{ 
                   fontSize: '16px', 
                   marginBottom: '4px',
-                  filter: activeFilters[type] ? 'none' : 'grayscale(100%)'
+                  filter: activeFilters[type] ? 'none' : 'grayscale(100%)',
+                  position: 'relative'
                 }}>
                   {stats.icon}
                 </div>
