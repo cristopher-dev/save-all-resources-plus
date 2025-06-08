@@ -41,12 +41,11 @@ import {
 } from 'react-icons/fa';
 
 export const OptionSection = () => {
-  const { handleOnSave } = useAppSaveAllResource();
-  const {
+  const { handleOnSave } = useAppSaveAllResource();  const {
     dispatch,
     state: {
       option: { ignoreNoContentFile, beautifyFile },
-      ui: { isSaving, selectedResources = {}, analysisCompleted },
+      ui: { isSaving, selectedResources = {}, analysisCompleted, isAnalyzing },
       downloadList,
     },
   } = useStore();
@@ -166,14 +165,15 @@ export const OptionSection = () => {
       </OptionsGrid>
       
       <ActionSection>
-        <ActionRow>
-          {!isSaving ? (
+        <ActionRow>          {!isSaving ? (
             <Button 
               variant="primary"
               size="lg"
               onClick={handleDownloadSelected}
               disabled={totalResources === 0}
               fullWidth
+              loading={isAnalyzing}
+              isScanning={isAnalyzing}
               style={{ 
                 background: hasSelections 
                   ? 'linear-gradient(135deg, #1283c3 0%, #10b981 100%)'
@@ -202,13 +202,14 @@ export const OptionSection = () => {
                 : `Descargar Todo (${totalResources} recursos)`
               }
             </Button>
-          ) : (
-            <>
+          ) : (            <>
               <Button 
                 variant="danger"
                 size="lg"
                 onClick={handleStopDownload}
                 fullWidth
+                loading={isSaving}
+                isScanning={false}
                 style={{ 
                   background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
                   border: 'none',

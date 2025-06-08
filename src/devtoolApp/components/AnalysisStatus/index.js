@@ -73,44 +73,31 @@ export const AnalysisStatus = () => {
   const totalResources = networkResource.length + staticResource.length;
   const isInterrupted = status.includes('detenido') || status.includes('interrumpido');
   
-  // No mostrar si no hay análisis activo y está en estado inicial
-  if (!isAnalyzing && !analysisCompleted && status === 'Listo para escanear...') {
+  // Solo mostrar cuando el análisis está activo (isAnalyzing = true)
+  // Se oculta automáticamente cuando el análisis termina (isAnalyzing = false)
+  if (!isAnalyzing) {
     return null;
   }
-  
-  // No mostrar si no hay recursos y no está analizando
-  if (totalResources === 0 && !isAnalyzing) {
-    return null;
-  }
-
   const getStatusIcon = () => {
-    if (analysisCompleted && !isInterrupted) return <FaCheck />;
     if (isInterrupted) return <FaExclamationTriangle />;
-    if (isAnalyzing) return <FaSpinner />;
-    return null;
+    // Durante el análisis activo, mostrar spinner
+    return <FaSpinner />;
   };
-
   const getStatusMessage = () => {
-    if (analysisCompleted && !isInterrupted) {
-      return `Análisis completado - ${totalResources} recursos detectados`;
-    }
     if (isInterrupted) {
       return status;
     }
-    if (isAnalyzing) {
-      return `Analizando recursos... ${totalResources} detectados`;
-    }
-    return status;
+    // Durante el análisis activo, mostrar progreso
+    return `Analizando recursos... ${totalResources} detectados`;
   };
-
   return (
     <AnalysisStatusContainer 
-      isCompleted={analysisCompleted && !isInterrupted}
+      isCompleted={false}
       isAnalyzing={isAnalyzing}
       isInterrupted={isInterrupted}
     >
       <StatusIcon 
-        isCompleted={analysisCompleted && !isInterrupted}
+        isCompleted={false}
         isAnalyzing={isAnalyzing}
         isInterrupted={isInterrupted}
       >

@@ -114,7 +114,7 @@ const getSizeStyles = (size) => {
 };
 
 export const ButtonWrapper = styled.button.withConfig({
-  shouldForwardProp: (prop) => !['variant', 'size', 'fullWidth', 'color', 'loading'].includes(prop)
+  shouldForwardProp: (prop) => !['variant', 'size', 'fullWidth', 'color', 'loading', 'isScanning'].includes(prop)
 })`
   position: relative;
   display: inline-flex;
@@ -150,13 +150,17 @@ export const ButtonWrapper = styled.button.withConfig({
     outline: 2px solid ${props => props.theme.colors.primary};
     outline-offset: 2px;
   }
-  
-  // Spinner
+    // Spinner
   .spinner {
     width: 14px;
     height: 14px;
     border: 2px solid transparent;
-    border-top: 2px solid currentColor;
+    border-top: 2px solid ${props => {
+      // Si está analizando (scanning), mostrar color "start" (verde)
+      if (props.isScanning) return '#10b981';
+      // Si no está analizando, mostrar color "stop" (rojo)
+      return '#ef4444';
+    }};
     border-radius: 50%;
     animation: ${spin} 1s linear infinite;
   }

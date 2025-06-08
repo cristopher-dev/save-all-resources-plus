@@ -150,12 +150,13 @@ export const Header = (props) => {
               <FaEye />
               Vista Previa
             </Button>
-            
-            {isAnalyzing ? (
+              {isAnalyzing ? (
               <Button 
                 onClick={handleStopClick} 
                 variant="danger"
                 size="sm"
+                loading={true}
+                isScanning={isAnalyzing}
               >
                 <FaStop />
                 Detener
@@ -166,6 +167,8 @@ export const Header = (props) => {
                 disabled={isActionDisabled}
                 variant="primary"
                 size="sm"
+                loading={isSaving}
+                isScanning={false}
               >
                 <FaSave />
                 {saveText}

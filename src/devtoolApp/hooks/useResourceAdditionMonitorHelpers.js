@@ -24,14 +24,14 @@ export function handleResourceStability({
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     if (currentResourceCount > 0) {
       dispatch(uiActions.setStatus(`Detectando recursos... ${currentResourceCount} encontrados`));
-    }
-    timeoutRef.current = setTimeout(() => {
+    }    timeoutRef.current = setTimeout(() => {
       stableCountRef.current++;
       if (stableCountRef.current >= 1 && currentResourceCount > 0) {
         const allResources = [...networkResource, ...staticResource];
         allResources.forEach(resource => {
           dispatch(downloadListActions.addDownloadItem({ url: resource.url }));
         });
+        // Marcar análisis como completado y detener el estado de análisis
         dispatch(uiActions.setAnalysisCompleted());
       }
     }, timeoutMs);

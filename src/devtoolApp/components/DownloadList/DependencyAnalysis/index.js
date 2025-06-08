@@ -155,8 +155,12 @@ const DependencyAnalysis = () => {
             <div style={{ textAlign: 'center', padding: '20px' }}>
               <div style={{ fontSize: '14px', color: '#666', marginBottom: '16px' }}>
                 🔍 Analizando dependencias entre recursos...
-              </div>
-              <Button color="danger" onClick={stopAnalysis}>
+              </div>              <Button 
+                color="danger" 
+                onClick={stopAnalysis}
+                loading={analyzing}
+                isScanning={analyzing}
+              >
                 <FaStop style={{ marginRight: '8px' }} />
                 Detener Análisis
               </Button>
@@ -169,8 +173,12 @@ const DependencyAnalysis = () => {
             <div style={{ textAlign: 'center', padding: '20px' }}>
               <div style={{ fontSize: '14px', color: '#f39c12', marginBottom: '16px' }}>
                 ⚠️ Análisis interrumpido por el usuario
-              </div>
-              <Button color="primary" onClick={restartAnalysis}>
+              </div>              <Button 
+                color="primary" 
+                onClick={restartAnalysis}
+                loading={false}
+                isScanning={false}
+              >
                 <FaSearch style={{ marginRight: '8px' }} />
                 Reiniciar Análisis
               </Button>

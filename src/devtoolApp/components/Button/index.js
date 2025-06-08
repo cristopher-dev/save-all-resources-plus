@@ -11,6 +11,7 @@ export const Button = ({
   fullWidth = false,
   color, // legacy support
   type = 'button',
+  isScanning = false, // Nueva prop para controlar el color del spinner
   ...restProps 
 }) => {
   // Filter out any remaining custom props that shouldn't go to DOM
@@ -28,14 +29,14 @@ export const Button = ({
     }
   };
   
-  return (
-    <ButtonWrapper 
+  return (    <ButtonWrapper 
       type={type}
       variant={color || variant} // legacy color prop support
       size={size}
       onClick={handleClick} 
       disabled={disabled || loading}
       fullWidth={fullWidth}
+      isScanning={isScanning} // Pasar la prop al ButtonWrapper
       {...domProps}
     >
       {loading && (
