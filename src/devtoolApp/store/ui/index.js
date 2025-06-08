@@ -15,6 +15,7 @@ export const ACTIONS = {
   STOP_ANALYSIS: 'STOP_ANALYSIS',
   RESET_ANALYSIS: 'RESET_ANALYSIS',
   START_ANALYSIS: 'START_ANALYSIS',
+  FORCE_RESET_SAVING: 'FORCE_RESET_SAVING',
 };
 
 export const INITIAL_STATE = {
@@ -82,6 +83,10 @@ export const resetAnalysis = () => ({
 
 export const startAnalysis = () => ({
   type: ACTIONS.START_ANALYSIS,
+});
+
+export const forceResetSaving = () => ({
+  type: ACTIONS.FORCE_RESET_SAVING,
 });
 
 let flashStatusTimeoutHandler = null;
@@ -182,6 +187,14 @@ export const uiReducer = (state = INITIAL_STATE, action) => {
         isAnalyzing: true,
         analysisCompleted: false,
         status: 'Iniciando escaneo de recursos...',
+      };
+    }
+    case ACTIONS.FORCE_RESET_SAVING: {
+      return {
+        ...state,
+        isSaving: false,
+        savingIndex: 0,
+        status: 'Operación de guardado reseteada',
       };
     }
     default: {

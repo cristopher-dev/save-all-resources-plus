@@ -17,6 +17,7 @@ import Button from 'devtoolApp/components/Button';
 import ResourcePreview from 'devtoolApp/components/DownloadList/ResourcePreview';
 import { useStore } from 'devtoolApp/store';
 import { INITIAL_STATE as UI_INITIAL_STATE } from 'devtoolApp/store/ui';
+import * as uiActions from 'devtoolApp/store/ui';
 import { useAppSaveAllResource } from '../../hooks/useAppSaveAllResource';
 import { useAppAnalysis } from '../../hooks/useAppAnalysis';
 import { 
@@ -27,12 +28,13 @@ import {
   FaCog,
   FaChartLine,
   FaGlobe,
-  FaStop
+  FaStop,
+  FaExclamationTriangle
 } from 'react-icons/fa';
 import packageJson from '/package.json';
 
 export const Header = (props) => {
-  const { state, theme } = useStore();
+  const { state, dispatch, theme } = useStore();
   const {
     ui: { status, isSaving, isAnalyzing, analysisCompleted },
     downloadList: { items = [] }
@@ -101,6 +103,15 @@ export const Header = (props) => {
     handleStopAnalysis();
   };
 
+  const handleForceReset = (event) => {
+    event.stopPropagation();
+    console.log('[HEADER]: Force resetting saving state');
+    dispatch(uiActions.forceResetSaving());
+  };
+
+  // Detectar si el botón ha estado bloqueado por mucho tiempo
+  const isStuckSaving = isSaving && status !== UI_INITIAL_STATE.status;
+
   return (
     <HeaderWrapper>
       <HeaderContent>
@@ -159,6 +170,18 @@ export const Header = (props) => {
               >
                 <FaSave />
                 {saveText}
+              </Button>
+            )}
+            
+            {isStuckSaving && (
+              <Button 
+                onClick={handleForceReset} 
+                variant="warning"
+                size="sm"
+                title="Resetear estado de guardado si está bloqueado"
+              >
+                <FaExclamationTriangle />
+                Desbloquear
               </Button>
             )}
             

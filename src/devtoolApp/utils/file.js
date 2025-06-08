@@ -47,15 +47,53 @@ export const resolveDuplicatedResources = (resourceList = []) => {
 };
 
 export const downloadZipFile = (toDownload, options, eachDoneCallback, callback) => {
-  const blobWrite = new zip.BlobWriter('application/zip');
-  const zipWriter = new zip.ZipWriter(blobWrite);
-  addItemsToZipWriter(
-    zipWriter,
-    toDownload,
-    options,
-    eachDoneCallback,
-    downloadCompleteZip.bind(this, zipWriter, blobWrite, callback)
-  );
+  try {
+    const blobWrite = new zip.BlobWriter('application/zip');
+    const zipWriter = new zip.ZipWriter(blobWrite);
+    
+    // Verificar que tenemos elementos para descargar
+    if (!toDownload || toDownload.length === 0) {
+      console.warn('[DOWNLOAD ZIP]: No items to download');
+      if (callback) callback();
+      return;
+    }
+    
+    console.log('[DOWNLOAD ZIP]: Starting download of', toDownload.length, 'items');
+    
+    // Wrapper para el callback que asegura que se ejecute una sola vez
+    let callbackExecuted = false;
+    const safeCallback = () => {
+      if (!callbackExecuted) {
+        callbackExecuted = true;
+        if (callback) {
+          callback();
+        }
+      }
+    };
+    
+    // Timeout de seguridad para la operación ZIP
+    const zipTimeout = setTimeout(() => {
+      console.error('[DOWNLOAD ZIP]: Operation timeout');
+      safeCallback();
+    }, 45000); // 45 segundos
+    
+    const wrappedCallback = () => {
+      clearTimeout(zipTimeout);
+      safeCallback();
+    };
+    
+    addItemsToZipWriter(
+      zipWriter,
+      toDownload,
+      options,
+      eachDoneCallback,
+      downloadCompleteZip.bind(this, zipWriter, blobWrite, wrappedCallback)
+    );
+    
+  } catch (error) {
+    console.error('[DOWNLOAD ZIP]: Error initializing ZIP download:', error);
+    if (callback) callback();
+  }
 };
 
 // Create a reader of the content for zip
@@ -124,26 +162,43 @@ export const addItemsToZipWriter = (zipWriter, items, options, eachDoneCallback,
   const item = items[0];
   const rest = items.slice(1);
   if (item) {
-    const resolvedContent = prepareZipItemContent(item, options);
-    const isNoContent = !item.content;
-    const ignoreNoContentFile = !!options?.ignoreNoContentFile;
-    if (isNoContent && ignoreNoContentFile) {
-      eachDoneCallback(item, true);
-      addItemsToZipWriter(zipWriter, rest, options, eachDoneCallback, callback);
-    } else {
-      const hasSize = resolvedContent.size > 0 || resolvedContent['blobReader']?.size > 0;
-      if (hasSize) {
-        zipWriter.add(item.saveAs.path, resolvedContent).then(() => {
-          eachDoneCallback(item, true);
-          addItemsToZipWriter(zipWriter, rest, options, eachDoneCallback, callback);
-        }).catch(() => {
+    try {
+      const resolvedContent = prepareZipItemContent(item, options);
+      const isNoContent = !item.content;
+      const ignoreNoContentFile = !!options?.ignoreNoContentFile;
+      if (isNoContent && ignoreNoContentFile) {
+        eachDoneCallback(item, true);
+        addItemsToZipWriter(zipWriter, rest, options, eachDoneCallback, callback);
+      } else {
+        const hasSize = resolvedContent.size > 0 || resolvedContent['blobReader']?.size > 0;
+        if (hasSize) {
+          // Agregar timeout específico para cada elemento
+          const itemTimeout = setTimeout(() => {
+            console.error('[ZIP ITEM]: Timeout adding item:', item.url);
+            eachDoneCallback(item, false);
+            addItemsToZipWriter(zipWriter, rest, options, eachDoneCallback, callback);
+          }, 10000); // 10 segundos por item
+          
+          zipWriter.add(item.saveAs.path, resolvedContent).then(() => {
+            clearTimeout(itemTimeout);
+            eachDoneCallback(item, true);
+            addItemsToZipWriter(zipWriter, rest, options, eachDoneCallback, callback);
+          }).catch((error) => {
+            clearTimeout(itemTimeout);
+            console.error('[ZIP ITEM]: Error adding item to zip:', item.url, error);
+            eachDoneCallback(item, false);
+            addItemsToZipWriter(zipWriter, rest, options, eachDoneCallback, callback);
+          });
+        } else {
+          console.warn('[ZIP ITEM]: Item has no size, skipping:', item.url);
           eachDoneCallback(item, false);
           addItemsToZipWriter(zipWriter, rest, options, eachDoneCallback, callback);
-        });
-      } else {
-        eachDoneCallback(item, false);
-        addItemsToZipWriter(zipWriter, rest, options, eachDoneCallback, callback);
+        }
       }
+    } catch (error) {
+      console.error('[ZIP ITEM]: Error preparing item content:', item.url, error);
+      eachDoneCallback(item, false);
+      addItemsToZipWriter(zipWriter, rest, options, eachDoneCallback, callback);
     }
   } else {
     callback();

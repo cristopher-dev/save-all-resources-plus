@@ -33,6 +33,13 @@ export const useAppSaveAllResource = () => {
     }
     console.log('[SAVE ALL]: Starting save operation with tabId:', chrome.devtools.inspectedWindow.tabId);
     dispatch(uiActions.setIsSaving(true));
+
+    // Timeout de seguridad para resetear isSaving en caso de que algo falle
+    const safetyTimeout = setTimeout(() => {
+      console.warn('[SAVE ALL]: Safety timeout reached, resetting isSaving state');
+      dispatch(uiActions.setIsSaving(false));
+      dispatch(uiActions.setStatus('Operación de guardado interrumpida por timeout'));
+    }, 60000); // 60 segundos
     try {
       for (let i = 0; i < downloadList.length; i++) {
         const downloadItem = downloadList[i];
@@ -41,8 +48,19 @@ export const useAppSaveAllResource = () => {
           continue;
         }
         dispatch(uiActions.setSavingIndex(i));
-        await new Promise(async (resolve) => {
+        await new Promise(async (resolve, reject) => {
           let loaded = true;
+          let downloadCompleted = false;
+          
+          // Timeout específico para cada descarga
+          const downloadTimeout = setTimeout(() => {
+            if (!downloadCompleted) {
+              console.error('[SAVE ALL]: Download timeout for item:', downloadItem.url);
+              dispatch(uiActions.setStatus(`Timeout en descarga: ${downloadItem.url}`));
+              resolve();
+            }
+          }, 30000); // 30 segundos por descarga
+          
           try {
             if (i > 0 || tab?.url !== downloadItem.url) {
               loaded = await waitForTabLoad(chrome.devtools.inspectedWindow.tabId, downloadItem, dispatch, uiActions, tab);
@@ -66,6 +84,8 @@ export const useAppSaveAllResource = () => {
                   dispatch(uiActions.setStatus(`Compressed: ${item.url} Processed: ${isDone}`));
                 },
                 () => {
+                  downloadCompleted = true;
+                  clearTimeout(downloadTimeout);
                   logResourceByUrl(dispatch, downloadItem.url, toDownload);
                   if (i + 1 !== downloadList.length) {
                     dispatch(resetNetworkResource());
@@ -75,19 +95,27 @@ export const useAppSaveAllResource = () => {
                 }
               );
             } else {
+              downloadCompleted = true;
+              clearTimeout(downloadTimeout);
               resolve();
             }
           } catch (error) {
+            downloadCompleted = true;
+            clearTimeout(downloadTimeout);
+            console.error('[SAVE ALL]: Error in download process:', error);
             dispatch(uiActions.setStatus('Error en descarga de recursos: ' + error.message));
             resolve();
           }
         });
         await new Promise(res => setTimeout(res, 50));
       }
+      clearTimeout(safetyTimeout);
       dispatch(uiActions.setStatus(UI_INITIAL_STATE.status));
       dispatch(uiActions.setIsSaving(false));
       dispatch(uiActions.setAnalysisCompleted());
     } catch (error) {
+      clearTimeout(safetyTimeout);
+      console.error('[SAVE ALL]: Critical error during save operation:', error);
       dispatch(uiActions.setStatus('Error durante el guardado: ' + error.message));
       dispatch(uiActions.setIsSaving(false));
     }
