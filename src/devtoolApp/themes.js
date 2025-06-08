@@ -1,5 +1,3 @@
-import { setLightness, darken, lighten, rgba, getLuminance } from 'polished';
-
 // Paleta de colores moderna y accesible
 export const colors = {
   // Colores primarios
@@ -42,6 +40,55 @@ export const colors = {
   warning: '#f59e0b',
   error: '#ef4444',
   info: '#3b82f6',
+};
+
+// Utilidades de color nativas
+const hexToRgb = (hex) => {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
+};
+
+const rgbaToString = (r, g, b, a = 1) => `rgba(${r}, ${g}, ${b}, ${a})`;
+
+const lighten = (amount, color) => {
+  const rgb = hexToRgb(color);
+  if (!rgb) return color;
+  const { r, g, b } = rgb;
+  const newR = Math.min(255, Math.round(r + (255 - r) * amount));
+  const newG = Math.min(255, Math.round(g + (255 - g) * amount));
+  const newB = Math.min(255, Math.round(b + (255 - b) * amount));
+  return `rgb(${newR}, ${newG}, ${newB})`;
+};
+
+const darken = (amount, color) => {
+  const rgb = hexToRgb(color);
+  if (!rgb) return color;
+  const { r, g, b } = rgb;
+  const newR = Math.max(0, Math.round(r * (1 - amount)));
+  const newG = Math.max(0, Math.round(g * (1 - amount)));
+  const newB = Math.max(0, Math.round(b * (1 - amount)));
+  return `rgb(${newR}, ${newG}, ${newB})`;
+};
+
+const rgba = (color, alpha) => {
+  const rgb = hexToRgb(color);
+  if (!rgb) return color;
+  return rgbaToString(rgb.r, rgb.g, rgb.b, alpha);
+};
+
+const getLuminance = (color) => {
+  const rgb = hexToRgb(color);
+  if (!rgb) return 0;
+  const { r, g, b } = rgb;
+  const [rs, gs, bs] = [r, g, b].map(c => {
+    c = c / 255;
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
 };
 
 export const THEME_KEYS = {
@@ -364,48 +411,5 @@ export const createGlobalStyles = (theme) => `
     --border-radius: ${theme.borderRadius}px;
   }
 `;
-
-// Función para detectar si un color es oscuro
-export const isColorDark = (color) => {
-  try {
-    const luminance = getLuminance(color);
-    return luminance < 0.5;
-  } catch (error) {
-    console.warn('Error calculating luminance for color:', color, error);
-    // Fallback: si el color contiene valores bajos, es probablemente oscuro
-    if (typeof color === 'string') {
-      const hex = color.replace('#', '');
-      if (hex.length === 3 || hex.length === 6) {
-        const r = parseInt(hex.length === 3 ? hex[0] + hex[0] : hex.substr(0, 2), 16);
-        const g = parseInt(hex.length === 3 ? hex[1] + hex[1] : hex.substr(2, 2), 16);
-        const b = parseInt(hex.length === 3 ? hex[2] + hex[2] : hex.substr(4, 2), 16);
-        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-        return brightness < 128;
-      }
-    }
-    return false;
-  }
-};
-
-// Función para obtener el color de texto apropiado según el fondo
-export const getContrastTextColor = (backgroundColor, theme) => {
-  if (!backgroundColor) return theme.colors.text;
-  
-  try {
-    return isColorDark(backgroundColor) ? theme.colors.white : theme.colors.text;
-  } catch (error) {
-    console.warn('Error determining contrast color for:', backgroundColor, error);
-    return theme.colors.text;
-  }
-};
-
-// Función para crear estilos con contraste automático
-export const getContrastingStyles = (backgroundColor, theme) => {
-  const textColor = getContrastTextColor(backgroundColor, theme);
-  return {
-    backgroundColor,
-    color: textColor
-  };
-};
 
 console.log('[DEVTOOL] Temas modernos cargados:', THEMES);
