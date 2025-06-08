@@ -314,8 +314,8 @@ export const HistoryMeta = styled.div`
 `;
 
 export const ActionButton = styled.button`
-  background: ${props => props.theme.primary};
-  color: white;
+  background: ${props => props.theme.colors.primary};
+  color: ${props => props.theme.colors.white};
   border: none;
   border-radius: 4px;
   padding: 6px 12px;

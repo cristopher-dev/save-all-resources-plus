@@ -20,13 +20,13 @@ export const CompressionHeader = styled.div.withConfig({
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  color: white;
+  background: linear-gradient(135deg, ${props => props.theme.colors.primary} 0%, ${props => props.theme.colors.secondary} 100%);
+  color: ${props => props.theme.colors.white};
   cursor: pointer;
   user-select: none;
   
   &:hover {
-    background: linear-gradient(135deg, #e668e8 0%, #e64865 100%);
+    background: linear-gradient(135deg, ${props => props.theme.colors.primaryHover} 0%, ${props => props.theme.colors.secondaryHover} 100%);
   }
 `;
 
@@ -83,7 +83,7 @@ export const StatCard = styled.div`
 `;
 
 export const StatIcon = styled.div`
-  color: #f093fb;
+  color: ${props => props.theme.colors.primary};
   font-size: 18px;
 `;
 
@@ -107,15 +107,15 @@ export const FormatOptions = styled.div`
 `;
 
 export const FormatOption = styled.div`
-  border: 2px solid ${props => props.selected ? '#f093fb' : props.theme.border};
+  border: 2px solid ${props => props.selected ? props.theme.colors.primary : props.theme.border};
   border-radius: 8px;
   padding: 16px;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: ${props => props.selected ? 'rgba(240, 147, 251, 0.1)' : props.theme.background};
+  background: ${props => props.selected ? props.theme.colors.primaryLight : props.theme.background};
   
   &:hover {
-    border-color: #f093fb;
+    border-color: ${props => props.theme.colors.primary};
     transform: translateY(-2px);
   }
 `;
@@ -172,7 +172,7 @@ export const SettingSelect = styled.select`
   
   &:focus {
     outline: none;
-    border-color: #f093fb;
+    border-color: ${props => props.theme.colors.primary};
   }
 `;
 
@@ -187,7 +187,7 @@ export const SettingInput = styled.input`
   
   &:focus {
     outline: none;
-    border-color: #f093fb;
+    border-color: ${props => props.theme.colors.primary};
   }
 `;
 
@@ -239,32 +239,31 @@ export const ActionButton = styled.button`
   .spinning {
     animation: ${spin} 1s linear infinite;
   }
-  
-  ${props => {
+    ${props => {
     switch (props.color) {
       case 'primary':
         return `
-          background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-          color: white;
-          &:hover { background: linear-gradient(135deg, #e668e8 0%, #e64865 100%); }
+          background: linear-gradient(135deg, ${props.theme.colors.primary} 0%, ${props.theme.colors.secondary} 100%);
+          color: ${props.theme.colors.white};
+          &:hover { background: linear-gradient(135deg, ${props.theme.colors.primaryHover} 0%, ${props.theme.colors.secondaryHover} 100%); }
         `;
       case 'secondary':
         return `
-          background-color: ${props.theme.border};
-          color: ${props.theme.text};
-          &:hover { background-color: ${props.theme.surfaceHover}; }
+          background-color: ${props.theme.colors.border};
+          color: ${props.theme.colors.text};
+          &:hover { background-color: ${props.theme.colors.surfaceHover}; }
         `;
       case 'danger':
         return `
-          background-color: #ff6b6b;
-          color: white;
-          &:hover { background-color: #ff5252; }
+          background-color: ${props.theme.colors.error};
+          color: ${props.theme.colors.white};
+          &:hover { background-color: ${props.theme.colors.errorHover}; }
         `;
       default:
         return `
-          background-color: ${props.theme.border};
-          color: ${props.theme.text};
-          &:hover { background-color: ${props.theme.surfaceHover}; }
+          background-color: ${props.theme.colors.border};
+          color: ${props.theme.colors.text};
+          &:hover { background-color: ${props.theme.colors.surfaceHover}; }
         `;
     }
   }}
@@ -311,7 +310,7 @@ export const ResultItem = styled.div`
   transition: all 0.2s ease;
   
   &:hover {
-    border-color: #f093fb;
+    border-color: ${props => props.theme.colors.primary};
     transform: translateY(-1px);
   }
 `;

@@ -27,12 +27,11 @@ export const PreviewTitle = styled.h2`
   color: ${props => props.theme.colors.text};
 `;
 
-export const CloseButton = styled.button`
-  background: ${props => props.theme.colors.danger};
+export const CloseButton = styled.button`  background: ${props => props.theme.colors.danger};
   border: none;
   border-radius: 4px;
   padding: 8px 10px;
-  color: white;
+  color: ${props => props.theme.colors.white};
   cursor: pointer;
   transition: all 0.2s ease;
 
@@ -88,10 +87,9 @@ export const TypeBadge = styled.button`
   font-size: 11px;
   cursor: pointer;
   transition: all 0.2s ease;
-
   &:hover {
     background: ${props => props.color || props.theme.colors.primary};
-    color: white;
+    color: ${props => props.theme.colors.white};
   }
 `;
 

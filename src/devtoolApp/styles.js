@@ -8,6 +8,8 @@ export const Wrapper = styled.div`
   min-width: 480px;
   background: ${props => props.theme.colors.background};
   min-height: 100vh;
+  max-height: 100vh;
+  overflow-y: auto;
   
   // Contenedor con diseño moderno
   display: flex;

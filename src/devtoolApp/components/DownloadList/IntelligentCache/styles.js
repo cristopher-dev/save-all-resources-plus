@@ -15,13 +15,13 @@ export const CacheHeader = styled.div.withConfig({
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(135deg, ${props => props.theme.colors.primary} 0%, ${props => props.theme.colors.secondary} 100%);
+  color: ${props => props.theme.colors.white};
   cursor: pointer;
   user-select: none;
   
   &:hover {
-    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    background: linear-gradient(135deg, ${props => props.theme.colors.primaryHover} 0%, ${props => props.theme.colors.secondaryHover} 100%);
   }
 `;
 
@@ -78,7 +78,7 @@ export const StatCard = styled.div`
 `;
 
 export const StatIcon = styled.div`
-  color: #667eea;
+  color: ${props => props.theme.colors.primary};
   font-size: 18px;
 `;
 
@@ -113,38 +113,37 @@ export const ActionButton = styled.button`
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  
-  ${props => {
+    ${props => {
     switch (props.color) {
       case 'primary':
         return `
-          background-color: #667eea;
-          color: white;
-          &:hover { background-color: #5a6fd8; }
+          background-color: ${props.theme.colors.primary};
+          color: ${props.theme.colors.white};
+          &:hover { background-color: ${props.theme.colors.primaryHover}; }
         `;
       case 'warning':
         return `
-          background-color: #feca57;
-          color: #333;
-          &:hover { background-color: #feb941; }
+          background-color: ${props.theme.colors.warning};
+          color: ${props.theme.colors.black};
+          &:hover { background-color: ${props.theme.colors.warningHover}; }
         `;
       case 'danger':
         return `
-          background-color: #ff6b6b;
-          color: white;
-          &:hover { background-color: #ff5252; }
+          background-color: ${props.theme.colors.error};
+          color: ${props.theme.colors.white};
+          &:hover { background-color: ${props.theme.colors.errorHover}; }
         `;
       case 'success':
         return `
-          background-color: #4ecdc4;
-          color: white;
-          &:hover { background-color: #45b7b8; }
+          background-color: ${props.theme.colors.success};
+          color: ${props.theme.colors.white};
+          &:hover { background-color: ${props.theme.colors.successHover}; }
         `;
       default:
         return `
-          background-color: ${props.theme.border};
-          color: ${props.theme.text};
-          &:hover { background-color: ${props.theme.surfaceHover}; }
+          background-color: ${props.theme.colors.border};
+          color: ${props.theme.colors.text};
+          &:hover { background-color: ${props.theme.colors.surfaceHover}; }
         `;
     }
   }}
@@ -169,7 +168,7 @@ export const CacheItem = styled.div`
   justify-content: space-between;
   padding: 12px;
   background: ${props => props.theme.background};
-  border: 1px solid ${props => props.expired ? '#ff6b6b' : props.theme.border};
+  border: 1px solid ${props => props.expired ? props.theme.colors.error : props.theme.border};
   border-radius: 6px;
   transition: all 0.2s ease;
   
@@ -177,9 +176,8 @@ export const CacheItem = styled.div`
     background-color: #fff5f5;
     opacity: 0.7;
   `}
-  
-  &:hover {
-    border-color: ${props => props.expired ? '#ff5252' : '#667eea'};
+    &:hover {
+    border-color: ${props => props.expired ? props.theme.colors.error : props.theme.colors.primary};
     transform: translateY(-1px);
   }
 `;
@@ -237,10 +235,9 @@ export const SettingInput = styled.input`
   font-size: 12px;
   background: ${props => props.theme.background};
   color: ${props => props.theme.text};
-  
-  &:focus {
+    &:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: ${props => props.theme.colors.primary};
   }
 `;
 
@@ -252,12 +249,11 @@ export const CachePolicy = styled.div`
 
 export const PolicyButton = styled.button.withConfig({
   shouldForwardProp: (prop) => prop !== 'active'
-})`
-  padding: 6px 12px;
-  border: 1px solid ${props => props.active ? '#667eea' : props.theme.border};
+})`  padding: 6px 12px;
+  border: 1px solid ${props => props.active ? props.theme.colors.primary : props.theme.border};
   border-radius: 4px;
-  background: ${props => props.active ? '#667eea' : props.theme.background};
-  color: ${props => props.active ? 'white' : props.theme.text};
+  background: ${props => props.active ? props.theme.colors.primary : props.theme.background};
+  color: ${props => props.active ? props.theme.colors.white : props.theme.text};
   font-size: 11px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -265,9 +261,8 @@ export const PolicyButton = styled.button.withConfig({
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  
-  &:hover {
-    border-color: #667eea;
+    &:hover {
+    border-color: ${props => props.theme.colors.primary};
     ${props => !props.active && `background: ${props.theme.surfaceHover};`}
   }
   

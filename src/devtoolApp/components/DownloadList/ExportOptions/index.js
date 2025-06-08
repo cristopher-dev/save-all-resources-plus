@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { useStore } from 'devtoolApp/store';
+import { useAppTheme } from 'devtoolApp/hooks/useAppTheme';
 import { 
   downloadZipFile, 
   resolveDuplicatedResources, 
@@ -25,6 +26,7 @@ import {
 const ExportOptions = () => {
   const { state } = useStore();
   const { networkResource = [], staticResource = [], option } = state;
+  const theme = useAppTheme();
   
   const [isExporting, setIsExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState(0);
@@ -85,12 +87,11 @@ const ExportOptions = () => {
           <ProgressContainer>
             <ProgressText>
               Exportando recursos... {exportProgress}%
-            </ProgressText>
-            <ProgressBar>
+            </ProgressText>            <ProgressBar>
               <div style={{
                 width: `${exportProgress}%`,
                 height: '100%',
-                backgroundColor: '#667eea',
+                backgroundColor: theme.colors.primary,
                 borderRadius: '4px',
                 transition: 'width 0.3s ease'
               }} />

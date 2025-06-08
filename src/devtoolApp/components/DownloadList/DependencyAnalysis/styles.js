@@ -78,9 +78,8 @@ export const DependencyNode = styled.div`
       case 'image': return theme.colors.primary;
       case 'font': return theme.colors.danger;
       default: return theme.colors.textSecondary;
-    }
-  }};
-  color: white;
+    }  }};
+  color: ${props => props.theme.colors.white};
   padding: 8px 12px;
   border-radius: 4px;
   margin: 4px;
@@ -176,9 +175,8 @@ export const DependencyItemType = styled.span`
       case 'image': return theme.colors.primary;
       case 'font': return theme.colors.danger;
       default: return theme.colors.textSecondary;
-    }
-  }};
-  color: white;
+    }  }};
+  color: ${props => props.theme.colors.white};
   padding: 2px 6px;
   border-radius: 3px;
   font-size: 10px;
@@ -226,7 +224,7 @@ export const CriticalPathList = styled.div`
 
 export const CriticalPathItem = styled.div`
   background: ${({ theme }) => theme.colors.warning};
-  color: white;
+  color: ${({ theme }) => theme.colors.white};
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 11px;

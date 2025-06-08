@@ -20,9 +20,13 @@ export const DownloadListContainer = styled.div`
   color: ${(props) => props.theme.text};
   margin: 0 20px;
   padding: 10px 0;
+  max-height: 60vh;
+  overflow-y: auto;
 `;
 
-export const DownloadListItemWrapper = styled.div`
+export const DownloadListItemWrapper = styled.div.withConfig({
+  shouldForwardProp: (prop) => !['highlighted', 'done', 'logExpanded', 'expired'].includes(prop)
+})`
   display: flex;
   flex-flow: row nowrap;
   justify-content: space-between;
@@ -93,12 +97,11 @@ export const DownloadListItemUrl = styled.div.withConfig({
   ${(props) =>
     props.active
       ? css`
-          padding-left: 10px;
-          &::before {
+          padding-left: 10px;          &::before {
             content: '';
             display: block;
             position: absolute;
-            color: white;
+            color: ${props => props.theme.colors.white};
             top: 5px;
             left: 0;
             width: 0;

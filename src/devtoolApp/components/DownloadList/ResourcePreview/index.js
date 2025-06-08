@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from 'devtoolApp/store';
+import { useAppTheme } from 'devtoolApp/hooks/useAppTheme';
 import { getFileSize, getFileType, getFileExtension } from 'devtoolApp/utils/file';
 import {
   PreviewContainer,
@@ -28,6 +29,7 @@ import { FaTimes, FaFile, FaImage, FaCode, FaFont, FaFileAlt } from 'react-icons
 const ResourcePreview = ({ isOpen, onClose }) => {
   const { state } = useStore();
   const { networkResource, staticResource, option } = state;
+  const { theme } = useAppTheme();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState('all');
   
@@ -47,15 +49,13 @@ const ResourcePreview = ({ isOpen, onClose }) => {
     fonts: FaFont,
     documents: FaFileAlt,
     other: FaFile
-  };
-
-  const typeColors = {
-    images: '#ff6b6b',
-    css: '#4ecdc4',
-    javascript: '#45b7d1',
-    fonts: '#96ceb4',
-    documents: '#ffeaa7',
-    other: '#ddd'
+  };  const typeColors = {
+    images: theme.colors.error,
+    css: theme.colors.success,
+    javascript: theme.colors.info,
+    fonts: theme.colors.secondary,
+    documents: theme.colors.warning,
+    other: theme.colors.textMuted
   };
 
   const getResourceStats = () => {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { FaBell, FaVolumeUp, FaDesktop, FaEnvelope, FaCog, FaCheck, FaTimes, FaExclamationTriangle, FaInfo } from 'react-icons/fa';
 import { useStore } from '../../../store';
+import { useAppTheme } from '../../../hooks/useAppTheme';
 import {
   NotificationContainer,
   NotificationHeader,
@@ -67,19 +68,20 @@ const NOTIFICATION_TYPES = {
   }
 };
 
-const NOTIFICATION_EVENTS = {
-  'downloadComplete': { name: 'Descarga Completada', icon: FaCheck, color: '#4ecdc4' },
-  'downloadFailed': { name: 'Descarga Fallida', icon: FaTimes, color: '#ff6b6b' },
-  'downloadStarted': { name: 'Descarga Iniciada', icon: FaInfo, color: '#667eea' },
-  'queueComplete': { name: 'Cola Completada', icon: FaCheck, color: '#4ecdc4' },
-  'cacheCleared': { name: 'Caché Limpiado', icon: FaInfo, color: '#feca57' },
-  'compressionComplete': { name: 'Compresión Completada', icon: FaCheck, color: '#4ecdc4' },
-  'error': { name: 'Error del Sistema', icon: FaExclamationTriangle, color: '#ff6b6b' }
-};
-
 const SystemNotifications = () => {
   const { state } = useStore();
   const { downloadList } = state;
+  const { theme } = useAppTheme();
+
+  const NOTIFICATION_EVENTS = {
+    'downloadComplete': { name: 'Descarga Completada', icon: FaCheck, color: theme.colors.success },
+    'downloadFailed': { name: 'Descarga Fallida', icon: FaTimes, color: theme.colors.error },
+    'downloadStarted': { name: 'Descarga Iniciada', icon: FaInfo, color: theme.colors.primary },
+    'queueComplete': { name: 'Cola Completada', icon: FaCheck, color: theme.colors.success },
+    'cacheCleared': { name: 'Caché Limpiado', icon: FaInfo, color: theme.colors.warning },
+    'compressionComplete': { name: 'Compresión Completada', icon: FaCheck, color: theme.colors.success },
+    'error': { name: 'Error del Sistema', icon: FaExclamationTriangle, color: theme.colors.error }
+  };
   
   const [expanded, setExpanded] = useState(false);
   const [notificationPermission, setNotificationPermission] = useState('default');
@@ -277,7 +279,7 @@ const SystemNotifications = () => {
       <NotificationContent expanded={expanded}>
         {notificationPermission !== 'granted' && (
           <PermissionStatus>
-            <FaExclamationTriangle style={{ marginRight: '8px', color: '#feca57' }} />
+            <FaExclamationTriangle style={{ marginRight: '8px', color: theme.colors.warning }} />
             Las notificaciones de sistema requieren permisos.
             <PermissionButton onClick={requestNotificationPermission}>
               Solicitar Permisos
@@ -463,8 +465,7 @@ const SystemNotifications = () => {
                     <HistoryInfo>
                       <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>
                         {notification.title}
-                      </div>
-                      <div style={{ fontSize: '11px', color: '#666' }}>
+                      </div>                      <div style={{ fontSize: '11px', color: theme.colors.textSecondary }}>
                         {notification.message}
                       </div>
                     </HistoryInfo>
@@ -490,8 +491,7 @@ const SystemNotifications = () => {
                 );
               })}
             </NotificationHistory>
-          ) : (
-            <div style={{ textAlign: 'center', padding: '40px 20px', color: '#666' }}>
+          ) : (            <div style={{ textAlign: 'center', padding: '40px 20px', color: theme.colors.textSecondary }}>
               <FaBell size={48} style={{ opacity: 0.3, marginBottom: '16px' }} />
               <div>
                 No hay notificaciones en el historial.<br />
@@ -506,20 +506,18 @@ const SystemNotifications = () => {
           
           <NotificationPreview>
             <PreviewContainer>
-              <PreviewNotification>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <FaCheck style={{ color: '#4ecdc4' }} />
+              <PreviewNotification>                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <FaCheck style={{ color: theme.colors.success }} />
                   <div>
                     <div style={{ fontWeight: 'bold', fontSize: '12px' }}>
                       Resources Saver
-                    </div>
-                    <div style={{ fontSize: '11px', color: '#666' }}>
+                    </div>                    <div style={{ fontSize: '11px', color: theme.colors.textSecondary }}>
                       Descarga completada - 25 recursos descargados
                     </div>
                   </div>
                 </div>
                 <PreviewActions>
-                  <small style={{ color: '#666' }}>Hace 2m</small>
+                  <small style={{ color: theme.colors.textSecondary }}>Hace 2m</small>
                 </PreviewActions>
               </PreviewNotification>
             </PreviewContainer>

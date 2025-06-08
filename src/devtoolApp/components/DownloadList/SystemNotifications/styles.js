@@ -202,8 +202,8 @@ export const PreviewActions = styled.div`
 `;
 
 export const TestButton = styled.button`
-  background: ${props => props.theme.primary};
-  color: white;
+  background: ${props => props.theme.colors.primary};
+  color: ${props => props.theme.colors.white};
   border: none;
   border-radius: 4px;
   padding: 6px 12px;
@@ -281,8 +281,8 @@ export const PermissionStatus = styled.div`
 `;
 
 export const PermissionButton = styled.button`
-  background: ${props => props.theme.primary};
-  color: white;
+  background: ${props => props.theme.colors.primary};
+  color: ${props => props.theme.colors.white};
   border: none;
   border-radius: 4px;
   padding: 4px 8px;

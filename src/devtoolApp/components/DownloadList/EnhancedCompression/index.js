@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { FaCompressArrowsAlt, FaFileArchive, FaCog, FaDownload, FaChartLine, FaSpinner, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
 import { useStore } from '../../../store';
+import { useAppTheme } from '../../../hooks/useAppTheme';
 import {
   CompressionContainer,
   CompressionHeader,
@@ -111,6 +112,7 @@ const COMPRESSION_LEVELS = {
 const EnhancedCompression = () => {
   const { state } = useStore();
   const { downloadList } = state;
+  const { theme } = useAppTheme();
   
   const [expanded, setExpanded] = useState(false);
   const [selectedFormat, setSelectedFormat] = useState('zip');
@@ -188,15 +190,14 @@ const EnhancedCompression = () => {
     // En una implementación real, aquí se descargaría el archivo
     console.log('Descargando:', result.filename);
   }, []);
-
   const getSpeedColor = (speed) => {
     switch (speed) {
-      case 'Muy Rápido': return '#4ecdc4';
-      case 'Rápido': return '#48cae4';
-      case 'Medio': return '#feca57';
-      case 'Lento': return '#ff9ff3';
-      case 'Muy Lento': return '#ff6b6b';
-      default: return '#666';
+      case 'Muy Rápido': return theme.colors.success;
+      case 'Rápido': return theme.colors.info;
+      case 'Medio': return theme.colors.warning;
+      case 'Lento': return theme.colors.primary;
+      case 'Muy Lento': return theme.colors.error;
+      default: return theme.colors.textMuted;
     }
   };
 
@@ -370,8 +371,7 @@ const EnhancedCompression = () => {
                   <PreviewCell>{formatBytes(compressionStats.estimatedSize)}</PreviewCell>
                 </PreviewRow>
                 <PreviewRow>
-                  <PreviewCell>Espacio ahorrado</PreviewCell>
-                  <PreviewCell style={{ color: '#4ecdc4', fontWeight: 'bold' }}>
+                  <PreviewCell>Espacio ahorrado</PreviewCell>                  <PreviewCell style={{ color: theme.colors.success, fontWeight: 'bold' }}>
                     {formatBytes(compressionStats.spaceSaved)} ({compressionStats.estimatedRatio}%)
                   </PreviewCell>
                 </PreviewRow>
@@ -427,12 +427,11 @@ const EnhancedCompression = () => {
             <CompressionProgress>
               <ProgressText>
                 Procesando archivos... {compressionProgress}%
-              </ProgressText>
-              <ProgressBar>
+              </ProgressText>              <ProgressBar>
                 <div style={{
                   width: `${compressionProgress}%`,
                   height: '100%',
-                  backgroundColor: '#667eea',
+                  backgroundColor: theme.colors.primary,
                   borderRadius: '4px',
                   transition: 'width 0.3s ease'
                 }} />

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { FaDatabase, FaTrash, FaBroom, FaChartLine, FaSync, FaExternalLinkAlt, FaClock, FaMemory, FaCompressArrowsAlt } from 'react-icons/fa';
 import { useStore } from '../../../store';
+import { useAppTheme } from '../../../hooks/useAppTheme';
 import {
   CacheContainer,
   CacheHeader,
@@ -45,6 +46,7 @@ const CACHE_POLICIES = {
 const IntelligentCache = () => {
   const { state } = useStore();
   const { downloadList } = state;
+  const theme = useAppTheme();
   
   const [expanded, setExpanded] = useState(false);
   const [cacheData, setCacheData] = useState({});
@@ -257,13 +259,12 @@ const IntelligentCache = () => {
           <CacheSectionTitle>📊 Métricas de Rendimiento</CacheSectionTitle>
           
           <CacheMetrics>
-            <div>
-              <MetricLabel>Uso de Caché: {cacheMetrics.cacheUsage}%</MetricLabel>
+            <div>              <MetricLabel>Uso de Caché: {cacheMetrics.cacheUsage}%</MetricLabel>
               <MetricBar>
                 <div style={{ 
                   width: `${Math.min(cacheMetrics.cacheUsage, 100)}%`,
                   height: '100%',
-                  backgroundColor: cacheMetrics.cacheUsage > 80 ? '#ff6b6b' : cacheMetrics.cacheUsage > 60 ? '#feca57' : '#48cae4',
+                  backgroundColor: cacheMetrics.cacheUsage > 80 ? theme.colors.error : cacheMetrics.cacheUsage > 60 ? theme.colors.warning : theme.colors.success,
                   borderRadius: '4px',
                   transition: 'all 0.3s ease'
                 }} />
@@ -276,7 +277,7 @@ const IntelligentCache = () => {
                 <div style={{ 
                   width: `${Math.round((cacheMetrics.validItems / (cacheMetrics.validItems + cacheMetrics.expiredItems || 1)) * 100)}%`,
                   height: '100%',
-                  backgroundColor: '#4ecdc4',
+                  backgroundColor: theme.colors.success,
                   borderRadius: '4px'
                 }} />
               </MetricBar>
@@ -309,7 +310,7 @@ const IntelligentCache = () => {
                   <CacheItemInfo>
                     <CacheItemName>
                       {item.url.split('/').pop() || 'Sin nombre'}
-                      {item.isExpired && <span style={{ color: '#ff6b6b', marginLeft: '8px' }}>(Expirado)</span>}
+                      {item.isExpired && <span style={{ color: theme.colors.error, marginLeft: '8px' }}>(Expirado)</span>}
                     </CacheItemName>
                     <CacheItemMeta>
                       {formatBytes(item.compressedSize)} | {item.compressionAlgorithm} | 
@@ -348,19 +349,18 @@ const IntelligentCache = () => {
 
         {cacheMetrics.mostAccessed.length > 0 && (
           <CacheSection>
-            <CacheSectionTitle>🔥 Recursos Más Accedidos</CacheSectionTitle>
-            <div style={{ display: 'grid', gap: '8px' }}>
+            <CacheSectionTitle>🔥 Recursos Más Accedidos</CacheSectionTitle>            <div style={{ display: 'grid', gap: '8px' }}>
               {cacheMetrics.mostAccessed.map((item, index) => (
                 <div key={item.hash} style={{
                   display: 'flex',
                   justifyContent: 'space-between',
                   padding: '8px 12px',
-                  backgroundColor: '#f8f9fa',
+                  backgroundColor: theme.colors.backgroundAlt,
                   borderRadius: '6px',
                   fontSize: '12px'
                 }}>
                   <span>#{index + 1} {item.url.split('/').pop()}</span>
-                  <span style={{ color: '#666' }}>{item.accessCount} accesos</span>
+                  <span style={{ color: theme.colors.textSecondary }}>{item.accessCount} accesos</span>
                 </div>
               ))}
             </div>

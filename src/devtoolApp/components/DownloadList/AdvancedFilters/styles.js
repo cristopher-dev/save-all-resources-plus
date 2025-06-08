@@ -159,7 +159,7 @@ export const Tag = styled.div`
   gap: 4px;
   padding: 4px 8px;
   background: ${props => props.theme.colors.primary};
-  color: white;
+  color: ${props => props.theme.colors.white};
   font-size: 11px;
   border-radius: 12px;
 `;
@@ -167,7 +167,7 @@ export const Tag = styled.div`
 export const TagRemove = styled.button`
   background: none;
   border: none;
-  color: white;
+  color: ${props => props.theme.colors.white};
   font-size: 12px;
   cursor: pointer;
   padding: 0;

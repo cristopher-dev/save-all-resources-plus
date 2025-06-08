@@ -185,8 +185,8 @@ export const TestSection = styled.div`
 `;
 
 export const TestButton = styled.button`
-  background: ${props => props.theme.primary};
-  color: white;
+  background: ${props => props.theme.colors.primary};
+  color: ${props => props.theme.colors.white};
   border: none;
   border-radius: 4px;
   padding: 8px 16px;
@@ -291,7 +291,7 @@ export const RuleInput = styled.input`
 
 export const RuleButton = styled.button`
   background: ${props => props.theme.primary};
-  color: white;
+  color: ${props => props.theme.colors ? props.theme.colors.white : '#ffffff'};
   border: none;
   border-radius: 4px;
   padding: 6px 12px;

@@ -1,4 +1,4 @@
-import { setLightness, darken, lighten, rgba } from 'polished';
+import { setLightness, darken, lighten, rgba, getLuminance } from 'polished';
 
 // Paleta de colores moderna y accesible
 export const colors = {
@@ -219,7 +219,29 @@ export const THEMES = {
 };
 
 // Utilidades de tema
-export const getTheme = (key) => THEMES[key] || THEMES[THEME_KEYS.LIGHT];
+export const getTheme = (key) => {
+  console.log('[DEVTOOL] getTheme: Requested key:', key);
+  console.log('[DEVTOOL] getTheme: Available themes:', Object.keys(THEMES));
+  
+  const theme = THEMES[key] || THEMES[THEME_KEYS.LIGHT];
+  
+  if (!theme) {
+    console.error('[DEVTOOL] getTheme: No theme found for key:', key, 'Available keys:', Object.keys(THEMES));
+    // Crear un tema básico de emergencia
+    return {
+      name: 'emergency',
+      colors: {
+        primary: '#1283c3',
+        background: '#ffffff',
+        text: '#000000',
+        white: '#ffffff'
+      }
+    };
+  }
+  
+  console.log('[DEVTOOL] getTheme: Returning theme for key:', key, 'Theme name:', theme.name);
+  return theme;
+};
 
 export const createGlobalStyles = (theme) => `
   :root {
@@ -233,5 +255,48 @@ export const createGlobalStyles = (theme) => `
     --border-radius: ${theme.borderRadius}px;
   }
 `;
+
+// Función para detectar si un color es oscuro
+export const isColorDark = (color) => {
+  try {
+    const luminance = getLuminance(color);
+    return luminance < 0.5;
+  } catch (error) {
+    console.warn('Error calculating luminance for color:', color, error);
+    // Fallback: si el color contiene valores bajos, es probablemente oscuro
+    if (typeof color === 'string') {
+      const hex = color.replace('#', '');
+      if (hex.length === 3 || hex.length === 6) {
+        const r = parseInt(hex.length === 3 ? hex[0] + hex[0] : hex.substr(0, 2), 16);
+        const g = parseInt(hex.length === 3 ? hex[1] + hex[1] : hex.substr(2, 2), 16);
+        const b = parseInt(hex.length === 3 ? hex[2] + hex[2] : hex.substr(4, 2), 16);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        return brightness < 128;
+      }
+    }
+    return false;
+  }
+};
+
+// Función para obtener el color de texto apropiado según el fondo
+export const getContrastTextColor = (backgroundColor, theme) => {
+  if (!backgroundColor) return theme.colors.text;
+  
+  try {
+    return isColorDark(backgroundColor) ? theme.colors.white : theme.colors.text;
+  } catch (error) {
+    console.warn('Error determining contrast color for:', backgroundColor, error);
+    return theme.colors.text;
+  }
+};
+
+// Función para crear estilos con contraste automático
+export const getContrastingStyles = (backgroundColor, theme) => {
+  const textColor = getContrastTextColor(backgroundColor, theme);
+  return {
+    backgroundColor,
+    color: textColor
+  };
+};
 
 console.log('[DEVTOOL] Temas modernos cargados:', THEMES);

@@ -77,8 +77,9 @@ export const Header = (props) => {
     }
     return 'Escanear';
   }, [status, isSaving, isAnalyzing, analysisCompleted, stats.totalResources]);
-
   const isActionDisabled = status !== UI_INITIAL_STATE.status || isSaving;
+  // El botón de vista previa solo debe estar deshabilitado si no hay recursos para mostrar
+  const isPreviewDisabled = stats.totalResources === 0;
 
   const handleMainAction = (event) => {
     event.stopPropagation();
@@ -93,7 +94,7 @@ export const Header = (props) => {
 
   const handlePreviewClick = (event) => {
     event.stopPropagation();
-    if (!isActionDisabled) {
+    if (!isPreviewDisabled) {
       setShowPreview(true);
     }
   };
@@ -138,13 +139,11 @@ export const Header = (props) => {
             <FaChartLine size={14} />
             <span>{stats.totalSize}</span>
           </StatItem>
-        </StatsContainer>
-
-        <ActionSection>
+        </StatsContainer>        <ActionSection>
           <ButtonGroup>
             <Button 
               onClick={handlePreviewClick} 
-              disabled={isActionDisabled}
+              disabled={isPreviewDisabled}
               variant="ghost"
               size="sm"
             >
