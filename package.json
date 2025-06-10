@@ -6,7 +6,7 @@
     "> 0.5%, last 2 versions, not dead"
   ],
   "repository": "git@github.com:cristopher-dev/save-all-resources-plus.git",
-  "author": "Cristopher Arévalo <cristopher.dev@gmail.com>",
+  "author": "Cristopher Martinez",
   "license": "GPL-3.0+",
   "scripts": {
     "dev": "yarn cp && parcel watch ./src/*.html --no-hmr --dist-dir unpacked2x",
