@@ -148,23 +148,43 @@ const ResetButton = styled.button`
 
 const DownloadSettings = () => {
   const { 
-    store: {
-      option: {
-        ignoreNoContentFile,
-        beautifyFile,
-        filterByFileType,
-        filterBySize,
-        includeImages,
-        includeStylesheets,
-        includeScripts,
-        includeFonts,
-        includeDocuments,
-        minFileSize,
-        maxFileSize
-      }
-    },
+    store,
     dispatch
   } = useStore();
+  
+  // Debug del estado
+  console.log('[DEBUG] Store state:', store);
+  
+  // Fallback para option en caso de que no esté definido
+  const option = store?.option || {
+    ignoreNoContentFile: false,
+    beautifyFile: false,
+    filterByFileType: false,
+    filterBySize: false,
+    includeImages: true,
+    includeStylesheets: true,
+    includeScripts: true,
+    includeFonts: true,
+    includeDocuments: true,
+    minFileSize: 0,
+    maxFileSize: 50240
+  };
+  
+  console.log('[DEBUG] Option state:', option);
+  
+  const {
+    ignoreNoContentFile,
+    beautifyFile,
+    filterByFileType,
+    filterBySize,
+    includeImages,
+    includeStylesheets,
+    includeScripts,
+    includeFonts,
+    includeDocuments,
+    minFileSize,
+    maxFileSize
+  } = option;
 
   const handleToggle = useCallback((action) => (event) => {
     dispatch(action(event.target.checked));

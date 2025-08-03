@@ -115,7 +115,7 @@ export const setIntegrityConfig = (config) => ({
   payload: config,
 });
 
-export const uiReducer = (state = INITIAL_STATE, action) => {
+export const optionReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case ACTIONS.SET_IGNORE_NO_CONTENT_FILE: {
       return {
@@ -207,4 +207,4 @@ export const uiReducer = (state = INITIAL_STATE, action) => {
   }
 };
 
-export default getReducerConfig(STATE_KEY, uiReducer);
+export default getReducerConfig(STATE_KEY, optionReducer);

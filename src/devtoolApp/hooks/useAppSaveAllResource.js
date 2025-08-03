@@ -12,11 +12,20 @@ export const useAppSaveAllResource = () => {
   const { networkResource, staticResource } = state;
   const networkResourceRef = useRef(networkResource);
   const staticResourceRef = useRef(staticResource);
+  
+  // Agregar fallbacks para option
+  const option = state.option || {
+    ignoreNoContentFile: false,
+    beautifyFile: false,
+    advancedFilters: {}
+  };
+  
   const {
     downloadList,
-    option: { ignoreNoContentFile, beautifyFile, advancedFilters },
     ui: { tab, selectedResources = {} },
   } = state;
+  
+  const { ignoreNoContentFile, beautifyFile, advancedFilters } = option;
 
   const handleOnSave = useCallback(async () => {
     // Verificar que el contexto de DevTools esté disponible antes de proceder
