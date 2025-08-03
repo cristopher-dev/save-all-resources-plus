@@ -33,10 +33,18 @@ export const OptionSection = () => {
     state: {
       ui: { isSaving, selectedResources = {}, analysisCompleted, isAnalyzing },
       downloadList,
+      networkResource = [],
+      staticResource = [],
     },
   } = useStore();  const selectedCount = Object.values(selectedResources).filter(Boolean).length;
   const hasSelections = selectedCount > 0;
   const totalResources = downloadList.length;
+  const totalDetectedResources = networkResource.length + staticResource.length;
+  
+  // El botón debe estar habilitado si:
+  // 1. Hay recursos en downloadList (páginas para descargar), O
+  // 2. Se detectaron recursos automáticamente
+  const hasResourcesForDownload = totalResources > 0 || totalDetectedResources > 0;
 
   const handleDownloadSelected = useCallback(async (event) => {
     event.stopPropagation();
@@ -78,7 +86,7 @@ export const OptionSection = () => {
       {analysisCompleted && (
         <ActionRow className="stats-grid" style={{ marginBottom: '20px' }}>
           <StatsCard className="stats-card">
-            <StatsNumber>{totalResources}</StatsNumber>
+            <StatsNumber>{totalResources > 0 ? totalResources : totalDetectedResources}</StatsNumber>
             <StatsLabel>Total Resources</StatsLabel>
           </StatsCard>
           <StatsCard className="stats-card">
@@ -86,7 +94,7 @@ export const OptionSection = () => {
             <StatsLabel>Selected</StatsLabel>
           </StatsCard>
           <StatsCard className="stats-card">
-            <StatsNumber>{Math.round((selectedCount / totalResources) * 100) || 0}%</StatsNumber>
+            <StatsNumber>{Math.round((selectedCount / Math.max(totalResources, totalDetectedResources, 1)) * 100) || 0}%</StatsNumber>
             <StatsLabel>Progress</StatsLabel>
           </StatsCard>        </ActionRow>
       )}
@@ -97,7 +105,7 @@ export const OptionSection = () => {
               variant="primary"
               size="lg"
               onClick={handleDownloadSelected}
-              disabled={totalResources === 0}
+              disabled={!hasResourcesForDownload || (!analysisCompleted && !hasSelections)}
               fullWidth
               loading={isAnalyzing}
               isScanning={isAnalyzing}
@@ -125,7 +133,9 @@ export const OptionSection = () => {
             >              <FaRocket style={{ fontSize: '16px', marginRight: '8px' }} />
               {hasSelections 
                 ? `Download Selected (${selectedCount} of ${totalResources})` 
-                : `Download All (${totalResources} resources)`
+                : totalResources > 0 
+                  ? `Download All (${totalResources} resources)`
+                  : `Download Resources (${totalDetectedResources} found)`
               }
             </Button>
           ) : (            <>
@@ -155,7 +165,9 @@ export const OptionSection = () => {
         {analysisCompleted && !isSaving && (
           <ActionRow>
             <StatusIndicator>
-              <FaCheckCircle />              Analysis completed - {totalResources} resources found
+              <FaCheckCircle />              Analysis completed - {totalResources > 0 
+                ? `${totalResources} resources found`
+                : `${totalDetectedResources} resources detected`}
               {hasSelections && ` (${selectedCount} selected)`}
             </StatusIndicator>
           </ActionRow>
@@ -169,7 +181,11 @@ export const OptionSection = () => {
               borderColor: 'rgba(255, 193, 7, 0.3)'
             }}>
               <FaSpinner className="fa-spin" />              Download in progress... 
-              {hasSelections ? `${selectedCount} resources` : `${totalResources} resources`}
+              {hasSelections 
+                ? `${selectedCount} resources` 
+                : totalResources > 0 
+                  ? `${totalResources} resources`
+                  : `${totalDetectedResources} resources`}
             </StatusIndicator>
           </ActionRow>
         )}

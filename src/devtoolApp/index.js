@@ -13,6 +13,7 @@ import { useAppInit } from './hooks/useAppInit';
 import { useAppRecordingStaticResource } from './hooks/useAppRecordingStaticResource';
 import { useAppRecordingNetworkResource } from './hooks/useAppRecordingNetworkResource';
 import { useResourceAdditionMonitor } from './hooks/useResourceAdditionMonitor';
+import { useAppAnalysis } from './hooks/useAppAnalysis';
 
 export const DevToolApp = ({ initialChromeTab }) => {
   useAppInit();
@@ -21,6 +22,7 @@ export const DevToolApp = ({ initialChromeTab }) => {
   useResourceAdditionMonitor(3000); // Detectar fin de adición después de 3 segundos sin nuevos recursos
 
   const { dispatch } = useStore();
+  const { handleStartAnalysis } = useAppAnalysis();
 
   useEffect(() => {
     // console.log('[DevToolApp] initialChromeTab:', initialChromeTab);
@@ -36,10 +38,15 @@ export const DevToolApp = ({ initialChromeTab }) => {
           true
         )
       );
+      
+      // Iniciar análisis automáticamente cuando se inicializa con una URL
+      setTimeout(() => {
+        handleStartAnalysis();
+      }, 1000);
     } else {
       // console.log('[DevToolApp] No initialChromeTab provided');
     }
-  }, [initialChromeTab, dispatch]);
+  }, [initialChromeTab, dispatch, handleStartAnalysis]);
 
   return (
     <Wrapper>

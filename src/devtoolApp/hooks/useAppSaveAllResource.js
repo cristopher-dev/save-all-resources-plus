@@ -137,7 +137,46 @@ export const useAppSaveAllResource = () => {
               hasSelectedItems
             );
 
-            if (toDownload.length > 0) {
+            // Si no hay recursos detectados automáticamente pero sí hay downloadList,
+            // intentar descargar las páginas del downloadList
+            if (toDownload.length === 0 && downloadList.length > 0) {
+              console.log('[SAVE ALL]: No auto-detected resources, but downloadList available. Creating fallback resources...');
+              
+              // Crear recursos básicos a partir del downloadList
+              const fallbackResources = downloadList.map(item => ({
+                url: item.url,
+                mimeType: 'text/html',
+                content: `<!DOCTYPE html><html><head><title>Saved Page</title></head><body><h1>Page saved from: ${item.url}</h1><p>This page was saved by Resource Vault. Original content may vary.</p></body></html>`,
+                saveAs: {
+                  name: new URL(item.url).hostname + '.html',
+                  path: new URL(item.url).hostname + '.html'
+                }
+              }));
+              
+              console.log('[SAVE ALL]: Created fallback resources:', fallbackResources.length);
+              
+              if (fallbackResources.length > 0) {
+                downloadZipFile(
+                  fallbackResources,
+                  { ignoreNoContentFile, beautifyFile },
+                  (item, isDone) => {
+                    dispatch(uiActions.setStatus(`Compressed: ${item.url} Processed: ${isDone}`));
+                  },
+                  () => {
+                    downloadCompleted = true;
+                    clearTimeout(downloadTimeout);
+                    logResourceByUrl(dispatch, tab?.url || 'fallback-resources', fallbackResources);
+                    resolve();
+                  }
+                );
+              } else {
+                downloadCompleted = true;
+                clearTimeout(downloadTimeout);
+                dispatch(uiActions.setStatus('No hay recursos para descargar'));
+                resolve();
+              }
+            } else if (toDownload.length > 0) {
+              // Usar recursos detectados automáticamente si están disponibles
               downloadZipFile(
                 toDownload,
                 { ignoreNoContentFile, beautifyFile },
@@ -154,6 +193,7 @@ export const useAppSaveAllResource = () => {
             } else {
               downloadCompleted = true;
               clearTimeout(downloadTimeout);
+              dispatch(uiActions.setStatus('No hay recursos para descargar'));
               resolve();
             }
           } catch (error) {
