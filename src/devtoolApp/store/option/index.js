@@ -20,17 +20,17 @@ export const ACTIONS = {
 };
 
 export const INITIAL_STATE = {
-  ignoreNoContentFile: false,
+  ignoreNoContentFile: false, // Cambiado para incluir todos los archivos
   beautifyFile: false,
-  filterByFileType: false,
-  filterBySize: false,
+  filterByFileType: false, // Deshabilitado por defecto
+  filterBySize: false, // Deshabilitado por defecto
   includeImages: true,
   includeStylesheets: true,
   includeScripts: true,
   includeFonts: true,
   includeDocuments: true,
   minFileSize: 0, // in KB
-  maxFileSize: 10240, // 10MB in KB
+  maxFileSize: 50240, // Aumentado a 50MB en KB
   excludeDomains: [],
   customFileExtensions: [], // custom extensions to include
   integrityConfig: {

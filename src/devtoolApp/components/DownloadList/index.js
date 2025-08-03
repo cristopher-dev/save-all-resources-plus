@@ -23,6 +23,7 @@ import * as uiActions from 'devtoolApp/store/ui';
 import LogSection from './LogSection';
 import OptionSection from './OptionSection';
 import AnalysisStatus from '../AnalysisStatus';
+import DownloadSettings from '../DownloadSettings';
 import { FaTrash, FaCheckSquare, FaSquare, FaFileAlt, FaImage, FaCode, FaFont, FaPlayCircle, FaInfoCircle, FaBars, FaEye } from 'react-icons/fa';
 
 // Función para obtener el tipo de archivo y su icono
@@ -249,7 +250,9 @@ export const DownloadList = () => {
 
   return (
     <DownloadListWrapper>
-      <AnalysisStatus /> <OptionSection />
+      <AnalysisStatus />
+      <DownloadSettings />
+      <OptionSection />
       <DownloadListHeader>
         <div style={{ 
           display: 'flex', 

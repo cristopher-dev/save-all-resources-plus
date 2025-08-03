@@ -12,9 +12,9 @@ export const validateAndPrepareResources = (resources) => {
       return false;
     }
     
-    // Verificar que tenga contenido o sea un tipo de recurso válido
-    if (!resource.content && !resource.mimeType) {
-      console.warn('[VALIDATE]: Skipping resource without content or mimeType:', resource.url);
+    // Aceptar recursos incluso sin contenido si tienen información válida
+    if (!resource.content && !resource.mimeType && !resource.url.startsWith('http')) {
+      console.warn('[VALIDATE]: Skipping resource without content, mimeType, or valid URL:', resource.url);
       return false;
     }
     
@@ -35,7 +35,7 @@ export const validateAndPrepareResources = (resources) => {
     }
     
     return true;
-  }).slice(0, 50); // Limitar a 50 recursos para evitar timeouts
+  }); // Sin límite de recursos
 };
 
 // Función helper para generar nombre de archivo único basado en el origen
@@ -113,13 +113,8 @@ export const downloadZipFile = (toDownload, options, eachDoneCallback, callback,
     
     console.log('[DOWNLOAD ZIP]: Starting download of', toDownload.length, 'items');
     
-    // Limitar el número de archivos a procesar para evitar timeouts
-    const maxItems = 100; // Límite máximo de archivos
-    const itemsToProcess = toDownload.slice(0, maxItems);
-    
-    if (toDownload.length > maxItems) {
-      console.warn(`[DOWNLOAD ZIP]: Limiting download to ${maxItems} items (original: ${toDownload.length})`);
-    }
+    // Procesar todos los archivos sin límite
+    const itemsToProcess = toDownload;
     
     // Wrapper para el callback que asegura que se ejecute una sola vez
     let callbackExecuted = false;
@@ -132,8 +127,8 @@ export const downloadZipFile = (toDownload, options, eachDoneCallback, callback,
       }
     };
     
-    // Timeout de seguridad para la operación ZIP (escalado según el número de archivos)
-    const timeoutDuration = Math.min(120000, Math.max(60000, itemsToProcess.length * 5000)); // Entre 60s y 120s
+    // Timeout de seguridad escalado según el número de archivos (sin límite máximo)
+    const timeoutDuration = Math.max(180000, itemsToProcess.length * 3000); // Mínimo 3 minutos, 3s por archivo
     const zipTimeout = setTimeout(() => {
       console.error('[DOWNLOAD ZIP]: Operation timeout after', timeoutDuration / 1000, 'seconds for', itemsToProcess.length, 'items');
       safeCallback();
@@ -248,6 +243,7 @@ export const addItemsToZipWriter = (zipWriter, items, options, eachDoneCallback,
       const isNoContent = !item.content;
       const ignoreNoContentFile = !!options?.ignoreNoContentFile;
       if (isNoContent && ignoreNoContentFile) {
+        console.log('[ZIP ITEM]: Skipping item without content (ignoreNoContentFile enabled):', item.url);
         eachDoneCallback(item, true);
         addItemsToZipWriter(zipWriter, rest, options, eachDoneCallback, callback);
       } else {
@@ -255,8 +251,8 @@ export const addItemsToZipWriter = (zipWriter, items, options, eachDoneCallback,
         if (hasSize) {
           // Timeout escalado según el tamaño del archivo (más tiempo para archivos grandes)
           const itemSize = resolvedContent.size || resolvedContent['blobReader']?.size || 0;
-          const baseTimeout = 15000; // 15 segundos base
-          const sizeTimeout = Math.min(30000, Math.max(baseTimeout, itemSize / 100000)); // hasta 30s para archivos grandes
+          const baseTimeout = 30000; // 30 segundos base
+          const sizeTimeout = Math.max(baseTimeout, itemSize / 50000); // Más tiempo para archivos grandes
           
           const itemTimeout = setTimeout(() => {
             console.error('[ZIP ITEM]: Timeout adding item after', sizeTimeout / 1000, 'seconds:', item.url, 'Size:', itemSize);
@@ -416,8 +412,22 @@ export const getFileType = (url, mimeType) => {
 
 // Reemplazar lógica de filtrado en applyAdvancedFilters
 export const applyAdvancedFilters = (resources, filters) => {
-  if (!filters) return resources;
-  return resources.filter(resource => applyAllFilters(resource, filters));
+  if (!filters) {
+    console.log('[ADVANCED FILTERS]: No filters defined, including all', resources.length, 'resources');
+    return resources;
+  }
+  
+  console.log('[ADVANCED FILTERS]: Applying filters to', resources.length, 'resources. Filter config:', filters);
+  
+  const filtered = resources.filter(resource => applyAllFilters(resource, filters));
+  
+  console.log('[ADVANCED FILTERS]: Filtered', resources.length, 'resources down to', filtered.length, 'resources');
+  
+  if (filtered.length < resources.length) {
+    console.log('[ADVANCED FILTERS]: Excluded', resources.length - filtered.length, 'resources due to filters');
+  }
+  
+  return filtered;
 };
 
 // Función para descargar un archivo individual
