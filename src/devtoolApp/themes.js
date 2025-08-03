@@ -1,45 +1,45 @@
-// Paleta de colores moderna y accesible
+// Paleta de colores moderna, clara y hermosa
 export const colors = {
-  // Colores primarios
-  blue: '#1283c3',
-  blueLight: '#60a5fa',
-  blueDark: '#1e40af',
+  // Colores primarios - tonos claros y vibrantes
+  blue: '#60a5fa',
+  blueLight: '#93c5fd',
+  blueDark: '#3b82f6',
   
-  // Colores secundarios  
-  green: '#10b981',
-  greenLight: '#34d399',
-  greenDark: '#059669',
+  // Colores secundarios - verdes frescos
+  green: '#34d399',
+  greenLight: '#6ee7b7',
+  greenDark: '#10b981',
   
-  // Estados
-  red: '#ef4444',
-  redLight: '#f87171',
-  redDark: '#dc2626',
+  // Estados - colores suaves y amigables
+  red: '#f87171',
+  redLight: '#fca5a5',
+  redDark: '#ef4444',
   
-  yellow: '#f59e0b',
-  yellowLight: '#fbbf24',
-  yellowDark: '#d97706',
+  yellow: '#fbbf24',
+  yellowLight: '#fcd34d',
+  yellowDark: '#f59e0b',
   
-  // Neutrales
-  black: '#000000',
+  // Neutrales - grises más claros y suaves
+  black: '#1f2937',
   white: '#ffffff',
   gray: {
-    50: '#f9fafb',
-    100: '#f3f4f6',
-    200: '#e5e7eb',
-    300: '#d1d5db',
-    400: '#9ca3af',
-    500: '#6b7280',
-    600: '#4b5563',
-    700: '#374151',
-    800: '#1f2937',
-    900: '#111827',
+    50: '#fafafa',
+    100: '#f5f5f5',
+    200: '#e5e5e5',
+    300: '#d4d4d4',
+    400: '#a3a3a3',
+    500: '#737373',
+    600: '#525252',
+    700: '#404040',
+    800: '#262626',
+    900: '#171717',
   },
   
-  // Colores semánticos
-  success: '#10b981',
-  warning: '#f59e0b',
-  error: '#ef4444',
-  info: '#3b82f6',
+  // Colores semánticos - más claros y amigables
+  success: '#34d399',
+  warning: '#fbbf24',
+  error: '#f87171',
+  info: '#60a5fa',
 };
 
 // Utilidades de color nativas
@@ -113,60 +113,60 @@ export const generateThemeConfig = (factor, baseShade, isDark = false) => {
     
     // Sistema de colores mejorado
     colors: {
-      // Colores primarios
+      // Colores primarios - más vibrantes y claros
       primary: isDark ? colors.blueLight : colors.blue,
-      primaryHover: isDark ? lighten(0.1, colors.blueLight) : darken(0.1, colors.blue),
-      primaryLight: isDark ? rgba(colors.blueLight, 0.2) : rgba(colors.blue, 0.1),
+      primaryHover: isDark ? lighten(0.15, colors.blueLight) : lighten(0.1, colors.blue),
+      primaryLight: isDark ? rgba(colors.blueLight, 0.25) : rgba(colors.blue, 0.15),
       
-      // Colores secundarios
+      // Colores secundarios - verdes frescos
       secondary: isDark ? colors.greenLight : colors.green,
-      secondaryHover: isDark ? lighten(0.1, colors.greenLight) : darken(0.1, colors.green),
-      secondaryLight: isDark ? rgba(colors.greenLight, 0.2) : rgba(colors.green, 0.1),
+      secondaryHover: isDark ? lighten(0.15, colors.greenLight) : lighten(0.1, colors.green),
+      secondaryLight: isDark ? rgba(colors.greenLight, 0.25) : rgba(colors.green, 0.15),
       
-      // Estados
+      // Estados - colores más suaves y amigables
       success: isDark ? colors.greenLight : colors.green,
-      successHover: isDark ? lighten(0.1, colors.greenLight) : darken(0.1, colors.green),
-      successBackground: isDark ? rgba(colors.greenLight, 0.15) : colors.gray[50],
-      successBorder: isDark ? rgba(colors.greenLight, 0.3) : colors.gray[200],
+      successHover: isDark ? lighten(0.15, colors.greenLight) : lighten(0.1, colors.green),
+      successBackground: isDark ? rgba(colors.greenLight, 0.2) : '#f0fdf4',
+      successBorder: isDark ? rgba(colors.greenLight, 0.4) : '#bbf7d0',
       
       warning: isDark ? colors.yellowLight : colors.yellow,
-      warningHover: isDark ? lighten(0.1, colors.yellowLight) : darken(0.1, colors.yellow),
-      warningBackground: isDark ? rgba(colors.yellowLight, 0.15) : '#fffbeb',
-      warningBorder: isDark ? rgba(colors.yellowLight, 0.3) : '#fed7aa',
+      warningHover: isDark ? lighten(0.15, colors.yellowLight) : lighten(0.1, colors.yellow),
+      warningBackground: isDark ? rgba(colors.yellowLight, 0.2) : '#fffbeb',
+      warningBorder: isDark ? rgba(colors.yellowLight, 0.4) : '#fde68a',
       
       error: isDark ? colors.redLight : colors.red,
-      errorHover: isDark ? lighten(0.1, colors.redLight) : darken(0.1, colors.red),
-      errorBackground: isDark ? rgba(colors.redLight, 0.15) : '#fef2f2',
-      errorBorder: isDark ? rgba(colors.redLight, 0.3) : '#fecaca',
+      errorHover: isDark ? lighten(0.15, colors.redLight) : lighten(0.1, colors.red),
+      errorBackground: isDark ? rgba(colors.redLight, 0.2) : '#fef2f2',
+      errorBorder: isDark ? rgba(colors.redLight, 0.4) : '#fecaca',
       
       info: isDark ? colors.blueLight : colors.info,
-      infoBackground: isDark ? rgba(colors.blueLight, 0.15) : '#eff6ff',
-      infoBorder: isDark ? rgba(colors.blueLight, 0.3) : '#bfdbfe',
+      infoBackground: isDark ? rgba(colors.blueLight, 0.2) : '#eff6ff',
+      infoBorder: isDark ? rgba(colors.blueLight, 0.4) : '#bfdbfe',
         // Texto - TODAS LAS FUENTES EN BLANCO
       text: colors.white,
       textSecondary: colors.white,
       textMuted: colors.white,
       textDisabled: colors.white,
       
-      // Fondos
-      background: isDark ? colors.gray[900] : colors.white,
-      backgroundSecondary: isDark ? colors.gray[800] : colors.gray[50],
-      backgroundAlt: isDark ? colors.gray[800] : colors.gray[100],
-      backgroundHover: isDark ? colors.gray[700] : colors.gray[100],
+      // Fondos - más claros y aireados
+      background: isDark ? colors.gray[800] : '#fafafa',
+      backgroundSecondary: isDark ? colors.gray[700] : '#f5f5f5',
+      backgroundAlt: isDark ? colors.gray[700] : '#ffffff',
+      backgroundHover: isDark ? colors.gray[600] : '#f0f0f0',
       
-      // Superficies
-      surface: isDark ? colors.gray[800] : colors.white,
-      surfaceHover: isDark ? colors.gray[700] : colors.gray[50],
-      surfaceActive: isDark ? colors.gray[600] : colors.gray[100],
+      // Superficies - más luminosas
+      surface: isDark ? colors.gray[700] : colors.white,
+      surfaceHover: isDark ? colors.gray[600] : '#f8f8f8',
+      surfaceActive: isDark ? colors.gray[500] : '#f0f0f0',
       
-      // Bordes
-      border: isDark ? colors.gray[700] : colors.gray[200],
-      borderLight: isDark ? colors.gray[800] : colors.gray[100],
-      borderStrong: isDark ? colors.gray[600] : colors.gray[300],
+      // Bordes - más suaves
+      border: isDark ? colors.gray[600] : colors.gray[200],
+      borderLight: isDark ? colors.gray[700] : colors.gray[100],
+      borderStrong: isDark ? colors.gray[500] : colors.gray[300],
       
-      // Sombras
-      shadow: isDark ? 'rgba(0, 0, 0, 0.5)' : 'rgba(0, 0, 0, 0.1)',
-      shadowStrong: isDark ? 'rgba(0, 0, 0, 0.7)' : 'rgba(0, 0, 0, 0.15)',
+      // Sombras - más delicadas
+      shadow: isDark ? 'rgba(0, 0, 0, 0.4)' : 'rgba(0, 0, 0, 0.08)',
+      shadowStrong: isDark ? 'rgba(0, 0, 0, 0.6)' : 'rgba(0, 0, 0, 0.12)',
     },
     
     // Espaciado y sizing
