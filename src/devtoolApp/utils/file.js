@@ -3,6 +3,41 @@ import * as zip from '@zip.js/zip.js';
 import { applyAllFilters } from './fileFilters';
 import { downloadBlobDirectly, downloadIndividualFile as downloadIndividualFileHelper } from './fileDownload';
 
+// Función para validar y preparar recursos antes de la descarga
+export const validateAndPrepareResources = (resources) => {
+  return resources.filter(resource => {
+    // Filtrar recursos válidos
+    if (!resource.url) {
+      console.warn('[VALIDATE]: Skipping resource without URL');
+      return false;
+    }
+    
+    // Verificar que tenga contenido o sea un tipo de recurso válido
+    if (!resource.content && !resource.mimeType) {
+      console.warn('[VALIDATE]: Skipping resource without content or mimeType:', resource.url);
+      return false;
+    }
+    
+    // Generar saveAs si no existe
+    if (!resource.saveAs) {
+      try {
+        const url = new URL(resource.url);
+        const pathname = url.pathname || '/index.html';
+        const filename = pathname.split('/').pop() || 'resource';
+        resource.saveAs = {
+          name: filename,
+          path: filename
+        };
+      } catch (error) {
+        console.warn('[VALIDATE]: Error generating saveAs for resource:', resource.url, error);
+        return false;
+      }
+    }
+    
+    return true;
+  }).slice(0, 50); // Limitar a 50 recursos para evitar timeouts
+};
+
 // Función helper para generar nombre de archivo único basado en el origen
 export const generateOriginFilename = (origin, originIndex = 0, totalOrigins = 1) => {
   try {
@@ -78,6 +113,14 @@ export const downloadZipFile = (toDownload, options, eachDoneCallback, callback,
     
     console.log('[DOWNLOAD ZIP]: Starting download of', toDownload.length, 'items');
     
+    // Limitar el número de archivos a procesar para evitar timeouts
+    const maxItems = 100; // Límite máximo de archivos
+    const itemsToProcess = toDownload.slice(0, maxItems);
+    
+    if (toDownload.length > maxItems) {
+      console.warn(`[DOWNLOAD ZIP]: Limiting download to ${maxItems} items (original: ${toDownload.length})`);
+    }
+    
     // Wrapper para el callback que asegura que se ejecute una sola vez
     let callbackExecuted = false;
     const safeCallback = () => {
@@ -89,23 +132,43 @@ export const downloadZipFile = (toDownload, options, eachDoneCallback, callback,
       }
     };
     
-    // Timeout de seguridad para la operación ZIP
+    // Timeout de seguridad para la operación ZIP (escalado según el número de archivos)
+    const timeoutDuration = Math.min(120000, Math.max(60000, itemsToProcess.length * 5000)); // Entre 60s y 120s
     const zipTimeout = setTimeout(() => {
-      console.error('[DOWNLOAD ZIP]: Operation timeout');
+      console.error('[DOWNLOAD ZIP]: Operation timeout after', timeoutDuration / 1000, 'seconds for', itemsToProcess.length, 'items');
       safeCallback();
-    }, 45000); // 45 segundos
+    }, timeoutDuration);
     
     const wrappedCallback = () => {
       clearTimeout(zipTimeout);
       safeCallback();
     };
     
+    // Contador de progreso
+    let processedItems = 0;
+    let successfulItems = 0;
+    
+    const progressCallback = (item, isDone) => {
+      processedItems++;
+      if (isDone) successfulItems++;
+      
+      const progress = Math.round((processedItems / itemsToProcess.length) * 100);
+      console.log(`[DOWNLOAD ZIP]: Progress ${progress}% (${processedItems}/${itemsToProcess.length}) - ${isDone ? 'Success' : 'Failed'}: ${item.url}`);
+      
+      if (eachDoneCallback) {
+        eachDoneCallback(item, isDone);
+      }
+    };
+    
     addItemsToZipWriter(
       zipWriter,
-      toDownload,
+      itemsToProcess,
       options,
-      eachDoneCallback,
-      downloadCompleteZip.bind(this, zipWriter, blobWrite, wrappedCallback, customFilename)
+      progressCallback,
+      () => {
+        console.log(`[DOWNLOAD ZIP]: Completed processing. Success: ${successfulItems}/${itemsToProcess.length}`);
+        downloadCompleteZip(zipWriter, blobWrite, wrappedCallback, customFilename);
+      }
     );
     
   } catch (error) {
@@ -176,7 +239,7 @@ function prepareZipItemContent(item, options) {
   return getContentRead(item);
 }
 
-export const addItemsToZipWriter = (zipWriter, items, options, eachDoneCallback, callback) => {
+export const addItemsToZipWriter = (zipWriter, items, options, eachDoneCallback, callback, retryCount = 0) => {
   const item = items[0];
   const rest = items.slice(1);
   if (item) {
@@ -190,12 +253,23 @@ export const addItemsToZipWriter = (zipWriter, items, options, eachDoneCallback,
       } else {
         const hasSize = resolvedContent.size > 0 || resolvedContent['blobReader']?.size > 0;
         if (hasSize) {
-          // Agregar timeout específico para cada elemento
+          // Timeout escalado según el tamaño del archivo (más tiempo para archivos grandes)
+          const itemSize = resolvedContent.size || resolvedContent['blobReader']?.size || 0;
+          const baseTimeout = 15000; // 15 segundos base
+          const sizeTimeout = Math.min(30000, Math.max(baseTimeout, itemSize / 100000)); // hasta 30s para archivos grandes
+          
           const itemTimeout = setTimeout(() => {
-            console.error('[ZIP ITEM]: Timeout adding item:', item.url);
+            console.error('[ZIP ITEM]: Timeout adding item after', sizeTimeout / 1000, 'seconds:', item.url, 'Size:', itemSize);
             eachDoneCallback(item, false);
-            addItemsToZipWriter(zipWriter, rest, options, eachDoneCallback, callback);
-          }, 10000); // 10 segundos por item
+            
+            // Intentar reintentar una vez si es el primer intento
+            if (retryCount === 0) {
+              console.log('[ZIP ITEM]: Retrying item:', item.url);
+              addItemsToZipWriter(zipWriter, [item, ...rest], options, eachDoneCallback, callback, 1);
+            } else {
+              addItemsToZipWriter(zipWriter, rest, options, eachDoneCallback, callback);
+            }
+          }, sizeTimeout);
           
           zipWriter.add(item.saveAs.path, resolvedContent).then(() => {
             clearTimeout(itemTimeout);
@@ -205,7 +279,14 @@ export const addItemsToZipWriter = (zipWriter, items, options, eachDoneCallback,
             clearTimeout(itemTimeout);
             console.error('[ZIP ITEM]: Error adding item to zip:', item.url, error);
             eachDoneCallback(item, false);
-            addItemsToZipWriter(zipWriter, rest, options, eachDoneCallback, callback);
+            
+            // Intentar reintentar una vez si es el primer intento
+            if (retryCount === 0) {
+              console.log('[ZIP ITEM]: Retrying item after error:', item.url);
+              addItemsToZipWriter(zipWriter, [item, ...rest], options, eachDoneCallback, callback, 1);
+            } else {
+              addItemsToZipWriter(zipWriter, rest, options, eachDoneCallback, callback);
+            }
           });
         } else {
           console.warn('[ZIP ITEM]: Item has no size, skipping:', item.url);

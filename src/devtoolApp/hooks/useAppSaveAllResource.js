@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import * as uiActions from '../store/ui';
-import { downloadZipFile, resolveDuplicatedResources, applyAdvancedFilters, generateOriginFilename } from '../utils/file';
+import { downloadZipFile, resolveDuplicatedResources, applyAdvancedFilters, generateOriginFilename, validateAndPrepareResources } from '../utils/file';
 import { logResourceByUrl } from '../utils/resource';
 import { resetNetworkResource } from '../store/networkResource';
 import { resetStaticResource } from '../store/staticResource';
@@ -45,7 +45,7 @@ export const useAppSaveAllResource = () => {
       console.warn('[SAVE ALL]: Safety timeout reached, resetting isSaving state');
       dispatch(uiActions.setIsSaving(false));
       dispatch(uiActions.setStatus('Operación de guardado interrumpida por timeout'));
-    }, 60000); // 60 segundos
+    }, 180000); // Aumentado a 180 segundos (3 minutos)
 
     try {
       const hasSelectedItems = Object.values(selectedResources).some((isSelected) => isSelected);
@@ -60,11 +60,11 @@ export const useAppSaveAllResource = () => {
 
           const downloadTimeout = setTimeout(() => {
             if (!downloadCompleted) {
-              console.error('[SAVE ALL]: Download timeout for selected resources');
-              dispatch(uiActions.setStatus(`Timeout en descarga de recursos seleccionados`));
+              console.error('[SAVE ALL]: Download timeout for selected resources after 120 seconds');
+              dispatch(uiActions.setStatus(`Timeout en descarga de recursos seleccionados - intentando finalizar...`));
               resolve();
             }
-          }, 30000);
+          }, 120000); // Aumentado a 120 segundos
 
           try {
             const allResources = [...(networkResource || []), ...(staticResource || [])];
@@ -84,8 +84,21 @@ export const useAppSaveAllResource = () => {
             });
 
             if (toDownload.length) {
+              // Validar y preparar recursos antes de la descarga
+              const validatedResources = validateAndPrepareResources(toDownload);
+              console.log('[SAVE ALL]: Validated resources:', validatedResources.length, 'of', toDownload.length);
+              
+              if (validatedResources.length === 0) {
+                console.warn('[SAVE ALL]: No valid resources to download');
+                downloadCompleted = true;
+                clearTimeout(downloadTimeout);
+                dispatch(uiActions.setStatus('No hay recursos válidos para descargar'));
+                resolve();
+                return;
+              }
+              
               downloadZipFile(
-                toDownload,
+                validatedResources,
                 { ignoreNoContentFile, beautifyFile },
                 (item, isDone) => {
                   dispatch(uiActions.setStatus(`Compressed: ${item.url} Processed: ${isDone}`));
@@ -93,7 +106,7 @@ export const useAppSaveAllResource = () => {
                 () => {
                   downloadCompleted = true;
                   clearTimeout(downloadTimeout);
-                  toDownload.forEach((resource) => {
+                  validatedResources.forEach((resource) => {
                     logResourceByUrl(dispatch, resource.url, [resource]);
                   });
                   resolve();
@@ -120,11 +133,11 @@ export const useAppSaveAllResource = () => {
 
           const downloadTimeout = setTimeout(() => {
             if (!downloadCompleted) {
-              console.error('[SAVE ALL]: Download timeout for all resources');
-              dispatch(uiActions.setStatus(`Timeout en descarga de todos los recursos`));
+              console.error('[SAVE ALL]: Download timeout for all resources after 120 seconds');
+              dispatch(uiActions.setStatus(`Timeout en descarga de todos los recursos - intentando finalizar...`));
               resolve();
             }
-          }, 30000);
+          }, 120000); // Aumentado a 120 segundos
 
           try {
             const allResources = [...(networkResource || []), ...(staticResource || [])];
@@ -176,9 +189,22 @@ export const useAppSaveAllResource = () => {
                 resolve();
               }
             } else if (toDownload.length > 0) {
+              // Validar y preparar recursos detectados automáticamente
+              const validatedResources = validateAndPrepareResources(toDownload);
+              console.log('[SAVE ALL]: Validated auto-detected resources:', validatedResources.length, 'of', toDownload.length);
+              
+              if (validatedResources.length === 0) {
+                console.warn('[SAVE ALL]: No valid auto-detected resources');
+                downloadCompleted = true;
+                clearTimeout(downloadTimeout);
+                dispatch(uiActions.setStatus('No hay recursos válidos detectados automáticamente'));
+                resolve();
+                return;
+              }
+              
               // Usar recursos detectados automáticamente si están disponibles
               downloadZipFile(
-                toDownload,
+                validatedResources,
                 { ignoreNoContentFile, beautifyFile },
                 (item, isDone) => {
                   dispatch(uiActions.setStatus(`Compressed: ${item.url} Processed: ${isDone}`));
@@ -186,7 +212,7 @@ export const useAppSaveAllResource = () => {
                 () => {
                   downloadCompleted = true;
                   clearTimeout(downloadTimeout);
-                  logResourceByUrl(dispatch, tab?.url || 'all-resources', toDownload);
+                  logResourceByUrl(dispatch, tab?.url || 'all-resources', validatedResources);
                   resolve();
                 }
               );
